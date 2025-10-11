@@ -1,35 +1,53 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
+import { getXrm } from "./utils/xrmUtils";
+import "./App.css";
+
+type UserInfo = {
+  userId: string;
+  userName: string;
+  organizationName: string;
+};
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [isDataverse, setIsDataverse] = useState(false);
+
+  useEffect(() => {
+    const xrm = getXrm();
+    if (!xrm) {
+      console.log("🧩 ローカル環境で実行中");
+      return; // Dataverse外（ローカル）
+    }
+
+    try {
+      const context = xrm.Utility.getGlobalContext();
+      const userId = context.userSettings.userId.replace(/[{}]/g, "");
+      const userName = context.userSettings.userName;
+      const organizationName = context.organizationSettings.uniqueName;
+
+      setUserInfo({ userId, userName, organizationName });
+      setIsDataverse(true);
+    } catch (error) {
+      console.error("❌ ユーザー情報の取得に失敗しました：", error);
+    }
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="app-container">
+      <h1>Dataverse ユーザー情報</h1>
+      <hr />
+
+      {isDataverse && userInfo ? (
+        <div className="user-info">
+          <p><strong>ユーザー名：</strong>{userInfo.userName}</p>
+          <p><strong>ユーザーID：</strong>{userInfo.userId}</p>
+          <p><strong>組織名：</strong>{userInfo.organizationName}</p>
+        </div>
+      ) : (
+        <p style={{ color: "#666" }}>🌐 現在はローカル環境で実行中です。</p>
+      )}
+    </div>
+  );
 }
 
-export default App
+export default App;
