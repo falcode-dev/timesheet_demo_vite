@@ -1,14 +1,26 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useDataverse } from "./hooks/useDataverse";
+// import { useDataverse } from "./hooks/useDataverse";
+import { Button } from "./component/button/Button";
+import * as FaIcons from "react-icons/fa";
 
 const queryClient = new QueryClient();
 
 function DataverseApp() {
-  const { user, workOrderList, timeEntryList, optionSets } = useDataverse();
+  // const { user, workOrderList, timeEntryList, optionSets } = useDataverse();
 
   return (
     <div style={{ padding: 24 }}>
-      <h1>Dataverse データ取得デモ</h1>
+      <Button
+        label="保存"
+        color="primary"
+        icon={<FaIcons.FaSave />}
+      // disabled={true}
+      />
+      <Button
+        label="保存"
+        color="secondary"
+      />
+      {/* <h1>Dataverse データ取得デモ</h1>
 
       {user ? (
         <>
@@ -36,7 +48,7 @@ function DataverseApp() {
       </ul>
 
       <h3>OptionSets</h3>
-      <pre>{JSON.stringify(optionSets, null, 2)}</pre>
+      <pre>{JSON.stringify(optionSets, null, 2)}</pre> */}
     </div>
   );
 }

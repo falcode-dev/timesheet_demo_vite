@@ -9,12 +9,6 @@ export const dataverseClient = {
         return result.entities;
     },
 
-    /** --------------------------------------------------
-     * 🎛️ OptionSet（選択肢列）取得
-     * --------------------------------------------------
-     * 複数列対応・Map/Array両対応
-     * useOptionSets の実装方針を踏襲
-     */
     async getOptionSets(entity: string, fields: string[]) {
         const xrm = getXrm();
         if (!xrm) throw new Error("Xrm 環境が存在しません。");
@@ -23,7 +17,6 @@ export const dataverseClient = {
             const metadata = await xrm.Utility.getEntityMetadata(entity, fields);
             if (!metadata?.Attributes) return {};
 
-            // Dataverse環境によってはMap型か配列型のどちらかになる
             const attributes =
                 typeof metadata.Attributes.get === "function"
                     ? fields.map((f) => metadata.Attributes.get(f)).filter(Boolean)
@@ -43,7 +36,6 @@ export const dataverseClient = {
                 }));
             };
 
-            // フィールドごとのOptionSetをまとめて返す
             const result: Record<string, { value: string; label: string }[]> = {};
             fields.forEach((field) => {
                 result[field] = getOptions(field);
@@ -53,6 +45,33 @@ export const dataverseClient = {
         } catch (err) {
             console.error(`OptionSet取得失敗 (${entity}):`, err);
             throw err;
+        }
+    },
+
+    /** --------------------------------------------------
+     * 🌐 TimeZone 定義の取得（別エンティティから取得）
+     * --------------------------------------------------
+     * TimeZone は OptionSet ではなく timezonedefinition エンティティに存在
+     */
+    async getTimeZones() {
+        const xrm = getXrm();
+        if (!xrm) throw new Error("Xrm 環境が存在しません。");
+
+        try {
+            // 例: timezonedefinition の DisplayName と StandardName を取得
+            const result = await xrm.WebApi.retrieveMultipleRecords(
+                "timezonedefinition",
+                "?$select=timezonecode,standardname,userinterfacename"
+            );
+
+            return result.entities.map((t: any) => ({
+                value: String(t.timezonecode),
+                // label: t.displayname || t.standardname || `(コード: ${t.timezonecode})`,
+                label: t.userinterfacename,
+            }));
+        } catch (err) {
+            console.error("TimeZone取得失敗:", err);
+            return [];
         }
     },
 };
