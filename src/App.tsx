@@ -1,53 +1,50 @@
-import { useEffect, useState } from "react";
-import { getXrm } from "./utils/xrmUtils";
-import "./App.css";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useDataverse } from "./hooks/useDataverse";
 
-type UserInfo = {
-  userId: string;
-  userName: string;
-  organizationName: string;
-};
+const queryClient = new QueryClient();
 
-function App() {
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-  const [isDataverse, setIsDataverse] = useState(false);
-
-  useEffect(() => {
-    const xrm = getXrm();
-    if (!xrm) {
-      console.log("🧩 ローカル環境で実行中");
-      return; // Dataverse外（ローカル）
-    }
-
-    try {
-      const context = xrm.Utility.getGlobalContext();
-      const userId = context.userSettings.userId.replace(/[{}]/g, "");
-      const userName = context.userSettings.userName;
-      const organizationName = context.organizationSettings.uniqueName;
-
-      setUserInfo({ userId, userName, organizationName });
-      setIsDataverse(true);
-    } catch (error) {
-      console.error("❌ ユーザー情報の取得に失敗しました：", error);
-    }
-  }, []);
+function DataverseApp() {
+  const { user, workOrderList, timeEntryList, optionSets } = useDataverse();
 
   return (
-    <div className="app-container">
-      <h1>Dataverse ユーザー情報</h1>
-      <hr />
+    <div style={{ padding: 24 }}>
+      <h1>Dataverse データ取得デモ</h1>
 
-      {isDataverse && userInfo ? (
-        <div className="user-info">
-          <p><strong>ユーザー名：</strong>{userInfo.userName}</p>
-          <p><strong>ユーザーID：</strong>{userInfo.userId}</p>
-          <p><strong>組織名：</strong>{userInfo.organizationName}</p>
-        </div>
+      {user ? (
+        <>
+          <p>👤 {user.userName}</p>
+          <p>組織: {user.organizationName}</p>
+        </>
       ) : (
-        <p style={{ color: "#666" }}>🌐 現在はローカル環境で実行中です。</p>
+        <p>🌐 ローカル環境です</p>
       )}
+
+      <h3>WorkOrder</h3>
+      <ul>
+        {workOrderList.map((a) => (
+          <li key={a.id}>{a.name}</li>
+        ))}
+      </ul>
+
+      <h3>TimeEntry</h3>
+      <ul>
+        {timeEntryList.map((b) => (
+          <li key={b.id}>
+            {b.name}（{b.start} - {b.end}）
+          </li>
+        ))}
+      </ul>
+
+      <h3>OptionSets</h3>
+      <pre>{JSON.stringify(optionSets, null, 2)}</pre>
     </div>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <DataverseApp />
+    </QueryClientProvider>
+  );
+}
