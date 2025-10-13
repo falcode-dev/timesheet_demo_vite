@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-// import { useDataverse } from "./hooks/useDataverse";
 import { Button } from "./component/button/Button";
 import { Select } from "./component/select/Select";
 import type { SelectOption } from "./component/select/Select";
@@ -9,14 +8,17 @@ import type { TabOption } from "./component/tab/Tabs";
 import { Input } from "./component/input/Input";
 import { Textarea } from "./component/textarea/Textarea";
 import * as FaIcons from "react-icons/fa";
+import "./App.css"; // ✅ ここにheader用CSSを入れる
 
 const queryClient = new QueryClient();
 
 function DataverseApp() {
-  // const { user, workOrderList, timeEntryList, optionSets } = useDataverse();
+  // const { user, workOrderList } = useDataverse();
 
-  const [selected, setSelected] = useState("");
-  const options: SelectOption[] = [
+  // ✅ 対象WOリスト（仮）
+  const [selectedWO, setSelectedWO] = useState("");
+  const workOrders: SelectOption[] = [
+    { value: "all", label: "すべて" },
     { value: "1", label: "案件A" },
     { value: "2", label: "案件B" },
     { value: "3", label: "案件C" },
@@ -33,78 +35,60 @@ function DataverseApp() {
   const [notes, setNotes] = useState("");
 
   return (
-    <div>
+    <div className="app-container">
+      {/* =============================
+          ヘッダー（Time Sheet + WO選択 + Upload）
+      ============================= */}
+      <header className="app-header">
+        <div className="header-left">
+          <h1 className="header-title">Time Sheet</h1>
+        </div>
 
-      <Button
-        label="保存"
-        color="primary"
-        icon={<FaIcons.FaSave />}
-      // disabled={true}
-      />
-      <Button
-        label="保存"
-        color="secondary"
-      />
-      <Select
-        options={options}
-        value={selected}
-        onChange={setSelected}
-        placeholder="対象WOを選択"
-      />
+        <div className="header-right">
+          <span className="header-label">対象WO</span>
+          <Select
+            options={workOrders}
+            value={selectedWO}
+            onChange={setSelectedWO}
+            placeholder="対象WOを選択"
+            className="wo-select"
+          />
+          <Button
+            label="アップロード"
+            color="primary"
+            icon={<FaIcons.FaUpload />}
+          />
+        </div>
+      </header>
 
-      <Tabs
-        tabs={tabOptions}
-        activeTab={active}
-        onChange={setActive}
-        className="custom-tab"
-      />
+      {/* =============================
+          以下コンテンツ部分
+      ============================= */}
+      <main className="main-content">
+        <Tabs
+          tabs={tabOptions}
+          activeTab={active}
+          onChange={setActive}
+          className="custom-tab"
+        />
 
-      <Input
-        label="氏名"
-        value={name}
-        onChange={setName}
-        placeholder="山田 太郎"
-      />
+        <Input
+          label="氏名"
+          value={name}
+          onChange={setName}
+          placeholder="山田 太郎"
+        />
 
-      <Textarea
-        label="備考"
-        value={notes}
-        onChange={setNotes}
-        placeholder="作業内容や注意事項などを入力してください"
-        rows={4}
-        showCount={true}
-        maxLength={2000}
-      />
-
-      {/* <h1>Dataverse データ取得デモ</h1>
-
-      {user ? (
-        <>
-          <p>👤 {user.userName}</p>
-          <p>組織: {user.organizationName}</p>
-        </>
-      ) : (
-        <p>🌐 ローカル環境です</p>
-      )}
-
-      <h3>WorkOrder</h3>
-      <ul>
-        {workOrderList.map((a) => (
-          <li key={a.id}>{a.name}</li>
-        ))}
-      </ul>
-
-      <h3>TimeEntry</h3>
-      <ul>
-        {timeEntryList.map((b) => (
-          <li key={b.id}>
-            {b.name}（{b.start} - {b.end}）
-          </li>
-        ))}
-      </ul>
-
-      <h3>OptionSets</h3>
-      <pre>{JSON.stringify(optionSets, null, 2)}</pre> */}
+        <Textarea
+          label="備考"
+          value={notes}
+          onChange={setNotes}
+          placeholder="作業内容や注意事項などを入力してください"
+          rows={4}
+          showCount={true}
+          maxLength={2000}
+        />
+      </main>
     </div>
   );
 }

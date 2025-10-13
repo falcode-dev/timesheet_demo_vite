@@ -12,7 +12,6 @@ type InputProps = {
 };
 
 export const Input: React.FC<InputProps> = ({
-    label,
     value = "",
     onChange,
     placeholder = "",
@@ -22,7 +21,6 @@ export const Input: React.FC<InputProps> = ({
 }) => {
     return (
         <div className={`input-wrapper ${className}`.trim()}>
-            {/* {label && <label className="input-label">{label}</label>} */}
             <input
                 type={type}
                 value={value}

@@ -14,7 +14,6 @@ type TextareaProps = {
 };
 
 export const Textarea: React.FC<TextareaProps> = ({
-    label,
     value = "",
     onChange,
     placeholder = "",
@@ -32,7 +31,6 @@ export const Textarea: React.FC<TextareaProps> = ({
 
     return (
         <div className={`textarea-wrapper ${className}`.trim()}>
-            {/* {label && <label className="textarea-label">{label}</label>} */}
             {showCount && (
                 <span
                     className={`textarea-count ${isOverLimit ? "over-limit" : ""}`}
