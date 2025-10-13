@@ -1,0 +1,129 @@
+/* ======================
+   セレクト全体
+====================== */
+.select-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.select-display {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 35px;
+    width: 300px;
+    padding: 0 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: #fff;
+    transition: 0.2s ease;
+    cursor: pointer;
+    user-select: none;
+    box-sizing: border-box;
+}
+
+.select-wrapper.open .select-display {
+    border-color: rgb(0, 137, 186);
+    box-shadow: 0 0 0 2px rgba(0, 137, 186, 0.15);
+}
+
+.select-wrapper.disabled .select-display {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ======================
+   テキスト
+====================== */
+.select-text {
+    flex: 1;
+    font-size: 14px;
+    color: rgb(0, 137, 186);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.select-text.placeholder {
+    color: #999;
+}
+
+/* ======================
+   アイコン
+====================== */
+.select-icon {
+    display: flex;
+    align-items: center;
+    color: rgb(0, 137, 186);
+    transition: transform 0.25s ease;
+}
+
+.select-wrapper.open .select-icon {
+    transform: rotate(180deg);
+}
+
+/* ======================
+   ドロップダウンリスト
+====================== */
+.select-option-list {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    width: 100%;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    z-index: 20;
+    overflow-y: auto;
+    animation: dropdown-fade 0.15s ease-out;
+}
+
+@keyframes dropdown-fade {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.select-option {
+    padding: 8px 12px;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.select-option:hover {
+    background-color: #eaf6fb;
+}
+
+.select-option.selected {
+    background-color: #e0f2f9;
+    color: rgb(0, 137, 186);
+    font-weight: bold;
+}
+
+.select-option.empty {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    padding: 10px 0;
+}
+
+/* スクロールバー */
+.select-option-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.select-option-list::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}

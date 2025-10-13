@@ -1,6 +1,9 @@
+import React, { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 // import { useDataverse } from "./hooks/useDataverse";
 import { Button } from "./component/button/Button";
+import { Select } from "./component/select/Select";
+import type { SelectOption } from "./component/select/Select";
 import * as FaIcons from "react-icons/fa";
 
 const queryClient = new QueryClient();
@@ -8,8 +11,16 @@ const queryClient = new QueryClient();
 function DataverseApp() {
   // const { user, workOrderList, timeEntryList, optionSets } = useDataverse();
 
+  const [selected, setSelected] = useState("");
+  const options: SelectOption[] = [
+    { value: "1", label: "案件A" },
+    { value: "2", label: "案件B" },
+    { value: "3", label: "案件C" },
+  ];
+
   return (
-    <div style={{ padding: 24 }}>
+    <div>
+
       <Button
         label="保存"
         color="primary"
@@ -20,6 +31,13 @@ function DataverseApp() {
         label="保存"
         color="secondary"
       />
+      <Select
+        options={options}
+        value={selected}
+        onChange={setSelected}
+        placeholder="対象WOを選択"
+      />
+
       {/* <h1>Dataverse データ取得デモ</h1>
 
       {user ? (
