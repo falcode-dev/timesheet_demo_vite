@@ -7,6 +7,7 @@ import { Select } from "./component/select/Select";
 import type { SelectOption } from "./component/select/Select";
 import { Input } from "./component/input/Input";
 import { Textarea } from "./component/textarea/Textarea";
+import { CalendarView } from "./product/calendar/CalendarView";
 import * as FaIcons from "react-icons/fa";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import "./App.css";
@@ -32,19 +33,8 @@ function DataverseApp() {
   ];
 
   const [viewTab, setViewTab] = useState("week");
-  const viewTabOptions: TabOption[] = [
-    { value: "day", label: "1日" },
-    { value: "3days", label: "3日" },
-    { value: "week", label: "週" },
-  ];
-
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [name, setName] = useState("");
-  const [notes, setNotes] = useState("");
 
-  // =============================
-  // 日付操作
-  // =============================
   const handlePrev = () => {
     const prev = new Date(currentDate);
     prev.setDate(prev.getDate() - 1);
@@ -58,9 +48,16 @@ function DataverseApp() {
   };
 
   const handleToday = () => setCurrentDate(new Date());
-
   const formatDate = (d: Date) =>
     `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+
+  const events = [
+    { title: "会議", start: "2025-10-12T10:00:00", end: "2025-10-12T11:00:00" },
+    { title: "作業A", start: "2025-10-12T13:00:00", end: "2025-10-12T15:00:00" },
+  ];
+
+  const [name, setName] = useState("");
+  const [notes, setNotes] = useState("");
 
   // =============================
   // JSX
@@ -68,7 +65,7 @@ function DataverseApp() {
   return (
     <div className="app-container">
       {/* =============================
-          ヘッダー（Time Sheet + WO選択 + Upload）
+          ヘッダー
       ============================= */}
       <header className="app-header">
         <div className="header-left">
@@ -98,7 +95,6 @@ function DataverseApp() {
       <section className="content-card">
         {/* ✅ コンテンツ上部 */}
         <div className="tab-header">
-          {/* 左：Tabs + 新規作成 */}
           <div className="tab-header-left">
             <Tabs
               tabs={mainTabOptions}
@@ -115,16 +111,10 @@ function DataverseApp() {
             />
           </div>
 
-          {/* ===========================
-              右エリア：日付ナビゲーション + ビュー切替
-          =========================== */}
           <div className="tab-header-right">
-            {/* 今日ボタン */}
             <button className="today-button" onClick={handleToday}>
               <FaIcons.FaCalendarDay className="icon" /> 今日
             </button>
-
-            {/* 前／次ナビゲーション */}
             <button className="arrow-button" onClick={handlePrev}>
               <IoIosArrowBack />
             </button>
@@ -132,13 +122,11 @@ function DataverseApp() {
               <IoIosArrowForward />
             </button>
 
-            {/* 日付表示 */}
             <div className="date-display">
               {formatDate(currentDate)}
               <FaIcons.FaRegCalendarAlt className="date-icon" />
             </div>
 
-            {/* ビュー切り替えタブ */}
             <div className="view-tabs">
               <button
                 className={`view-tab ${viewTab === "day" ? "active" : ""}`}
@@ -168,10 +156,14 @@ function DataverseApp() {
           <aside className="sidebar-container">
             <h2 className="sidebar-title">検索</h2>
 
-            {/* ラジオボタン */}
             <div className="sidebar-radios">
               <label>
-                <input type="radio" name="searchType" value="name" defaultChecked />
+                <input
+                  type="radio"
+                  name="searchType"
+                  value="name"
+                  defaultChecked
+                />
                 ユーザー名
               </label>
               <label>
@@ -180,13 +172,8 @@ function DataverseApp() {
               </label>
             </div>
 
-            {/* ✅ あなたの Input コンポーネントを使用 */}
-            <Input
-              placeholder="ユーザー名を入力"
-              className="sidebar-input"
-            />
+            <Input placeholder="ユーザー名を入力" className="sidebar-input" />
 
-            {/* 自分情報 */}
             <div className="sidebar-self">
               <div className="sidebar-self-top">
                 <input
@@ -209,27 +196,19 @@ function DataverseApp() {
             </div>
           </aside>
 
-          {/* === メインフォーム === */}
-          <div className="content-form">
-            <Input
-              label="氏名"
-              value={name}
-              onChange={setName}
-              placeholder="山田 太郎"
-            />
-            <Textarea
-              label="備考"
-              value={notes}
-              onChange={setNotes}
-              placeholder="作業内容や注意事項などを入力してください"
-              rows={4}
-              showCount={true}
-              maxLength={2000}
+          {/* === カレンダーエリア === */}
+          <div className="content-main">
+            <CalendarView
+              viewMode={
+                viewTab === "day" ? "1日" : viewTab === "3days" ? "3日" : "週"
+              }
+              currentDate={currentDate}
+              onDateChange={setCurrentDate}
+              events={events}
             />
           </div>
         </div>
 
-        {/* ✅ コンテンツ下部 */}
         {/* ✅ コンテンツ下部 */}
         <div className="content-bottom">
           <div className="content-bottom-left">
