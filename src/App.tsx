@@ -4,6 +4,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Button } from "./component/button/Button";
 import { Select } from "./component/select/Select";
 import type { SelectOption } from "./component/select/Select";
+import { Tabs } from "./component/tab/Tabs";
+import type { TabOption } from "./component/tab/Tabs";
 import * as FaIcons from "react-icons/fa";
 
 const queryClient = new QueryClient();
@@ -16,6 +18,13 @@ function DataverseApp() {
     { value: "1", label: "案件A" },
     { value: "2", label: "案件B" },
     { value: "3", label: "案件C" },
+  ];
+
+  const [active, setActive] = useState("week");
+  const tabOptions: TabOption[] = [
+    { value: "day", label: "1日" },
+    { value: "3days", label: "3日" },
+    { value: "week", label: "週" },
   ];
 
   return (
@@ -36,6 +45,13 @@ function DataverseApp() {
         value={selected}
         onChange={setSelected}
         placeholder="対象WOを選択"
+      />
+
+      <Tabs
+        tabs={tabOptions}
+        activeTab={active}
+        onChange={setActive}
+        className="custom-tab"
       />
 
       {/* <h1>Dataverse データ取得デモ</h1>
