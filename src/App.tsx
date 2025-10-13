@@ -7,6 +7,7 @@ import type { SelectOption } from "./component/select/Select";
 import { Tabs } from "./component/tab/Tabs";
 import type { TabOption } from "./component/tab/Tabs";
 import { Input } from "./component/input/Input";
+import { Textarea } from "./component/textarea/Textarea";
 import * as FaIcons from "react-icons/fa";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ function DataverseApp() {
   ];
 
   const [name, setName] = useState("");
+  const [notes, setNotes] = useState("");
 
   return (
     <div>
@@ -62,6 +64,16 @@ function DataverseApp() {
         value={name}
         onChange={setName}
         placeholder="山田 太郎"
+      />
+
+      <Textarea
+        label="備考"
+        value={notes}
+        onChange={setNotes}
+        placeholder="作業内容や注意事項などを入力してください"
+        rows={4}
+        showCount={true}
+        maxLength={2000}
       />
 
       {/* <h1>Dataverse データ取得デモ</h1>

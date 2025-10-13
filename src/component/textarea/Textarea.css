@@ -1,0 +1,105 @@
+:root {
+    --main-color: rgb(0, 137, 186);
+    --border-color: #ccc;
+    --disabled-bg: #f4f4f4;
+    --disabled-text: #aaa;
+    --error-color: #d9534f;
+}
+
+/* ======================
+   コンテナ
+====================== */
+.textarea-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    width: 300px;
+    font-family: "Inter", "Noto Sans JP", sans-serif;
+    box-sizing: border-box;
+}
+
+.textarea-label {
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: var(--main-color);
+    user-select: none;
+}
+
+/* ======================
+   テキストエリア本体
+====================== */
+.textarea-container {
+    position: relative;
+    width: 100%;
+}
+
+.textarea-field {
+    width: 300px;
+    padding: 8px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: #fff;
+    color: #333;
+    font-size: 0.9rem;
+    resize: vertical;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    line-height: 1.5;
+    min-height: 80px;
+}
+
+/* hover */
+.textarea-field:hover {
+    border-color: var(--main-color);
+}
+
+/* focus */
+.textarea-field:focus {
+    outline: none;
+    border-color: var(--main-color);
+    box-shadow: 0 0 0 2px rgba(0, 137, 186, 0.15);
+}
+
+/* disabled */
+.textarea-field.disabled {
+    background-color: var(--disabled-bg);
+    color: var(--disabled-text);
+    cursor: not-allowed;
+}
+
+/* placeholder */
+.textarea-field::placeholder {
+    color: #aaa;
+}
+
+/* ======================
+   カウンター
+====================== */
+.textarea-count {
+    /* position: absolute; */
+    /* bottom: 6px; */
+    /* right: 10px; */
+    font-size: 0.75rem;
+    color: #999;
+    pointer-events: none;
+}
+
+.textarea-count.over-limit {
+    color: var(--error-color);
+    font-weight: bold;
+}
+
+/* ======================
+   レスポンシブ
+====================== */
+@media (max-width: 480px) {
+    .textarea-field {
+        font-size: 0.85rem;
+        padding: 6px 8px;
+    }
+
+    .textarea-count {
+        font-size: 0.7rem;
+    }
+}
