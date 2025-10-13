@@ -13,7 +13,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  /* padding: 0 10px; */
   height: 70px;
 }
 
@@ -51,10 +50,7 @@ body {
   background: #fff;
   border-radius: 8px;
   border: 1px solid #ccc;
-  /* box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08); */
-  /* margin: 0 10px; */
-  padding: 20px;
-  /* max-width: 1000px; */
+  padding: 10px;
   width: 100%;
   box-sizing: border-box;
   display: flex;
@@ -84,41 +80,267 @@ body {
 }
 
 /* =============================
+   タブヘッダー全体
+============================= */
+.tab-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* =============================
+   左エリア（タブ＋新規作成）
+============================= */
+.tab-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  /* ✅ タブとボタンを分離 */
+}
+
+.main-tabs {
+  display: flex;
+  border: 1px solid var(--main-color);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.main-tabs .tab-item {
+  min-width: 100px;
+  padding: 6px 14px;
+  font-weight: 600;
+  color: var(--main-color);
+  background-color: white;
+  border: none;
+  border-right: 1px solid var(--main-color);
+  cursor: pointer;
+  transition: 0.2s ease;
+  text-align: center;
+}
+
+.main-tabs .tab-item.active {
+  background-color: var(--main-color);
+  color: white;
+}
+
+.main-tabs .tab-item:last-child {
+  border-right: none;
+}
+
+/* ✅ タイムエントリボタン（独立版） */
+/* .add-entry-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background-color: var(--main-color);
+  color: white;
+  border: 1px solid var(--main-color);
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.add-entry-button .icon {
+  color: inherit;
+  font-size: 0.9rem;
+}
+
+.add-entry-button:hover {
+  background-color: white;
+  color: var(--main-color);
+} */
+
+/* =============================
+   右エリア（日付ナビ＋ビュー切替）
+============================= */
+.tab-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* 今日ボタン */
+.today-button {
+  background: none;
+  border: none;
+  color: var(--main-color);
+  font-size: 15px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 6px 10px;
+  transition: 0.2s;
+  border-radius: 6px;
+}
+
+.today-button:hover {
+  opacity: 0.75;
+  background-color: rgba(0, 137, 186, 0.08);
+}
+
+.today-button .icon {
+  font-size: 1rem;
+  margin-bottom: 1px;
+}
+
+/* ＜ ＞ ボタン */
+.arrow-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--main-color);
+  font-weight: bold;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: 0.2s;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+}
+
+.arrow-button:hover {
+  background-color: rgba(0, 137, 186, 0.1);
+}
+
+/* ===== 日付表示 ===== */
+.date-display {
+  height: 35px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--main-color);
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 6px 10px;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.date-icon {
+  font-size: 1rem;
+  margin-bottom: 1px;
+}
+
+/* ===== ビュータブ ===== */
+.view-tabs {
+  display: flex;
+  border: 1px solid var(--main-color);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.view-tab {
+  padding: 6px 10px;
+  font-weight: 600;
+  color: var(--main-color);
+  background-color: white;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+  text-align: center;
+  min-width: 50px;
+}
+
+.view-tab.active {
+  background-color: var(--main-color);
+  color: white;
+}
+
+.view-tab:not(:last-child) {
+  border-right: 1px solid var(--main-color);
+}
+
+.view-tab:hover:not(.active) {
+  background-color: #f0f9ff;
+}
+
+/* =============================
+   コンテンツ下部エリア
+============================= */
+.content-bottom {
+  /* display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  flex-wrap: wrap;
+  gap: 10px; */
+
+  display: flex;
+  margin-top: 10px;
+  gap: 10px;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+/* 左側のボタン群 */
+.content-bottom-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* 右端の3点リーダーボタン */
+.content-bottom-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.menu-button {
+  background: none;
+  border: none;
+  color: var(--main-color);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: 0.2s ease;
+  padding: 6px 8px;
+  border-radius: 6px;
+}
+
+.menu-button:hover {
+  background-color: rgba(0, 137, 186, 0.08);
+}
+
+/* =============================
    レスポンシブ対応
 ============================= */
 @media (max-width: 768px) {
-  /* .content-card {
-    width: 95%;
-    padding: 16px;
-    gap: 16px;
-  } */
-
-  .content-top h2,
-  .content-middle h3,
-  .content-bottom h3 {
-    font-size: 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  /* .content-card {
-    width: 95%;
-    padding: 14px;
-    border-radius: 8px;
-    gap: 14px;
-  } */
-
-  .content-top,
-  .content-middle,
   .content-bottom {
-    gap: 12px;
+    flex-direction: row;
+    align-items: center;
   }
 
-  .content-top h2,
-  .content-middle h3,
-  .content-bottom h3 {
-    font-size: 0.95rem;
-    text-align: center;
+  .content-bottom .btn {
+    width: 100%;
+    height: 45px;
+  }
+
+  .content-bottom-left {
+    justify-content: center;
+    flex-wrap: nowrap;
+    width: 100%;
+  }
+
+  .content-bottom-right {
+    justify-content: center;
+  }
+
+  .menu-button {
+    font-size: 1.4rem;
   }
 }
 
@@ -126,8 +348,6 @@ body {
 /* =============================
    レスポンシブ対応
 ============================= */
-
-/* ▼ タブレット（768px以下） */
 @media (max-width: 768px) {
   .app-header {
     flex-direction: column;
@@ -152,7 +372,6 @@ body {
     font-size: 0.85rem;
   }
 
-  /* ✅ タブレット時はボタンが行幅いっぱい */
   .header-right button {
     width: 100%;
     max-width: 100%;
@@ -166,9 +385,45 @@ body {
   .header-right .select-display {
     width: 100%;
   }
+
+  .tab-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .tab-header-left,
+  .tab-header-right {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .tab-header-left {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .main-tabs,
+  .view-tabs {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .view-tab {
+    width: 100%;
+  }
+
+  .add-entry-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .date-display {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
-/* ▼ スマホ（480px以下） */
 @media (max-width: 480px) {
   .app-header {
     flex-direction: column;
@@ -193,11 +448,8 @@ body {
 
   .header-label {
     font-size: 0.85rem;
-    color: var(--main-color);
-    font-weight: bold;
   }
 
-  /* ✅ スマホ時はボタンとセレクトが全幅 */
   .wo-select {
     width: 100%;
     max-width: 100%;
@@ -210,5 +462,31 @@ body {
 
   .header-right .select-display {
     width: 100%;
+  }
+
+  .tab-header {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .tab,
+  .view-tab {
+    font-size: 0.85rem;
+    padding: 6px 0;
+    width: 100%;
+  }
+
+  .add-entry-button {
+    font-size: 0.85rem;
+    padding: 6px 10px;
+  }
+
+  .today-button {
+    font-size: 0.9rem;
+  }
+
+  .date-display {
+    font-size: 0.85rem;
+    padding: 6px 8px;
   }
 }
