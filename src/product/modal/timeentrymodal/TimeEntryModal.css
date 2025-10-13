@@ -1,0 +1,239 @@
+:root {
+    --main-color: rgb(0, 137, 186);
+    --border-color: #ccc;
+    --input-radius: 4px;
+    --input-padding: 8px 12px;
+    --input-font-size: 0.9rem;
+}
+
+/* =======================================
+   モーダル全体
+======================================= */
+.timeentry-modal-body {
+    padding: 10px 20px 20px 20px;
+    box-sizing: border-box;
+}
+
+.timeentry-modal-body .select-display {
+    width: 100%;
+}
+
+/* =======================================
+   ラベル
+======================================= */
+.modal-label {
+    display: block;
+    font-weight: bold;
+    color: var(--main-color);
+    margin-top: 12px;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+}
+
+/* =======================================
+   グリッド構造（左右カラム）
+======================================= */
+.modal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* ✅ 2グリッド */
+    gap: 24px;
+    margin-top: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* 左右カラムの中身を均等整列 */
+.modal-grid>div {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    /* 各フィールドの間隔 */
+}
+
+/* =======================================
+   日付・時間フィールド
+======================================= */
+.datetime-row {
+    display: flex;
+    align-items: stretch;
+    gap: 6px;
+    width: 100%;
+}
+
+.datetime-row .input-suffix {
+    position: relative;
+    top: -28px;
+    left: 228px;
+    background-color: #fff;
+}
+
+.datetime-row .icon {
+    /* position: relative;
+    top: -28px;
+    left: 230px; */
+}
+
+.datetime-row-input {
+    width: 50%;
+}
+
+.date-input,
+.time-input,
+.minute-input {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-height: 36px;
+}
+
+/* =======================================
+   入力フィールド共通
+======================================= */
+.form-control,
+textarea,
+.date-input input,
+.time-input input,
+.minute-input input {
+    width: 100%;
+    border: 1px solid var(--border-color);
+    border-radius: var(--input-radius);
+    padding: var(--input-padding);
+    font-size: var(--input-font-size);
+    font-weight: bold;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    min-height: 36px;
+}
+
+.form-control:focus,
+.date-input input:focus,
+.time-input input:focus,
+.minute-input input:focus,
+textarea:focus {
+    border-color: var(--main-color);
+    outline: none;
+    box-shadow: 0 0 4px rgba(0, 137, 186, 0.3);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* =======================================
+   アイコン
+======================================= */
+.icon {
+    position: relative;
+    top: -1px;
+    color: var(--main-color);
+    cursor: pointer;
+    font-size: 1rem;
+    transition: opacity 0.2s ease;
+}
+
+.icon:hover {
+    opacity: 0.7;
+}
+
+/* =======================================
+   リソース・リンク・カウント
+======================================= */
+.resource-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+}
+
+.resource-link {
+    color: var(--main-color);
+    font-weight: bold;
+    text-decoration: underline;
+    font-size: 0.9rem;
+}
+
+.resource-link:hover {
+    opacity: 0.8;
+}
+
+.char-count {
+    text-align: right;
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 4px;
+}
+
+/* =======================================
+   無効スタイル
+======================================= */
+input[disabled],
+textarea[disabled],
+.form-control[readonly] {
+    background-color: #f8f8f8;
+    color: #666;
+}
+
+/* =======================================
+   ボタン
+======================================= */
+.timeentry-create-button {
+    margin-left: 10px;
+}
+
+/* =======================================
+   アニメーション（BaseModalと同期）
+======================================= */
+@keyframes modalFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.98);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes modalFadeOut {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.98);
+    }
+}
+
+.modal-content.fade-in {
+    animation: modalFadeIn 0.3s ease forwards;
+}
+
+.modal-content.fade-out {
+    animation: modalFadeOut 0.3s ease forwards;
+}
+
+/* =======================================
+   レスポンシブ対応
+======================================= */
+@media (max-width: 768px) {
+    .modal-grid {
+        grid-template-columns: 1fr;
+        /* ✅ スマホ時は1カラム */
+    }
+
+    .datetime-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .timeentry-modal-body {
+        padding: 10px;
+    }
+}

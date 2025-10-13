@@ -6,11 +6,11 @@ import type { TabOption } from "./component/tab/Tabs";
 import { Select } from "./component/select/Select";
 import type { SelectOption } from "./component/select/Select";
 import { Input } from "./component/input/Input";
-import { Textarea } from "./component/textarea/Textarea";
 import { CalendarView } from "./product/calendar/CalendarView";
 import * as FaIcons from "react-icons/fa";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import "./App.css";
+import { TimeEntryModal } from "./product/modal/timeentrymodal/TimeEntryModal";
 
 const queryClient = new QueryClient();
 
@@ -56,8 +56,46 @@ function DataverseApp() {
     { title: "作業A", start: "2025-10-12T13:00:00", end: "2025-10-12T15:00:00" },
   ];
 
-  const [name, setName] = useState("");
-  const [notes, setNotes] = useState("");
+  // =============================
+  // モーダル関連
+  // =============================
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedDateTime, setSelectedDateTime] = useState<{
+    start: Date;
+    end: Date;
+  } | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
+
+  const openNewModal = () => {
+    setSelectedDateTime({
+      start: new Date(),
+      end: new Date(new Date().getTime() + 60 * 60 * 1000),
+    });
+    setSelectedEvent(null);
+    setIsModalOpen(true);
+  };
+
+  const handleDateClick = (range: { start: Date; end: Date }) => {
+    setSelectedDateTime(range);
+    setSelectedEvent(null);
+    setIsModalOpen(true);
+  };
+
+  const handleEventClick = (eventData: any) => {
+    setSelectedEvent(eventData);
+    setSelectedDateTime(null);
+    setIsModalOpen(true);
+  };
+
+  const handleSubmit = (data: any) => {
+    console.log("📝 保存データ:", data);
+  };
+
+  // モーダルに渡すダミーの選択肢
+  const dummyOptions: SelectOption[] = [
+    { value: "opt1", label: "選択肢1" },
+    { value: "opt2", label: "選択肢2" },
+  ];
 
   // =============================
   // JSX
@@ -103,11 +141,13 @@ function DataverseApp() {
               className="main-tabs"
             />
 
+            {/* ✅ モーダルを開くボタン */}
             <Button
               label="新しいタイムエントリを作成"
               color="primary"
               icon={<FaIcons.FaPlus />}
               className="add-entry-button new-create-button"
+              onClick={openNewModal}
             />
           </div>
 
@@ -204,6 +244,8 @@ function DataverseApp() {
               }
               currentDate={currentDate}
               onDateChange={setCurrentDate}
+              onDateClick={handleDateClick} // ✅ 日付クリックでモーダル表示
+              onEventClick={handleEventClick} // ✅ イベントクリックでもモーダル
               events={events}
             />
           </div>
@@ -231,6 +273,19 @@ function DataverseApp() {
           </div>
         </div>
       </section>
+
+      {/* ✅ タイムエントリモーダル */}
+      <TimeEntryModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleSubmit}
+        selectedDateTime={selectedDateTime}
+        selectedEvent={selectedEvent}
+        woOptions={workOrders}
+        maincategoryOptions={dummyOptions}
+        paymenttypeOptions={dummyOptions}
+        timecategoryOptions={dummyOptions}
+      />
     </div>
   );
 }
