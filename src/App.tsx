@@ -164,21 +164,69 @@ function DataverseApp() {
 
         {/* ✅ コンテンツ中部 */}
         <div className="content-middle">
-          <Input
-            label="氏名"
-            value={name}
-            onChange={setName}
-            placeholder="山田 太郎"
-          />
-          <Textarea
-            label="備考"
-            value={notes}
-            onChange={setNotes}
-            placeholder="作業内容や注意事項などを入力してください"
-            rows={4}
-            showCount={true}
-            maxLength={2000}
-          />
+          {/* === サイドバー === */}
+          <aside className="sidebar-container">
+            <h2 className="sidebar-title">検索</h2>
+
+            {/* ラジオボタン */}
+            <div className="sidebar-radios">
+              <label>
+                <input type="radio" name="searchType" value="name" defaultChecked />
+                ユーザー名
+              </label>
+              <label>
+                <input type="radio" name="searchType" value="number" />
+                社員番号
+              </label>
+            </div>
+
+            {/* ✅ あなたの Input コンポーネントを使用 */}
+            <Input
+              placeholder="ユーザー名を入力"
+              className="sidebar-input"
+            />
+
+            {/* 自分情報 */}
+            <div className="sidebar-self">
+              <div className="sidebar-self-top">
+                <input
+                  type="checkbox"
+                  checked
+                  readOnly
+                  className="sidebar-self-checkbox"
+                />
+                <div className="sidebar-self-text">
+                  <span className="sidebar-self-number">社員番号（自分）</span>
+                  <span className="sidebar-self-roman">TARO TANAKA</span>
+                </div>
+              </div>
+
+              <div className="sidebar-self-divider">
+                <FaIcons.FaChevronDown className="sidebar-self-icon" />
+                <span className="sidebar-self-label">ユーザー名</span>
+                <FaIcons.FaTasks className="sidebar-self-icon" />
+              </div>
+            </div>
+          </aside>
+
+          {/* === メインフォーム === */}
+          <div className="content-form">
+            <Input
+              label="氏名"
+              value={name}
+              onChange={setName}
+              placeholder="山田 太郎"
+            />
+            <Textarea
+              label="備考"
+              value={notes}
+              onChange={setNotes}
+              placeholder="作業内容や注意事項などを入力してください"
+              rows={4}
+              showCount={true}
+              maxLength={2000}
+            />
+          </div>
         </div>
 
         {/* ✅ コンテンツ下部 */}
