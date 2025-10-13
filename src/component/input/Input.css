@@ -1,0 +1,78 @@
+:root {
+    --main-color: rgb(0, 137, 186);
+    --border-color: #ccc;
+    --disabled-bg: #f4f4f4;
+    --disabled-text: #aaa;
+}
+
+/* ======================
+   入力コンテナ
+====================== */
+.input-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+    font-family: "Inter", "Noto Sans JP", sans-serif;
+    box-sizing: border-box;
+}
+
+/* ======================
+   ラベル
+====================== */
+/* .input-label {
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: var(--main-color);
+    user-select: none;
+} */
+
+/* ======================
+   入力フィールド
+====================== */
+.input-field {
+    height: 35px;
+    width: 300px;
+    padding: 0 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: #fff;
+    color: #333;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+/* ホバー時 */
+.input-field:hover {
+    border-color: var(--main-color);
+}
+
+/* フォーカス時 */
+.input-field:focus {
+    outline: none;
+    border-color: var(--main-color);
+    box-shadow: 0 0 0 2px rgba(0, 137, 186, 0.15);
+}
+
+/* 無効化 */
+.input-field.disabled {
+    background-color: var(--disabled-bg);
+    color: var(--disabled-text);
+    cursor: not-allowed;
+}
+
+/* プレースホルダー */
+.input-field::placeholder {
+    color: #aaa;
+}
+
+/* ======================
+   レスポンシブ
+====================== */
+@media (max-width: 480px) {
+    .input-field {
+        height: 32px;
+        font-size: 0.85rem;
+    }
+}

@@ -6,6 +6,7 @@ import { Select } from "./component/select/Select";
 import type { SelectOption } from "./component/select/Select";
 import { Tabs } from "./component/tab/Tabs";
 import type { TabOption } from "./component/tab/Tabs";
+import { Input } from "./component/input/Input";
 import * as FaIcons from "react-icons/fa";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,8 @@ function DataverseApp() {
     { value: "3days", label: "3日" },
     { value: "week", label: "週" },
   ];
+
+  const [name, setName] = useState("");
 
   return (
     <div>
@@ -52,6 +55,13 @@ function DataverseApp() {
         activeTab={active}
         onChange={setActive}
         className="custom-tab"
+      />
+
+      <Input
+        label="氏名"
+        value={name}
+        onChange={setName}
+        placeholder="山田 太郎"
       />
 
       {/* <h1>Dataverse データ取得デモ</h1>
