@@ -61,34 +61,49 @@ function DataverseApp() {
         </div>
       </header>
 
-      {/* =============================
-          以下コンテンツ部分
-      ============================= */}
-      <main className="main-content">
-        <Tabs
-          tabs={tabOptions}
-          activeTab={active}
-          onChange={setActive}
-          className="custom-tab"
-        />
+      {/* ==========================
+     下部カードコンテナ
+========================== */}
+      <section className="content-card">
+        <div className="content-top">
+          <h2>上部エリア</h2>
+          <Tabs
+            tabs={tabOptions}
+            activeTab={active}
+            onChange={setActive}
+            className="custom-tab"
+          />
+        </div>
 
-        <Input
-          label="氏名"
-          value={name}
-          onChange={setName}
-          placeholder="山田 太郎"
-        />
+        <div className="content-middle">
+          <h3>内部エリア</h3>
+          <Input
+            label="氏名"
+            value={name}
+            onChange={setName}
+            placeholder="山田 太郎"
+          />
+          <Textarea
+            label="備考"
+            value={notes}
+            onChange={setNotes}
+            placeholder="作業内容や注意事項などを入力してください"
+            rows={4}
+            showCount={true}
+            maxLength={2000}
+          />
+        </div>
 
-        <Textarea
-          label="備考"
-          value={notes}
-          onChange={setNotes}
-          placeholder="作業内容や注意事項などを入力してください"
-          rows={4}
-          showCount={true}
-          maxLength={2000}
-        />
-      </main>
+        <div className="content-bottom">
+          <h3>下部エリア</h3>
+          <Button
+            label="保存"
+            color="primary"
+            icon={<FaIcons.FaSave />}
+          />
+        </div>
+      </section>
+
     </div>
   );
 }

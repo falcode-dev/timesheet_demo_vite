@@ -13,8 +13,12 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 10px;
+  /* padding: 0 10px; */
   height: 70px;
+}
+
+.app-container {
+  padding: 0 10px;
 }
 
 .header-title {
@@ -39,6 +43,85 @@ body {
   color: var(--main-color);
   font-weight: bold;
 }
+
+/* =============================
+   カード型コンテナ
+============================= */
+.content-card {
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  /* box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08); */
+  /* margin: 0 10px; */
+  padding: 20px;
+  /* max-width: 1000px; */
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* =============================
+   コンテンツエリア区分
+============================= */
+.content-top,
+.content-middle,
+.content-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 各エリアタイトル */
+.content-top h2,
+.content-middle h3,
+.content-bottom h3 {
+  margin: 0;
+  color: var(--main-color);
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+/* =============================
+   レスポンシブ対応
+============================= */
+@media (max-width: 768px) {
+  /* .content-card {
+    width: 95%;
+    padding: 16px;
+    gap: 16px;
+  } */
+
+  .content-top h2,
+  .content-middle h3,
+  .content-bottom h3 {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  /* .content-card {
+    width: 95%;
+    padding: 14px;
+    border-radius: 8px;
+    gap: 14px;
+  } */
+
+  .content-top,
+  .content-middle,
+  .content-bottom {
+    gap: 12px;
+  }
+
+  .content-top h2,
+  .content-middle h3,
+  .content-bottom h3 {
+    font-size: 0.95rem;
+    text-align: center;
+  }
+}
+
 
 /* =============================
    レスポンシブ対応
