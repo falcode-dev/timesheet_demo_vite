@@ -10,7 +10,7 @@
    モーダル全体
 ======================================= */
 .timeentry-modal-body {
-    padding: 10px 20px 20px 20px;
+    /* padding: 10px 20px 20px 20px; */
     box-sizing: border-box;
 }
 
@@ -47,7 +47,7 @@
 .modal-grid>div {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 5px;
     /* 各フィールドの間隔 */
 }
 
@@ -69,9 +69,13 @@
 }
 
 .datetime-row .icon {
-    /* position: relative;
+    position: relative;
     top: -28px;
-    left: 230px; */
+    left: 230px;
+}
+
+.datetime-row .select-display {
+    width: 85px;
 }
 
 .datetime-row-input {

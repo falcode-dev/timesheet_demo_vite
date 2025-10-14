@@ -45,7 +45,6 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     const [category, setCategory] = useState("");
     const [paymentType, setPaymentType] = useState("");
     const [task, setTask] = useState("");
-    const maxLength = 2000;
 
     const [startDate, setStartDate] = useState("");
     const [startHour, setStartHour] = useState("");
@@ -275,16 +274,19 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                         <label className="modal-label">タスク</label>
                         <Select options={taskOptions} value={task} onChange={setTask} />
 
-                        <label className="modal-label">コメント</label>
+                        {/* <label className="modal-label">コメント</label> */}
+                        {/* <div className="char-count">
+                            {comment.length}/{maxLength}
+                        </div> */}
                         <Textarea
+                            label="コメント"
                             value={comment}
                             onChange={setComment}
                             placeholder="コメントを入力"
                             rows={4}
+                            showCount={true}
+                            maxLength={2000}
                         />
-                        <div className="char-count">
-                            {comment.length}/{maxLength}
-                        </div>
                     </div>
                 </div>
             </div>

@@ -1,142 +1,161 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import * as FaIcons from "react-icons/fa";
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import "./App.css";
+
 import { Button } from "./component/button/Button";
 import { Tabs } from "./component/tab/Tabs";
 import type { TabOption } from "./component/tab/Tabs";
 import { Select } from "./component/select/Select";
 import { Input } from "./component/input/Input";
 import { CalendarView } from "./product/calendar/CalendarView";
-import * as FaIcons from "react-icons/fa";
-import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
-import "./App.css";
 import { TimeEntryModal } from "./product/modal/timeentrymodal/TimeEntryModal";
-import { useDataverse } from "./hooks/useDataverse";
 
+import { useDataverse } from "./hooks/useDataverse";
+import { dataverseClient } from "./api/dataverseClient";
+
+/* =============================
+   ユーティリティ
+============================= */
+
+/** ✅ URLパラメータ取得 */
+const getUrlParams = (): Record<string, string> => {
+  const params = new URLSearchParams(window.location.search);
+  const obj: Record<string, string> = {};
+  params.forEach((value, key) => {
+    obj[key.toLowerCase()] = value;
+  });
+  return obj;
+};
+
+/* =============================
+   メインアプリ本体
+============================= */
 const queryClient = new QueryClient();
 
 function DataverseApp() {
-  // =============================
-  // Dataverse データ取得
-  // =============================
+  const { recordid } = getUrlParams();
   const { user, workOrderList, timeEntryList, optionSets } = useDataverse();
 
-  // =============================
-  // ローカルUIステート
-  // =============================
-  const [selectedWO, setSelectedWO] = useState("");
-  const [events, setEvents] = useState<any[]>([]);
-  const [mainTab, setMainTab] = useState("user");
-  const [viewTab, setViewTab] = useState("week");
+  // ----------------------------
+  // 状態管理
+  // ----------------------------
+  const [selectedWO, setSelectedWO] = useState<string>(recordid || "all");
+  const [viewMode, setViewMode] = useState<"1日" | "3日" | "週">("週");
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [isTimeEntryModalOpen, setIsTimeEntryModalOpen] = useState(false);
+  const [selectedDateTime, setSelectedDateTime] = useState<{ start: Date; end: Date } | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
+  const [events, setEvents] = useState<any[]>([]);
 
+  // ----------------------------
+  // ✅ TimeEntry → FullCalendar イベント変換
+  // ----------------------------
+  useEffect(() => {
+    if (!timeEntryList?.length) return;
+
+    const filtered =
+      !selectedWO || selectedWO === "all"
+        ? timeEntryList
+        : timeEntryList.filter((e: any) => e.workOrderId === selectedWO);
+
+    const formatted = filtered.map((t: any) => ({
+      id: t.id,
+      title: t.name,
+      start: t.start,
+      end: t.end,
+      workOrderId: t.workOrderId,
+      extendedProps: t,
+    }));
+
+    setEvents(formatted);
+  }, [selectedWO, timeEntryList]);
+
+  // ----------------------------
+  // TimeEntry 登録・更新
+  // ----------------------------
+  const handleTimeEntrySubmit = async (data: any) => {
+    try {
+      const isUpdate = data.id && events.some((ev) => ev.id === data.id);
+      let result: any;
+
+      if (isUpdate) {
+        result = await dataverseClient.updateTimeEntry(data.id, data);
+      } else {
+        result = await dataverseClient.createTimeEntry(data);
+      }
+
+      console.log("✅ 登録・更新完了:", result);
+      setIsTimeEntryModalOpen(false);
+      // React Query による自動再取得を期待
+    } catch (err) {
+      console.error("❌ 登録・更新失敗:", err);
+      alert("保存に失敗しました。");
+    }
+  };
+
+  // ----------------------------
+  // カレンダー操作
+  // ----------------------------
+  const getShiftDays = () => (viewMode === "1日" ? 1 : viewMode === "3日" ? 3 : 7);
+
+  const handlePrev = () => {
+    const days = getShiftDays();
+    setCurrentDate((prev) => {
+      const newDate = new Date(prev);
+      newDate.setDate(prev.getDate() - days);
+      return newDate;
+    });
+  };
+
+  const handleNext = () => {
+    const days = getShiftDays();
+    setCurrentDate((prev) => {
+      const newDate = new Date(prev);
+      newDate.setDate(prev.getDate() + days);
+      return newDate;
+    });
+  };
+
+  const handleToday = () => setCurrentDate(new Date());
+
+  // ----------------------------
+  // イベントクリック
+  // ----------------------------
+  const handleEventClick = (eventData: any) => {
+    console.log("🟢 イベントクリック:", eventData);
+    setSelectedEvent({
+      id: eventData.id,
+      title: eventData.title,
+      start: eventData.start,
+      end: eventData.end,
+      extendedProps: eventData.extendedProps,
+    });
+    setSelectedDateTime(null);
+    setIsTimeEntryModalOpen(true);
+  };
+
+  // ----------------------------
+  // 今日の日付固定表示
+  // ----------------------------
+  const today = new Date();
+  const formattedToday = `${today.getFullYear()}年${String(today.getMonth() + 1).padStart(2, "0")}月${String(
+    today.getDate()
+  ).padStart(2, "0")}日`;
+
+  // ----------------------------
+  // タブ設定
+  // ----------------------------
   const mainTabOptions: TabOption[] = [
     { value: "user", label: "ユーザー" },
     { value: "indirect", label: "間接タスク" },
   ];
+  const [mainTab, setMainTab] = useState("user");
 
-  // =============================
-  // イベント初期化（WO選択時）
-  // =============================
-  // =============================
-  // イベント初期化（WO選択時）
-  // =============================
-  useEffect(() => {
-    if (!timeEntryList?.length) return;
-
-    // 🔹 useMemo化に近い動き：内部処理を最小化
-    setEvents(() => {
-      const source =
-        !selectedWO || selectedWO === "all"
-          ? timeEntryList
-          : timeEntryList.filter((e: any) => e.workOrderId === selectedWO);
-
-      return source.map((t: any) => ({
-        id: t.id,
-        title: t.name,
-        start: t.start,
-        end: t.end,
-      }));
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedWO, timeEntryList?.length]);
-
-
-
-  // =============================
-  // カレンダー操作
-  // =============================
-  const handlePrev = () => {
-    const prev = new Date(currentDate);
-    prev.setDate(prev.getDate() - 1);
-    setCurrentDate(prev);
-  };
-
-  const handleNext = () => {
-    const next = new Date(currentDate);
-    next.setDate(next.getDate() + 1);
-    setCurrentDate(next);
-  };
-
-  const handleToday = () => setCurrentDate(new Date());
-  const formatDate = (d: Date) =>
-    `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
-
-  // =============================
-  // モーダル関連
-  // =============================
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedDateTime, setSelectedDateTime] = useState<{
-    start: Date;
-    end: Date;
-  } | null>(null);
-  const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
-
-  const openNewModal = () => {
-    setSelectedDateTime({
-      start: new Date(),
-      end: new Date(new Date().getTime() + 60 * 60 * 1000),
-    });
-    setSelectedEvent(null);
-    setIsModalOpen(true);
-  };
-
-  const handleDateClick = (range: { start: Date; end: Date }) => {
-    setSelectedDateTime(range);
-    setSelectedEvent(null);
-    setIsModalOpen(true);
-  };
-
-  const handleEventClick = (eventData: any) => {
-    setSelectedEvent(eventData);
-    setSelectedDateTime(null);
-    setIsModalOpen(true);
-  };
-
-  const handleSubmit = (data: any) => {
-    console.log("📝 保存データ:", data);
-    if (data.id) {
-      setEvents((prev) =>
-        prev.map((ev) =>
-          ev.id === data.id
-            ? { ...ev, title: data.task || "無題", start: data.start, end: data.end }
-            : ev
-        )
-      );
-    } else {
-      const newEvent = {
-        id: String(Date.now()),
-        title: data.task || "新しいイベント",
-        start: data.start,
-        end: data.end,
-      };
-      setEvents((prev) => [...prev, newEvent]);
-    }
-    setIsModalOpen(false);
-  };
-
-  // =============================
+  // ----------------------------
   // JSX
-  // =============================
+  // ----------------------------
   return (
     <div className="app-container">
       {/* =============================
@@ -149,7 +168,6 @@ function DataverseApp() {
 
         <div className="header-right">
           <span className="header-label">対象WO</span>
-          {/* WorkOrderListをSelectOption形式に変換 */}
           <Select
             options={[
               { value: "all", label: "すべて" },
@@ -173,18 +191,20 @@ function DataverseApp() {
       <section className="content-card">
         <div className="tab-header">
           <div className="tab-header-left">
-            <Tabs
-              tabs={mainTabOptions}
-              activeTab={mainTab}
-              onChange={setMainTab}
-              className="main-tabs"
-            />
+            <Tabs tabs={mainTabOptions} activeTab={mainTab} onChange={setMainTab} className="main-tabs" />
             <Button
               label="新しいタイムエントリを作成"
               color="primary"
               icon={<FaIcons.FaPlus />}
               className="add-entry-button new-create-button"
-              onClick={openNewModal}
+              onClick={() => {
+                setSelectedDateTime({
+                  start: new Date(),
+                  end: new Date(new Date().getTime() + 60 * 60 * 1000),
+                });
+                setSelectedEvent(null);
+                setIsTimeEntryModalOpen(true);
+              }}
             />
           </div>
 
@@ -198,34 +218,31 @@ function DataverseApp() {
             <button className="arrow-button" onClick={handleNext}>
               <IoIosArrowForward />
             </button>
+
             <div className="date-display">
-              {formatDate(currentDate)}
+              {formattedToday}
               <FaIcons.FaRegCalendarAlt className="date-icon" />
             </div>
+
             <div className="view-tabs">
-              <button
-                className={`view-tab ${viewTab === "day" ? "active" : ""}`}
-                onClick={() => setViewTab("day")}
-              >
+              <button className={`view-tab ${viewMode === "1日" ? "active" : ""}`} onClick={() => setViewMode("1日")}>
                 1日
               </button>
-              <button
-                className={`view-tab ${viewTab === "3days" ? "active" : ""}`}
-                onClick={() => setViewTab("3days")}
-              >
+              <button className={`view-tab ${viewMode === "3日" ? "active" : ""}`} onClick={() => setViewMode("3日")}>
                 3日
               </button>
-              <button
-                className={`view-tab ${viewTab === "week" ? "active" : ""}`}
-                onClick={() => setViewTab("week")}
-              >
+              <button className={`view-tab ${viewMode === "週" ? "active" : ""}`} onClick={() => setViewMode("週")}>
                 週
               </button>
             </div>
           </div>
         </div>
 
+        {/* =============================
+            中央コンテンツ
+        ============================= */}
         <div className="content-middle">
+          {/* サイドバー */}
           <aside className="sidebar-container">
             <h2 className="sidebar-title">検索</h2>
             <div className="sidebar-radios">
@@ -253,18 +270,26 @@ function DataverseApp() {
             </div>
           </aside>
 
+          {/* カレンダー */}
           <div className="content-main">
             <CalendarView
-              viewMode={viewTab === "day" ? "1日" : viewTab === "3days" ? "3日" : "週"}
+              viewMode={viewMode}
               currentDate={currentDate}
               onDateChange={setCurrentDate}
-              onDateClick={handleDateClick}
+              onDateClick={(range) => {
+                setSelectedDateTime(range);
+                setSelectedEvent(null);
+                setIsTimeEntryModalOpen(true);
+              }}
               onEventClick={handleEventClick}
               events={events}
             />
           </div>
         </div>
 
+        {/* =============================
+            フッター操作群
+        ============================= */}
         <div className="content-bottom">
           <div className="content-bottom-left">
             <Button label="ユーザー 一覧設定" color="secondary" icon={<FaIcons.FaUser />} />
@@ -278,20 +303,20 @@ function DataverseApp() {
         </div>
       </section>
 
-      {/* ✅ useDataverseのoptionSetsを安全に渡す */}
+      {/* =============================
+          モーダル
+      ============================= */}
       <TimeEntryModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={handleSubmit}
+        isOpen={isTimeEntryModalOpen}
+        onClose={() => setIsTimeEntryModalOpen(false)}
+        onSubmit={handleTimeEntrySubmit}
         selectedDateTime={selectedDateTime}
         selectedEvent={selectedEvent}
         woOptions={workOrderList.map((w: any) => ({ value: w.id, label: w.name }))}
-
-        // ✅ Dataverseの構造に合わせてキー名修正
         maincategoryOptions={optionSets?.category ?? []}
         paymenttypeOptions={optionSets?.status ?? []}
         timecategoryOptions={[]}
-        locationOptions={optionSets?.timezone ?? []} // ← 現時点でlocationがないため空配列
+        locationOptions={optionSets?.timezone ?? []}
       />
     </div>
   );

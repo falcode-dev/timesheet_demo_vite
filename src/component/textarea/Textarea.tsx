@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import "./Textarea.css";
 
 type TextareaProps = {
-    label?: string;
+    label?: string; // ✅ ラベル（指定があれば表示）
     value?: string;
     onChange?: (value: string) => void;
     placeholder?: string;
@@ -14,6 +14,7 @@ type TextareaProps = {
 };
 
 export const Textarea: React.FC<TextareaProps> = ({
+    label,
     value = "",
     onChange,
     placeholder = "",
@@ -23,21 +24,22 @@ export const Textarea: React.FC<TextareaProps> = ({
     maxLength,
     className = "",
 }) => {
-    // ✅ 改行を除いた文字数をカウント
     const charCount = useMemo(() => value.replace(/\n/g, "").length, [value]);
-
-    // ✅ 残り・超過判定
     const isOverLimit = maxLength !== undefined && charCount > maxLength;
 
     return (
         <div className={`textarea-wrapper ${className}`.trim()}>
-            {showCount && (
-                <span
-                    className={`textarea-count ${isOverLimit ? "over-limit" : ""}`}
-                >
-                    {charCount}
-                    {maxLength ? ` / ${maxLength}` : ""}
-                </span>
+            {/* ✅ ラベル＆カウンター横並び */}
+            {(label || showCount) && (
+                <div className="textarea-header">
+                    {label && <label className="modal-label">{label}</label>}
+                    {showCount && (
+                        <span className={`textarea-count ${isOverLimit ? "over-limit" : ""}`}>
+                            {charCount}
+                            {maxLength ? ` / ${maxLength}` : ""}
+                        </span>
+                    )}
+                </div>
             )}
 
             <div className="textarea-container">
@@ -49,8 +51,6 @@ export const Textarea: React.FC<TextareaProps> = ({
                     disabled={disabled}
                     className={`textarea-field ${disabled ? "disabled" : ""}`}
                 />
-
-
             </div>
         </div>
     );

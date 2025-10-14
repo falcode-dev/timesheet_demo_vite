@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -15,6 +15,11 @@ interface CalendarViewProps {
     events: any[];
 }
 
+/**
+ * FullCalendar 表示コンポーネント
+ * - currentDate 変更時にカレンダー移動
+ * - viewMode に応じた表示切替
+ */
 export const CalendarView: React.FC<CalendarViewProps> = ({
     viewMode,
     currentDate,
@@ -23,6 +28,41 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
     onEventClick,
     events,
 }) => {
+    const calendarRef = useRef<FullCalendar>(null);
+
+    // -------------------------------
+    // 📅 currentDate が変わったら移動
+    // -------------------------------
+    useEffect(() => {
+        const api = calendarRef.current?.getApi();
+        if (api) {
+            api.gotoDate(currentDate);
+        }
+    }, [currentDate]);
+
+    // -------------------------------
+    // 🔄 viewMode が変わったらビュー変更
+    // -------------------------------
+    useEffect(() => {
+        const api = calendarRef.current?.getApi();
+        if (!api) return;
+
+        switch (viewMode) {
+            case "1日":
+                api.changeView("timeGridDay");
+                break;
+            case "3日":
+                api.changeView("timeGridThreeDay");
+                break;
+            default:
+                api.changeView("timeGridWeek");
+                break;
+        }
+    }, [viewMode]);
+
+    // -------------------------------
+    // 📅 日付クリック・イベントクリック
+    // -------------------------------
     const handleDateSelect = (selectInfo: any) => {
         onDateClick?.({ start: selectInfo.start, end: selectInfo.end });
     };
@@ -31,22 +71,15 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
         onEventClick?.(clickInfo.event);
     };
 
-    const getViewName = () => {
-        switch (viewMode) {
-            case "1日":
-                return "timeGridDay";
-            case "3日":
-                return "timeGridThreeDay";
-            default:
-                return "timeGridWeek";
-        }
-    };
-
+    // -------------------------------
+    // ✅ JSX
+    // -------------------------------
     return (
         <div className="calendar-wrapper">
             <FullCalendar
+                ref={calendarRef}
                 plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                initialView={getViewName()}
+                initialView="timeGridWeek"
                 selectable
                 selectMirror
                 select={handleDateSelect}
@@ -63,7 +96,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 firstDay={1}
                 initialDate={currentDate}
                 views={{
-                    // ✅ カスタムビューを正しく定義
+                    // ✅ カスタム3日ビュー定義
                     timeGridThreeDay: {
                         type: "timeGrid",
                         duration: { days: 3 },
