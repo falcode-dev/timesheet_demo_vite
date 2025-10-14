@@ -11,7 +11,8 @@ import { Select } from "./component/select/Select";
 import { Input } from "./component/input/Input";
 import { CalendarView } from "./product/calendar/CalendarView";
 import { TimeEntryModal } from "./product/modal/timeentrymodal/TimeEntryModal";
-import { FavoriteTaskModal } from "./product/modal/favoritetaskmodal/FavoriteTaskModal"; // ✅ 追加
+import { FavoriteTaskModal } from "./product/modal/favoritetaskmodal/FavoriteTaskModal";
+import { UserListModal } from "./product/modal/userlistmodal/UserListModal";
 
 import { useDataverse } from "./hooks/useDataverse";
 import { dataverseClient } from "./api/dataverseClient";
@@ -19,8 +20,6 @@ import { dataverseClient } from "./api/dataverseClient";
 /* =============================
    ユーティリティ
 ============================= */
-
-/** ✅ URLパラメータ取得 */
 const getUrlParams = (): Record<string, string> => {
   const params = new URLSearchParams(window.location.search);
   const obj: Record<string, string> = {};
@@ -46,13 +45,14 @@ function DataverseApp() {
   const [viewMode, setViewMode] = useState<"1日" | "3日" | "週">("週");
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isTimeEntryModalOpen, setIsTimeEntryModalOpen] = useState(false);
-  const [isFavoriteTaskModalOpen, setIsFavoriteTaskModalOpen] = useState(false); // ✅ 追加
+  const [isFavoriteTaskModalOpen, setIsFavoriteTaskModalOpen] = useState(false);
+  const [isUserListModalOpen, setIsUserListModalOpen] = useState(false);
   const [selectedDateTime, setSelectedDateTime] = useState<{ start: Date; end: Date } | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
   const [events, setEvents] = useState<any[]>([]);
 
   // ----------------------------
-  // ✅ TimeEntry → FullCalendar イベント変換
+  // TimeEntry → FullCalendar イベント変換
   // ----------------------------
   useEffect(() => {
     if (!timeEntryList?.length) return;
@@ -97,11 +97,19 @@ function DataverseApp() {
   };
 
   // ----------------------------
-  // ✅ お気に入りタスク保存処理
+  // お気に入りタスク保存処理
   // ----------------------------
   const handleSaveFavoriteTasks = (tasks: string[]) => {
     console.log("✅ 保存されたお気に入りタスク:", tasks);
     setIsFavoriteTaskModalOpen(false);
+  };
+
+  // ----------------------------
+  // ユーザー一覧保存処理
+  // ----------------------------
+  const handleSaveUserList = (users: string[]) => {
+    console.log("✅ 保存されたユーザー一覧:", users);
+    setIsUserListModalOpen(false);
   };
 
   // ----------------------------
@@ -301,12 +309,17 @@ function DataverseApp() {
         ============================= */}
         <div className="content-bottom">
           <div className="content-bottom-left">
-            <Button label="ユーザー 一覧設定" color="secondary" icon={<FaIcons.FaUser />} />
+            <Button
+              label="ユーザー 一覧設定"
+              color="secondary"
+              icon={<FaIcons.FaUser />}
+              onClick={() => setIsUserListModalOpen(true)}
+            />
             <Button
               label="お気に入り間接タスク設定"
               color="secondary"
               icon={<FaIcons.FaStar />}
-              onClick={() => setIsFavoriteTaskModalOpen(true)} // ✅ モーダル開く
+              onClick={() => setIsFavoriteTaskModalOpen(true)}
             />
           </div>
           <div className="content-bottom-right">
@@ -337,6 +350,12 @@ function DataverseApp() {
         isOpen={isFavoriteTaskModalOpen}
         onClose={() => setIsFavoriteTaskModalOpen(false)}
         onSave={handleSaveFavoriteTasks}
+      />
+
+      <UserListModal
+        isOpen={isUserListModalOpen}
+        onClose={() => setIsUserListModalOpen(false)}
+        onSave={handleSaveUserList}
       />
     </div>
   );
