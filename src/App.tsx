@@ -11,6 +11,7 @@ import { Select } from "./component/select/Select";
 import { Input } from "./component/input/Input";
 import { CalendarView } from "./product/calendar/CalendarView";
 import { TimeEntryModal } from "./product/modal/timeentrymodal/TimeEntryModal";
+import { FavoriteTaskModal } from "./product/modal/favoritetaskmodal/FavoriteTaskModal"; // ✅ 追加
 
 import { useDataverse } from "./hooks/useDataverse";
 import { dataverseClient } from "./api/dataverseClient";
@@ -45,6 +46,7 @@ function DataverseApp() {
   const [viewMode, setViewMode] = useState<"1日" | "3日" | "週">("週");
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isTimeEntryModalOpen, setIsTimeEntryModalOpen] = useState(false);
+  const [isFavoriteTaskModalOpen, setIsFavoriteTaskModalOpen] = useState(false); // ✅ 追加
   const [selectedDateTime, setSelectedDateTime] = useState<{ start: Date; end: Date } | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
   const [events, setEvents] = useState<any[]>([]);
@@ -88,11 +90,18 @@ function DataverseApp() {
 
       console.log("✅ 登録・更新完了:", result);
       setIsTimeEntryModalOpen(false);
-      // React Query による自動再取得を期待
     } catch (err) {
       console.error("❌ 登録・更新失敗:", err);
       alert("保存に失敗しました。");
     }
+  };
+
+  // ----------------------------
+  // ✅ お気に入りタスク保存処理
+  // ----------------------------
+  const handleSaveFavoriteTasks = (tasks: string[]) => {
+    console.log("✅ 保存されたお気に入りタスク:", tasks);
+    setIsFavoriteTaskModalOpen(false);
   };
 
   // ----------------------------
@@ -293,7 +302,12 @@ function DataverseApp() {
         <div className="content-bottom">
           <div className="content-bottom-left">
             <Button label="ユーザー 一覧設定" color="secondary" icon={<FaIcons.FaUser />} />
-            <Button label="お気に入り間接タスク設定" color="secondary" icon={<FaIcons.FaStar />} />
+            <Button
+              label="お気に入り間接タスク設定"
+              color="secondary"
+              icon={<FaIcons.FaStar />}
+              onClick={() => setIsFavoriteTaskModalOpen(true)} // ✅ モーダル開く
+            />
           </div>
           <div className="content-bottom-right">
             <button className="menu-button" title="その他">
@@ -304,7 +318,7 @@ function DataverseApp() {
       </section>
 
       {/* =============================
-          モーダル
+          モーダル群
       ============================= */}
       <TimeEntryModal
         isOpen={isTimeEntryModalOpen}
@@ -317,6 +331,12 @@ function DataverseApp() {
         paymenttypeOptions={optionSets?.status ?? []}
         timecategoryOptions={[]}
         locationOptions={optionSets?.timezone ?? []}
+      />
+
+      <FavoriteTaskModal
+        isOpen={isFavoriteTaskModalOpen}
+        onClose={() => setIsFavoriteTaskModalOpen(false)}
+        onSave={handleSaveFavoriteTasks}
       />
     </div>
   );
