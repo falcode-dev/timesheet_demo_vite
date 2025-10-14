@@ -112,6 +112,20 @@
     color: #fff;
 }
 
+.fc-theme-standard .fc-scrollgrid {
+    border: none;
+    border-left: 1px solid var(--fc-border-color);
+    /* border-right: 1px solid var(--fc-border-color); */
+}
+
+.fc .fc-scrollgrid-section-header>* {
+    border: none;
+}
+
+.fc .fc-scrollgrid-section-liquid>td {
+    border: none;
+}
+
 /* =============================
    レスポンシブ対応
 ============================= */
@@ -133,8 +147,9 @@
         overflow-x: auto;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
-        padding: 4px 0;
+        /* padding: 4px 0; */
         min-height: 500px;
+        border-top: 1px solid #ccc;
         /* ✅ スマホでも最低高さ */
     }
 
@@ -153,6 +168,10 @@
 
     .fc .fc-daygrid-day-frame {
         min-height: 60px;
+    }
+
+    .fc-theme-standard .fc-scrollgrid {
+        border-left: none;
     }
 }
 

@@ -1,0 +1,145 @@
+:root {
+    --main-color: rgb(0, 137, 186);
+}
+
+/* =============================
+   サイドバー全体
+============================= */
+.sidebar-container {
+    width: 260px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+/* タイトル */
+.sidebar-title {
+    color: var(--main-color);
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: bold;
+}
+
+/* =============================
+   ラジオボタン群
+============================= */
+.sidebar-radios {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sidebar-radios label {
+    display: flex;
+    align-items: center;
+    color: var(--main-color);
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.sidebar-radios input[type="radio"] {
+    accent-color: var(--main-color);
+    margin-right: 6px;
+}
+
+/* =============================
+   入力欄
+============================= */
+.sidebar-input {
+    width: 100%;
+}
+
+/* =============================
+   自分の情報ボックス
+============================= */
+.sidebar-self {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-sizing: border-box;
+}
+
+.sidebar-self-top {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    width: 100%;
+}
+
+.sidebar-self-checkbox {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--main-color);
+}
+
+.sidebar-self-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    color: var(--main-color);
+}
+
+.sidebar-self-number {
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.sidebar-self-roman {
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+}
+
+/* =============================
+   区切り行
+============================= */
+.sidebar-self-divider {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.sidebar-self-icon {
+    color: var(--main-color);
+    font-size: 1rem;
+}
+
+.sidebar-self-label {
+    color: var(--main-color);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+/* =============================
+   レスポンシブ対応
+============================= */
+@media (max-width: 768px) {
+    .sidebar-container {
+        width: 100%;
+        padding: 8px 12px;
+        /* border-bottom: 1px solid #ccc; */
+    }
+
+    .sidebar-title {
+        font-size: 0.9rem;
+    }
+
+    .sidebar-radios {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .sidebar-self {
+        gap: 6px;
+    }
+
+    /* .sidebar-self-divider {
+        justify-content: center;
+    } */
+}

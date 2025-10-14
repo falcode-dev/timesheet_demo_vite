@@ -1,0 +1,213 @@
+:root {
+    --main-color: rgb(0, 137, 186);
+}
+
+/* =============================
+   コンテンツヘッダー（タブ＋日付ナビ）
+============================= */
+.tab-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    background-color: #fff;
+    box-sizing: border-box;
+}
+
+/* 左側（タブ＋新規作成ボタン） */
+.tab-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* メインタブ */
+.main-tabs {
+    display: flex;
+    border: 1px solid var(--main-color);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.main-tabs .tab-item {
+    min-width: 100px;
+    padding: 6px 14px;
+    font-weight: 600;
+    color: var(--main-color);
+    background-color: white;
+    border: none;
+    border-right: 1px solid var(--main-color);
+    cursor: pointer;
+    transition: 0.2s ease;
+    text-align: center;
+}
+
+.main-tabs .tab-item.active {
+    background-color: var(--main-color);
+    color: white;
+}
+
+.main-tabs .tab-item:last-child {
+    border-right: none;
+}
+
+/* =============================
+   右側（日付ナビ＋期間切替）
+============================= */
+.tab-header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+/* 今日ボタン */
+.today-button {
+    background: none;
+    border: none;
+    color: var(--main-color);
+    font-size: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    padding: 6px 10px;
+    transition: 0.2s;
+    border-radius: 6px;
+}
+
+.today-button:hover {
+    opacity: 0.8;
+    background-color: rgba(0, 137, 186, 0.08);
+}
+
+/* ← → ボタン */
+.arrow-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: var(--main-color);
+    font-weight: bold;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: 0.2s;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+}
+
+.arrow-button:hover {
+    background-color: rgba(0, 137, 186, 0.1);
+}
+
+/* 日付表示エリア */
+.date-display {
+    height: 35px;
+    width: 170px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--main-color);
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 6px 10px;
+    white-space: nowrap;
+    box-sizing: border-box;
+}
+
+/* ビュー切替ボタン */
+.view-tabs {
+    display: flex;
+    border: 1px solid var(--main-color);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.view-tab {
+    padding: 6px 10px;
+    font-weight: 600;
+    color: var(--main-color);
+    background-color: white;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+    text-align: center;
+    min-width: 50px;
+}
+
+.view-tab.active {
+    background-color: var(--main-color);
+    color: white;
+}
+
+.view-tab:not(:last-child) {
+    border-right: 1px solid var(--main-color);
+}
+
+/* =============================
+   レスポンシブ対応
+============================= */
+@media (max-width: 768px) {
+    .tab-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .tab-header-left,
+    .tab-header-right {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .tab-header-left {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .main-tabs,
+    .view-tabs {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .view-tab {
+        flex: 1;
+    }
+
+    .add-entry-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .date-display {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .today-button {
+        font-size: 0.9rem;
+    }
+
+    .date-display {
+        font-size: 0.85rem;
+        padding: 6px 8px;
+    }
+
+    .view-tab {
+        font-size: 0.85rem;
+    }
+}

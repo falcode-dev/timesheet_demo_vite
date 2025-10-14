@@ -1,0 +1,113 @@
+:root {
+    --main-color: rgb(0, 137, 186);
+}
+
+/* =============================
+   ヘッダー全体
+============================= */
+.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 70px;
+    flex-shrink: 0;
+    padding: 0 12px;
+    box-sizing: border-box;
+}
+
+/* タイトル部分 */
+.header-title {
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: var(--main-color);
+    margin: 0;
+    white-space: nowrap;
+}
+
+/* 右側グループ */
+.header-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    flex-direction: row;
+}
+
+/* ラベル */
+.header-label {
+    font-size: 0.9rem;
+    color: var(--main-color);
+    font-weight: bold;
+}
+
+/* =============================
+   レスポンシブ対応
+============================= */
+@media (max-width: 768px) {
+    .app-header {
+        flex-direction: column;
+        align-items: flex-start;
+        height: auto;
+        padding: 10px 0;
+        gap: 10px;
+    }
+
+    .header-title {
+        font-size: 1.5rem;
+    }
+
+    .header-right {
+        width: 100%;
+        justify-content: flex-start;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .header-right .select-wrapper {
+        width: 100%;
+    }
+
+    .header-label {
+        font-size: 0.85rem;
+    }
+
+    .wo-select,
+    .header-right button,
+    .header-right .select-display {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .app-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 8px;
+    }
+
+    .header-title {
+        font-size: 1.4rem;
+        text-align: center;
+    }
+
+    .header-right {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        width: 100%;
+    }
+
+    .header-label {
+        font-size: 0.85rem;
+    }
+
+    .wo-select,
+    .header-right button,
+    .header-right .select-display {
+        width: 100%;
+        max-width: 100%;
+    }
+}

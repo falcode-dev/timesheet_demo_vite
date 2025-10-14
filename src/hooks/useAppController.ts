@@ -1,25 +1,13 @@
+// src/hooks/useAppController.ts
 import { useState, useEffect } from "react";
 import { getXrm } from "../utils/xrmUtils";
 import { dataverseClient } from "../api/dataverseClient";
+import { getUrlParams } from "../utils/url";
+import { fromUtcToJst } from "../utils/dateUtils";
 
-/** Dataverse UTC → JST 補正 */
-const fromUtcToJst = (datetimeString: string): string => {
-    if (!datetimeString) return "";
-    const date = new Date(datetimeString);
-    const corrected = new Date(date.getTime() - 9 * 60 * 60 * 1000);
-    return corrected.toISOString();
-};
-
-/** URLパラメータ取得ユーティリティ */
-const getUrlParams = (): Record<string, string> => {
-    const params = new URLSearchParams(window.location.search);
-    const obj: Record<string, string> = {};
-    params.forEach((value, key) => {
-        obj[key.toLowerCase()] = value;
-    });
-    return obj;
-};
-
+/** ============================
+ *  型定義
+ * ============================ */
 export interface EventData {
     id: string;
     title: string;
@@ -29,6 +17,9 @@ export interface EventData {
     extendedProps?: Record<string, any>;
 }
 
+/** ============================
+ *  useAppController
+ * ============================ */
 export const useAppController = () => {
     const { recordid } = getUrlParams();
 
@@ -56,6 +47,7 @@ export const useAppController = () => {
     const fetchWorkOrders = async () => {
         const xrm = getXrm();
         if (!xrm) {
+            // ローカル開発用モックデータ
             setWorkOrders([
                 { id: "wo-001", name: "サンプル現場A" },
                 { id: "wo-002", name: "サンプル現場B" },
@@ -86,6 +78,7 @@ export const useAppController = () => {
             const category = await dataverseClient.getOptionSets("proto_timeentry", ["proto_maincategory"]);
             const status = await dataverseClient.getOptionSets("proto_timeentry", ["proto_paymenttype"]);
             const timezone = await dataverseClient.getTimeZones();
+
             setOptionSets({
                 category: category["proto_maincategory"] || [],
                 status: status["proto_paymenttype"] || [],
@@ -174,6 +167,8 @@ export const useAppController = () => {
             }
 
             setIsTimeEntryModalOpen(false);
+
+            // 軽負荷でリフレッシュ
             setTimeout(() => {
                 fetchEvents();
                 fetchOptionSets();
@@ -188,25 +183,8 @@ export const useAppController = () => {
     // カレンダー操作
     // ----------------------------
     const getShiftDays = () => (viewMode === "1日" ? 1 : viewMode === "3日" ? 3 : 7);
-
-    const handlePrev = () => {
-        const days = getShiftDays();
-        setCurrentDate((prev) => {
-            const newDate = new Date(prev);
-            newDate.setDate(prev.getDate() - days);
-            return newDate;
-        });
-    };
-
-    const handleNext = () => {
-        const days = getShiftDays();
-        setCurrentDate((prev) => {
-            const newDate = new Date(prev);
-            newDate.setDate(prev.getDate() + days);
-            return newDate;
-        });
-    };
-
+    const handlePrev = () => setCurrentDate((prev) => new Date(prev.setDate(prev.getDate() - getShiftDays())));
+    const handleNext = () => setCurrentDate((prev) => new Date(prev.setDate(prev.getDate() + getShiftDays())));
     const handleToday = () => setCurrentDate(new Date());
 
     // ----------------------------
@@ -219,7 +197,7 @@ export const useAppController = () => {
     }, [selectedWO]);
 
     // ----------------------------
-    // 返却
+    // 返却値
     // ----------------------------
     return {
         workOrders,
@@ -231,7 +209,7 @@ export const useAppController = () => {
         viewMode,
         setViewMode,
         currentDate,
-        setCurrentDate, // ✅ これを追加
+        setCurrentDate,
         isTimeEntryModalOpen,
         setIsTimeEntryModalOpen,
         selectedDateTime,
