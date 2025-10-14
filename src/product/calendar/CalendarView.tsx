@@ -18,7 +18,7 @@ interface CalendarViewProps {
 export const CalendarView: React.FC<CalendarViewProps> = ({
     viewMode,
     currentDate,
-    onDateChange,
+    // onDateChange,
     onDateClick,
     onEventClick,
     events,

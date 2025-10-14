@@ -18,6 +18,7 @@ interface TimeEntryModalProps {
     maincategoryOptions: SelectOption[];
     paymenttypeOptions: SelectOption[];
     timecategoryOptions: SelectOption[];
+    locationOptions: SelectOption[]; // ✅ 追加（DataverseのLocation）
 }
 
 export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
@@ -30,6 +31,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     maincategoryOptions,
     paymenttypeOptions,
     timecategoryOptions,
+    locationOptions, // ✅ 受け取り
 }) => {
     // =============================
     // 状態管理
@@ -77,12 +79,6 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
         { value: "abc", label: "株式会社ABC" },
         { value: "xyz", label: "株式会社XYZ" },
         { value: "sample", label: "サンプル商事" },
-    ];
-
-    const locationOptions: SelectOption[] = [
-        { value: "tokyo", label: "東京" },
-        { value: "osaka", label: "大阪" },
-        { value: "nagoya", label: "名古屋" },
     ];
 
     const taskOptions: SelectOption[] = [
