@@ -74,6 +74,10 @@ body,
 }
 
 @media (max-width: 768px) {
+    html {
+        height: auto;
+    }
+
     .app-container {
         display: block;
         padding: 8px;

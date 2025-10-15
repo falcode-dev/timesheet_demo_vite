@@ -36,8 +36,9 @@ export const useAppController = () => {
     const [workOrders, setWorkOrders] = useState<{ id: string; name: string }[]>([]);
     const [events, setEvents] = useState<EventData[]>([]);
     const [optionSets, setOptionSets] = useState<{
-        category?: { value: string; label: string }[];
-        status?: { value: string; label: string }[];
+        maincategory?: { value: string; label: string }[];
+        timecategory?: { value: string; label: string }[];
+        paymenttype?: { value: string; label: string }[];
         timezone?: { value: string; label: string }[];
     }>({});
 
@@ -49,8 +50,8 @@ export const useAppController = () => {
         if (!xrm) {
             // ローカル開発用モックデータ
             setWorkOrders([
-                { id: "wo-001", name: "サンプル現場A" },
-                { id: "wo-002", name: "サンプル現場B" },
+                { id: "wo-001", name: "ワークオーダサンプルデータ①" },
+                { id: "wo-002", name: "ワークオーダサンプルデータ②" },
             ]);
             return;
         }
@@ -66,7 +67,7 @@ export const useAppController = () => {
             }));
             setWorkOrders(mapped);
         } catch (err) {
-            console.error("❌ WorkOrder取得失敗:", err);
+            console.error("ワークオーダIDとワークオーダ番号の取得に失敗しました。：", err);
         }
     };
 
@@ -75,13 +76,15 @@ export const useAppController = () => {
     // ----------------------------
     const fetchOptionSets = async () => {
         try {
-            const category = await dataverseClient.getOptionSets("proto_timeentry", ["proto_maincategory"]);
-            const status = await dataverseClient.getOptionSets("proto_timeentry", ["proto_paymenttype"]);
+            const maincategory = await dataverseClient.getOptionSets("proto_timeentry", ["proto_maincategory"]);
+            const timecategory = await dataverseClient.getOptionSets("proto_timeentry", ["proto_timecategory"]);
+            const paymenttype = await dataverseClient.getOptionSets("proto_timeentry", ["proto_paymenttype"]);
             const timezone = await dataverseClient.getTimeZones();
 
             setOptionSets({
-                category: category["proto_maincategory"] || [],
-                status: status["proto_paymenttype"] || [],
+                maincategory: maincategory["proto_maincategory"] || [],
+                timecategory: timecategory["proto_timecategory"] || [],
+                paymenttype: paymenttype["proto_paymenttype"] || [],
                 timezone,
             });
         } catch (err) {

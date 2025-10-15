@@ -127,9 +127,9 @@ export const DataverseApp = () => {
                 selectedDateTime={selectedDateTime}
                 selectedEvent={selectedEvent}
                 woOptions={workOrders.map((w) => ({ value: w.id, label: w.name }))}
-                maincategoryOptions={optionSets?.category ?? []}
-                paymenttypeOptions={optionSets?.status ?? []}
-                timecategoryOptions={[]}
+                maincategoryOptions={optionSets?.maincategory ?? []}
+                timecategoryOptions={optionSets?.timecategory ?? []}
+                paymenttypeOptions={optionSets?.paymenttype ?? []}
                 locationOptions={optionSets?.timezone ?? []}
             />
 
