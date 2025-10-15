@@ -5,9 +5,11 @@ import { Tabs } from "../../component/tab/Tabs";
 import { Button } from "../../component/button/Button";
 import type { TabOption } from "../../component/tab/Tabs";
 
+type MainTab = "user" | "indirect";
+
 interface ContentHeaderProps {
     mainTab: string;
-    setMainTab: (tab: string) => void;
+    setMainTab: (tab: MainTab) => void;
     viewMode: "1日" | "3日" | "週";
     setViewMode: (mode: "1日" | "3日" | "週") => void;
     formattedToday: string;
@@ -36,7 +38,7 @@ export const ContentHeader: React.FC<ContentHeaderProps> = ({
     return (
         <div className="tab-header">
             <div className="tab-header-left">
-                <Tabs tabs={mainTabOptions} activeTab={mainTab} onChange={setMainTab} className="main-tabs" />
+                <Tabs tabs={mainTabOptions} activeTab={mainTab} onChange={(v) => setMainTab(v as MainTab)} className="main-tabs" />
                 <Button
                     label="新しいタイムエントリを作成"
                     color="primary"

@@ -117,6 +117,77 @@
 }
 
 /* =============================
+   検索結果一覧
+============================= */
+.sidebar-results {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 180px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.sidebar-result-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #333;
+    font-size: 0.9rem;
+}
+
+.sidebar-result-item input[type="checkbox"] {
+    accent-color: var(--main-color);
+    height: 20px;
+    width: 20px;
+    border-radius: 8px;
+}
+
+.sidebar-result-text {
+    color: var(--main-color);
+    font-weight: 500;
+}
+
+/* =============================
+   間接タスク（ラジオリスト）
+============================= */
+.sidebar-task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.sidebar-task-radio {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    color: var(--main-color);
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.sidebar-task-radio input[type="radio"] {
+    accent-color: var(--main-color);
+    margin-top: 3px;
+}
+
+.sidebar-task-lines {
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-task-category {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.sidebar-task-name {
+    font-size: 0.85rem;
+}
+
+/* =============================
    レスポンシブ対応
 ============================= */
 @media (max-width: 768px) {

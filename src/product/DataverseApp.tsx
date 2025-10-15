@@ -33,6 +33,9 @@ export const DataverseApp = () => {
         handleToday,
     } = useAppController();
 
+    // ✅ mainTabを追加（ユーザー／間接タスク）
+    const [mainTab, setMainTab] = useState<"user" | "indirect">("user");
+
     // ✅ モーダル開閉状態を追加
     const [isFavoriteTaskModalOpen, setIsFavoriteTaskModalOpen] = useState(false);
     const [isUserListModalOpen, setIsUserListModalOpen] = useState(false);
@@ -72,8 +75,8 @@ export const DataverseApp = () => {
             <section className="content-card">
                 {/* 上部タブ＆日付ナビ */}
                 <ContentHeader
-                    mainTab="user"
-                    setMainTab={() => { }}
+                    mainTab={mainTab}              // ✅ 状態を渡す
+                    setMainTab={setMainTab}        // ✅ setterを渡す（ここが重要）
                     viewMode={viewMode}
                     setViewMode={setViewMode}
                     formattedToday={formattedToday}
@@ -92,7 +95,8 @@ export const DataverseApp = () => {
 
                 {/* 中央エリア：サイドバー＋カレンダー */}
                 <div className="content-middle">
-                    <Sidebar userName="テストユーザー" />
+                    {/* <Sidebar userName="テストユーザー" /> */}
+                    <Sidebar userName="テストユーザー" mainTab={mainTab} />
 
                     <div className="content-main">
                         <CalendarView
