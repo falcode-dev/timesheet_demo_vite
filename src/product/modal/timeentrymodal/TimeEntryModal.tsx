@@ -225,6 +225,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                 ref={endDateRef}
                                 type="date"
                                 value={endDate}
+                                className="datetime-row-input"
                                 onChange={setEndDate}
                                 suffix={
                                     <FaIcons.FaRegCalendarAlt
