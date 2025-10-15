@@ -32,7 +32,7 @@ export const Header: React.FC<HeaderProps> = ({
             />
             <Button
                 label="アップロード"
-                color="primary"
+                color="secondary"
                 icon={<FaIcons.FaUpload />}
             />
         </div>

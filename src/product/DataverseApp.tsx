@@ -104,11 +104,20 @@ export const DataverseApp = () => {
                             currentDate={currentDate}
                             onDateChange={setCurrentDate}
                             onDateClick={(range) => {
+                                // ✅ 新規作成モード
                                 setSelectedDateTime(range);
                                 setSelectedEvent(null);
                                 setIsTimeEntryModalOpen(true);
                             }}
-                            onEventClick={setSelectedEvent}
+                            onEventClick={(event) => {
+                                // ✅ 編集モード
+                                setSelectedEvent(event);
+                                setSelectedDateTime({
+                                    start: event.start,
+                                    end: event.end,
+                                });
+                                setIsTimeEntryModalOpen(true);
+                            }}
                             events={events}
                         />
                     </div>

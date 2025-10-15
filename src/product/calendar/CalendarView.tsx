@@ -9,21 +9,16 @@ import "./CalendarView.css";
 interface CalendarViewProps {
     viewMode: "1日" | "3日" | "週";
     currentDate: Date;
-    onDateChange: (newDate: Date) => void;
+    onDateChange?: (newDate: Date) => void;
     onDateClick?: (range: { start: Date; end: Date }) => void;
     onEventClick?: (eventData: any) => void;
     events: any[];
 }
 
-/**
- * FullCalendar 表示コンポーネント
- * - currentDate 変更時にカレンダー移動
- * - viewMode に応じた表示切替
- */
 export const CalendarView: React.FC<CalendarViewProps> = ({
     viewMode,
     currentDate,
-    // onDateChange,
+    onDateChange,
     onDateClick,
     onEventClick,
     events,
@@ -31,17 +26,20 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
     const calendarRef = useRef<FullCalendar>(null);
 
     // -------------------------------
-    // 📅 currentDate が変わったら移動
+    // 📅 currentDate が変わったらカレンダー移動
     // -------------------------------
     useEffect(() => {
         const api = calendarRef.current?.getApi();
-        if (api) {
+        if (!api) return;
+        // FullCalendar 側がすでに同じ日付を表示しているならスキップ
+        const calendarDate = api.getDate();
+        if (calendarDate.toDateString() !== currentDate.toDateString()) {
             api.gotoDate(currentDate);
         }
     }, [currentDate]);
 
     // -------------------------------
-    // 🔄 viewMode が変わったらビュー変更
+    // 🔄 viewMode 変更
     // -------------------------------
     useEffect(() => {
         const api = calendarRef.current?.getApi();
@@ -61,14 +59,18 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
     }, [viewMode]);
 
     // -------------------------------
-    // 📅 日付クリック・イベントクリック
+    // 📅 日付選択
     // -------------------------------
     const handleDateSelect = (selectInfo: any) => {
         onDateClick?.({ start: selectInfo.start, end: selectInfo.end });
     };
 
+    // -------------------------------
+    // 🎯 イベントクリック
+    // -------------------------------
     const handleEventClick = (clickInfo: any) => {
-        onEventClick?.(clickInfo.event);
+        const { id, title, start, end, extendedProps } = clickInfo.event;
+        onEventClick?.({ id, title, start, end, extendedProps });
     };
 
     // -------------------------------
@@ -80,12 +82,12 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 ref={calendarRef}
                 plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                 initialView="timeGridWeek"
+                headerToolbar={false}
                 selectable
                 selectMirror
                 select={handleDateSelect}
                 eventClick={handleEventClick}
                 events={events}
-                headerToolbar={false}
                 allDaySlot={false}
                 slotDuration="00:30:00"
                 height="100%"
@@ -96,12 +98,21 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 firstDay={1}
                 initialDate={currentDate}
                 views={{
-                    // ✅ カスタム3日ビュー定義
                     timeGridThreeDay: {
                         type: "timeGrid",
                         duration: { days: 3 },
                         buttonText: "3日",
                     },
+                }}
+                // ✅ 変更：currentDate がズレたときだけ更新（無限ループ防止）
+                datesSet={(info) => {
+                    const newDate = info.start;
+                    if (
+                        onDateChange &&
+                        newDate.toDateString() !== currentDate.toDateString()
+                    ) {
+                        onDateChange(newDate);
+                    }
                 }}
             />
         </div>
