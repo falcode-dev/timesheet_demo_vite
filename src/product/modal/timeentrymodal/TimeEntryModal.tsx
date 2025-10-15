@@ -6,6 +6,7 @@ import type { SelectOption } from "../../../component/select/Select";
 import { Button } from "../../../component/button/Button";
 import { Input } from "../../../component/input/Input";
 import { Textarea } from "../../../component/textarea/Textarea";
+import { ResourceSelectModal } from "../resourceselectmodal/ResourceSelectModal";
 import "./TimeEntryModal.css";
 
 interface TimeEntryModalProps {
@@ -18,7 +19,7 @@ interface TimeEntryModalProps {
     maincategoryOptions: SelectOption[];
     paymenttypeOptions: SelectOption[];
     timecategoryOptions: SelectOption[];
-    locationOptions: SelectOption[]; // ✅ 追加（DataverseのLocation）
+    locationOptions: SelectOption[]; // ✅ DataverseのLocation
 }
 
 export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
@@ -31,7 +32,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     maincategoryOptions,
     paymenttypeOptions,
     timecategoryOptions,
-    locationOptions, // ✅ 受け取り
+    locationOptions,
 }) => {
     // =============================
     // 状態管理
@@ -45,6 +46,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     const [category, setCategory] = useState("");
     const [paymentType, setPaymentType] = useState("");
     const [task, setTask] = useState("");
+    const [resource, setResource] = useState(""); // ✅ 選択したリソース名
 
     const [startDate, setStartDate] = useState("");
     const [startHour, setStartHour] = useState("");
@@ -55,6 +57,17 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
 
     const startDateRef = useRef<HTMLInputElement>(null);
     const endDateRef = useRef<HTMLInputElement>(null);
+
+    // ✅ リソース選択モーダルの状態
+    const [isResourceModalOpen, setIsResourceModalOpen] = useState(false);
+    const openResourceModal = () => setIsResourceModalOpen(true);
+    const closeResourceModal = () => setIsResourceModalOpen(false);
+
+    // ✅ モーダルの保存時にリソース名を受け取る（今は仮で固定）
+    const handleResourceSave = () => {
+        setResource("山田 太郎（自分）");
+        closeResourceModal();
+    };
 
     // =============================
     // 選択肢
@@ -120,6 +133,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setCategory(selectedEvent.extendedProps?.category || "");
             setPaymentType(selectedEvent.extendedProps?.paymentType || "");
             setTask(selectedEvent.extendedProps?.task || "");
+            setResource(selectedEvent.extendedProps?.resource || "");
         } else if (selectedDateTime) {
             setMode("create");
             const { start, end } = selectedDateTime;
@@ -137,6 +151,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setPaymentType("");
             setTask("");
             setComment("");
+            setResource("");
         }
     }, [isOpen, selectedEvent, selectedDateTime]);
 
@@ -156,6 +171,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             category,
             paymentType,
             task,
+            resource,
             start,
             end,
         };
@@ -167,130 +183,137 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     // JSX
     // =============================
     return (
-        <BaseModal
-            isOpen={isOpen}
-            onClose={onClose}
-            title={mode === "edit" ? "タイムエントリを編集" : "新しいタイムエントリを作成"}
-            description={
-                mode === "edit"
-                    ? "内容を修正して「更新」を押してください。"
-                    : "必要な情報を入力して「作成」を押してください。"
-            }
-            footerButtons={[
-                <Button key="cancel" label="キャンセル" color="secondary" onClick={onClose} />,
-                <Button
-                    key="save"
-                    label={mode === "edit" ? "更新" : "作成"}
-                    color="primary"
-                    onClick={handleSave}
-                    className="timeentry-create-button"
-                />,
-            ]}
-            size="large"
-        >
-            <div className="timeentry-modal-body">
-                <label className="modal-label">WO番号</label>
-                <Select
-                    options={filteredWoOptions}
-                    value={wo}
-                    onChange={setWo}
-                    placeholder="WOを選択"
-                />
+        <>
+            <BaseModal
+                isOpen={isOpen}
+                onClose={onClose}
+                title={mode === "edit" ? "タイムエントリを編集" : "新しいタイムエントリを作成"}
+                description={
+                    mode === "edit"
+                        ? "内容を修正して「更新」を押してください。"
+                        : "必要な情報を入力して「作成」を押してください。"
+                }
+                footerButtons={[
+                    <Button key="cancel" label="キャンセル" color="secondary" onClick={onClose} />,
+                    <Button
+                        key="save"
+                        label={mode === "edit" ? "更新" : "作成"}
+                        color="primary"
+                        onClick={handleSave}
+                        className="timeentry-create-button"
+                    />,
+                ]}
+                size="large"
+            >
+                <div className="timeentry-modal-body">
+                    <label className="modal-label">WO番号</label>
+                    <Select
+                        options={filteredWoOptions}
+                        value={wo}
+                        onChange={setWo}
+                        placeholder="WOを選択"
+                    />
 
-                <div className="modal-grid">
-                    {/* 左列 */}
-                    <div>
-                        <label className="modal-label">スケジュール開始日</label>
-                        <div className="datetime-row">
-                            <Input
-                                ref={startDateRef}
-                                type="date"
-                                value={startDate}
-                                className="datetime-row-input"
-                                onChange={setStartDate}
-                                suffix={
-                                    <FaIcons.FaRegCalendarAlt
-                                        className="icon"
-                                        onClick={() => startDateRef.current?.showPicker?.()}
-                                    />
-                                }
+                    <div className="modal-grid">
+                        {/* 左列 */}
+                        <div>
+                            <label className="modal-label">スケジュール開始日</label>
+                            <div className="datetime-row">
+                                <Input
+                                    ref={startDateRef}
+                                    type="date"
+                                    value={startDate}
+                                    className="datetime-row-input"
+                                    onChange={setStartDate}
+                                    suffix={
+                                        <FaIcons.FaRegCalendarAlt
+                                            className="icon"
+                                            onClick={() => startDateRef.current?.showPicker?.()}
+                                        />
+                                    }
+                                />
+                                <Select options={hours} value={startHour} onChange={setStartHour} />
+                                <Select options={minutes} value={startMinute} onChange={setStartMinute} />
+                            </div>
+
+                            <label className="modal-label">スケジュール終了日</label>
+                            <div className="datetime-row">
+                                <Input
+                                    ref={endDateRef}
+                                    type="date"
+                                    value={endDate}
+                                    className="datetime-row-input"
+                                    onChange={setEndDate}
+                                    suffix={
+                                        <FaIcons.FaRegCalendarAlt
+                                            className="icon"
+                                            onClick={() => endDateRef.current?.showPicker?.()}
+                                        />
+                                    }
+                                />
+                                <Select options={hours} value={endHour} onChange={setEndHour} />
+                                <Select options={minutes} value={endMinute} onChange={setEndMinute} />
+                            </div>
+
+                            <label className="modal-label">EndUser</label>
+                            <Select options={endUserOptions} value={endUser} onChange={setEndUser} />
+
+                            <label className="modal-label">Location</label>
+                            <Select options={locationOptions} value={location} onChange={setLocation} />
+
+                            <div className="resource-header">
+                                <label className="modal-label">リソース</label>
+                                <a href="#" className="resource-link" onClick={openResourceModal}>
+                                    リソース選択
+                                </a>
+                            </div>
+                            <Textarea
+                                placeholder="リソースの詳細を入力"
+                                value=""
+                                onChange={() => { }}
+                                rows={4}
+                                onClick={openResourceModal}
                             />
-                            <Select options={hours} value={startHour} onChange={setStartHour} />
-                            <Select options={minutes} value={startMinute} onChange={setStartMinute} />
                         </div>
 
-                        <label className="modal-label">スケジュール終了日</label>
-                        <div className="datetime-row">
-                            <Input
-                                ref={endDateRef}
-                                type="date"
-                                value={endDate}
-                                className="datetime-row-input"
-                                onChange={setEndDate}
-                                suffix={
-                                    <FaIcons.FaRegCalendarAlt
-                                        className="icon"
-                                        onClick={() => endDateRef.current?.showPicker?.()}
-                                    />
-                                }
+                        {/* 右列 */}
+                        <div>
+                            <label className="modal-label">タイムカテゴリ</label>
+                            <Select options={timecategoryOptions} value={timeCategory} onChange={setTimeCategory} />
+
+                            <label className="modal-label">カテゴリ</label>
+                            <Select options={maincategoryOptions} value={category} onChange={setCategory} />
+
+                            <label className="modal-label">ペイメントタイプ</label>
+                            <Select options={paymenttypeOptions} value={paymentType} onChange={setPaymentType} />
+
+                            <label className="modal-label">サブカテゴリ</label>
+                            <Input value="自動設定" disabled />
+
+                            <label className="modal-label">タスク</label>
+                            <Select options={taskOptions} value={task} onChange={setTask} />
+
+                            <Textarea
+                                label="コメント"
+                                value={comment}
+                                onChange={setComment}
+                                placeholder="コメントを入力"
+                                rows={4}
+                                showCount={true}
+                                maxLength={2000}
                             />
-                            <Select options={hours} value={endHour} onChange={setEndHour} />
-                            <Select options={minutes} value={endMinute} onChange={setEndMinute} />
                         </div>
-
-                        <label className="modal-label">EndUser</label>
-                        <Select options={endUserOptions} value={endUser} onChange={setEndUser} />
-
-                        <label className="modal-label">Location</label>
-                        <Select options={locationOptions} value={location} onChange={setLocation} />
-
-                        <div className="resource-header">
-                            <label className="modal-label">リソース</label>
-                            <a href="#" className="resource-link">
-                                リソース選択
-                            </a>
-                        </div>
-                        <Textarea
-                            placeholder="リソースの詳細を入力"
-                            value=""
-                            onChange={() => { }}
-                            rows={4}
-                        />
-                    </div>
-
-                    {/* 右列 */}
-                    <div>
-                        <label className="modal-label">タイムカテゴリ</label>
-                        <Select options={timecategoryOptions} value={timeCategory} onChange={setTimeCategory} />
-
-                        <label className="modal-label">カテゴリ</label>
-                        <Select options={maincategoryOptions} value={category} onChange={setCategory} />
-
-                        <label className="modal-label">ペイメントタイプ</label>
-                        <Select options={paymenttypeOptions} value={paymentType} onChange={setPaymentType} />
-
-                        <label className="modal-label">サブカテゴリ</label>
-                        <Input value="自動設定" disabled />
-
-                        <label className="modal-label">タスク</label>
-                        <Select options={taskOptions} value={task} onChange={setTask} />
-
-                        {/* <label className="modal-label">コメント</label> */}
-                        {/* <div className="char-count">
-                            {comment.length}/{maxLength}
-                        </div> */}
-                        <Textarea
-                            label="コメント"
-                            value={comment}
-                            onChange={setComment}
-                            placeholder="コメントを入力"
-                            rows={4}
-                            showCount={true}
-                            maxLength={2000}
-                        />
                     </div>
                 </div>
-            </div>
-        </BaseModal>
+            </BaseModal>
+
+            {/* ✅ リソース選択モーダル */}
+            <ResourceSelectModal
+                isOpen={isResourceModalOpen}
+                onClose={closeResourceModal}
+                onSave={handleResourceSave}
+                userName="山田 太郎"
+            />
+        </>
     );
 };

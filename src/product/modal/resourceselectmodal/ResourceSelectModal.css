@@ -1,0 +1,190 @@
+:root {
+    --main-color: rgb(0, 137, 186);
+}
+
+/* =============================
+   リソース選択モーダル（全体）
+============================= */
+.resource-modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    /* padding: 10px 20px; */
+    box-sizing: border-box;
+    background-color: #f4f4f4;
+}
+
+/* タイトル */
+.resource-title {
+    color: var(--main-color);
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: bold;
+}
+
+/* =============================
+   ラジオボタン群
+============================= */
+.resource-radios {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.resource-radios label {
+    display: flex;
+    align-items: center;
+    color: var(--main-color);
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.resource-radios input[type="radio"] {
+    accent-color: var(--main-color);
+    margin: 0 6px 0 1px;
+    height: 20px;
+    width: 20px;
+}
+
+/* =============================
+   入力欄
+============================= */
+.resource-input {
+    width: 100%;
+}
+
+/* =============================
+   自分の情報ボックス
+============================= */
+.resource-self {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.resource-self-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.resource-self-checkbox {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--main-color);
+}
+
+.resource-self-text {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    color: var(--main-color);
+}
+
+.resource-self-number {
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.resource-self-roman {
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+}
+
+/* =============================
+   区切り行
+============================= */
+.resource-self-divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.resource-self-icon {
+    color: var(--main-color);
+    font-size: 1rem;
+}
+
+.resource-self-label {
+    color: var(--main-color);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+/* =============================
+   ソートボタン行
+============================= */
+.resource-sort-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    margin: 4px 0 10px 0;
+}
+
+.resource-sort-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #f4f4f4;
+    border: none;
+    /* border-radius: 4px; */
+    color: var(--main-color);
+    font-size: 0.9rem;
+    font-weight: 600;
+    /* padding: 4px 10px; */
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+/* .resource-sort-btn:hover {
+    background: var(--main-color);
+    color: #fff;
+} */
+
+.resource-sort-icon {
+    font-size: 1rem;
+}
+
+.modal-content.medium {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 500px;
+    width: 400px;
+    padding: 15px;
+    background-color: #f4f4f4;
+}
+
+/* .modal-footer {
+    display: none;
+} */
+
+.resource-modal-button {
+    margin-left: 10px;
+}
+
+/* =============================
+   レスポンシブ対応
+============================= */
+@media (max-width: 768px) {
+    .resource-modal-body {
+        padding: 8px 12px;
+    }
+
+    .resource-title {
+        font-size: 0.9rem;
+    }
+
+    .resource-radios {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .resource-self {
+        gap: 6px;
+    }
+}

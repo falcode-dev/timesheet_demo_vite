@@ -11,6 +11,7 @@ type TextareaProps = {
     showCount?: boolean; // ✅ カウンター表示
     maxLength?: number;  // ✅ 最大文字数
     className?: string;
+    onClick?: () => void; // ✅ ← 追加！
 };
 
 export const Textarea: React.FC<TextareaProps> = ({
@@ -23,6 +24,7 @@ export const Textarea: React.FC<TextareaProps> = ({
     showCount = false,
     maxLength,
     className = "",
+    onClick, // ✅ 追加
 }) => {
     const charCount = useMemo(() => value.replace(/\n/g, "").length, [value]);
     const isOverLimit = maxLength !== undefined && charCount > maxLength;
@@ -46,6 +48,7 @@ export const Textarea: React.FC<TextareaProps> = ({
                 <textarea
                     value={value}
                     onChange={(e) => onChange?.(e.target.value)}
+                    onClick={onClick} // ✅ 追加：クリックイベントを許可
                     placeholder={placeholder}
                     rows={rows}
                     disabled={disabled}
