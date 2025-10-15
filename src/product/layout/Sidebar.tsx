@@ -21,13 +21,16 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ userName, mainTab }) => {
-    // =============================
-    // 状態管理
-    // =============================
     const [searchType, setSearchType] = useState<"name" | "number">("name");
     const [keyword, setKeyword] = useState("");
     const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
     const [selectedTask, setSelectedTask] = useState<string>("");
+
+    // ✅ ソート状態
+    const [isUserSortOpen, setIsUserSortOpen] = useState(false);
+    const [isTaskSortOpen, setIsTaskSortOpen] = useState(false);
+    const [userSortOption, setUserSortOption] = useState<string>("numberAsc");
+    const [taskSortOption, setTaskSortOption] = useState<string>("categoryAsc");
 
     // 仮ユーザー
     const users: User[] = [
@@ -38,7 +41,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, mainTab }) => {
         { id: "5", number: "0005", name: "山本 健" },
     ];
 
-    // 仮の間接タスク
+    // 仮タスク
     const indirectTasks: IndirectTask[] = [
         { id: "t1", category: "会議", task: "定例ミーティング" },
         { id: "t2", category: "教育", task: "新入社員研修資料作成" },
@@ -46,15 +49,45 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, mainTab }) => {
         { id: "t4", category: "その他", task: "社内イベント準備" },
     ];
 
-    // 検索結果
+    // ✅ 検索結果
     const filteredUsers = useMemo(() => {
-        if (!keyword.trim()) return [];
-        return searchType === "name"
-            ? users.filter((u) => u.name.includes(keyword))
-            : users.filter((u) => u.number.includes(keyword));
-    }, [keyword, searchType, users]);
+        let result =
+            searchType === "name"
+                ? users.filter((u) => u.name.includes(keyword))
+                : users.filter((u) => u.number.includes(keyword));
 
-    // チェック切替
+        switch (userSortOption) {
+            case "numberAsc":
+                return result.sort((a, b) => a.number.localeCompare(b.number));
+            case "numberDesc":
+                return result.sort((a, b) => b.number.localeCompare(a.number));
+            case "nameAsc":
+                return result.sort((a, b) => a.name.localeCompare(b.name));
+            case "nameDesc":
+                return result.sort((a, b) => b.name.localeCompare(a.name));
+            default:
+                return result;
+        }
+    }, [keyword, searchType, users, userSortOption]);
+
+    // ✅ タスクソート
+    const sortedTasks = useMemo(() => {
+        const copy = [...indirectTasks];
+        switch (taskSortOption) {
+            case "categoryAsc":
+                return copy.sort((a, b) => a.category.localeCompare(b.category));
+            case "categoryDesc":
+                return copy.sort((a, b) => b.category.localeCompare(a.category));
+            case "taskAsc":
+                return copy.sort((a, b) => a.task.localeCompare(b.task));
+            case "taskDesc":
+                return copy.sort((a, b) => b.task.localeCompare(a.task));
+            default:
+                return copy;
+        }
+    }, [taskSortOption]);
+
+    // ✅ 選択トグル
     const toggleSelect = (userId: string) => {
         setSelectedUsers((prev) =>
             prev.includes(userId)
@@ -62,6 +95,21 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, mainTab }) => {
                 : [...prev, userId]
         );
     };
+
+    // ✅ 並び替え候補
+    const userSortOptions = [
+        { value: "numberAsc", label: "▲ 社員番号昇順" },
+        { value: "numberDesc", label: "▼ 社員番号降順" },
+        { value: "nameAsc", label: "▲ ユーザー名昇順" },
+        { value: "nameDesc", label: "▼ ユーザー名降順" },
+    ];
+
+    const taskSortOptions = [
+        { value: "categoryAsc", label: "▲ サブカテゴリ昇順" },
+        { value: "categoryDesc", label: "▼ サブカテゴリ降順" },
+        { value: "taskAsc", label: "▲ タスク昇順" },
+        { value: "taskDesc", label: "▼ タスク降順" },
+    ];
 
     return (
         <aside className="sidebar-container">
@@ -72,6 +120,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, mainTab }) => {
                 <>
                     <h2 className="sidebar-title">検索</h2>
 
+                    {/* 検索タイプ切り替え */}
                     <div className="sidebar-radios">
                         <label>
                             <input
@@ -80,7 +129,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, mainTab }) => {
                                 value="name"
                                 checked={searchType === "name"}
                                 onChange={() => setSearchType("name")}
-                            />{" "}
+                            />
                             ユーザー名
                         </label>
                         <label>
@@ -90,7 +139,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, mainTab }) => {
                                 value="number"
                                 checked={searchType === "number"}
                                 onChange={() => setSearchType("number")}
-                            />{" "}
+                            />
                             社員番号
                         </label>
                     </div>
@@ -106,37 +155,67 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, mainTab }) => {
                         onChange={setKeyword}
                     />
 
-                    <div className="sidebar-self">
-                        <div className="sidebar-self-top">
-                            <input
-                                type="checkbox"
-                                checked
-                                readOnly
-                                className="sidebar-self-checkbox"
-                            />
-                            <div className="sidebar-self-text">
-                                <span className="sidebar-self-number">社員番号（自分）</span>
-                                <span className="sidebar-self-roman">
-                                    {userName || "未取得"}
-                                </span>
-                            </div>
+                    {/* 自分 */}
+                    <label className="sidebar-self-item">
+                        <input
+                            type="checkbox"
+                            checked
+                            readOnly
+                            className="sidebar-checkbox"
+                        />
+                        <div className="sidebar-self-text">
+                            <span className="sidebar-self-number">社員番号（自分）</span>
+                            <span className="sidebar-self-roman">
+                                {userName || "未取得"}
+                            </span>
                         </div>
+                    </label>
 
-                        <div className="sidebar-self-divider">
-                            <FaIcons.FaChevronDown className="sidebar-self-icon" />
-                            <span className="sidebar-self-label">ユーザー名</span>
-                            <FaIcons.FaTasks className="sidebar-self-icon" />
-                        </div>
+                    {/* ✅ 見出しクリックで開閉 */}
+                    <div
+                        className="sidebar-self-divider clickable"
+                        onClick={() => setIsUserSortOpen((p) => !p)}
+                    >
+                        <FaIcons.FaChevronDown
+                            className={`sidebar-self-icon ${isUserSortOpen ? "rotated" : ""}`}
+                        />
+                        <span className="sidebar-self-label">ユーザー名</span>
+                        <FaIcons.FaSortAmountDown className="sidebar-self-icon" />
                     </div>
 
+                    {/* 並び替えメニュー */}
+                    {isUserSortOpen && (
+                        <div className="sidebar-sort-dropdown">
+                            {userSortOptions.map((opt) => (
+                                <div
+                                    key={opt.value}
+                                    className={`sidebar-sort-option ${userSortOption === opt.value ? "active" : ""
+                                        }`}
+                                    onClick={() => {
+                                        setUserSortOption(opt.value);
+                                        setIsUserSortOpen(false);
+                                    }}
+                                >
+                                    {opt.label}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* 検索結果 */}
                     {filteredUsers.length > 0 && (
                         <div className="sidebar-results">
                             {filteredUsers.map((user) => (
-                                <label key={user.id} className="sidebar-result-item">
+                                <label
+                                    key={user.id}
+                                    className="sidebar-result-item"
+                                    onClick={() => toggleSelect(user.id)}
+                                >
                                     <input
                                         type="checkbox"
                                         checked={selectedUsers.includes(user.id)}
                                         onChange={() => toggleSelect(user.id)}
+                                        className="sidebar-checkbox"
                                     />
                                     <span className="sidebar-result-text">
                                         {user.number}：{user.name}
@@ -153,23 +232,52 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, mainTab }) => {
             ============================= */}
             {mainTab === "indirect" && (
                 <>
-                    <div className="sidebar-self-divider">
-                        <FaIcons.FaChevronDown className="sidebar-self-icon" />
+                    {/* 見出しクリックで開閉 */}
+                    <div
+                        className="sidebar-self-divider clickable"
+                        onClick={() => setIsTaskSortOpen((p) => !p)}
+                    >
+                        <FaIcons.FaChevronDown
+                            className={`sidebar-self-icon ${isTaskSortOpen ? "rotated" : ""}`}
+                        />
                         <span className="sidebar-self-label">カテゴリ・タスク</span>
                         <FaIcons.FaSortAmountDown className="sidebar-self-icon" />
                     </div>
 
-                    {/* ✅ デザイン統一ラジオリスト */}
+                    {/* 並び替えメニュー */}
+                    {isTaskSortOpen && (
+                        <div className="sidebar-sort-dropdown">
+                            {taskSortOptions.map((opt) => (
+                                <div
+                                    key={opt.value}
+                                    className={`sidebar-sort-option ${taskSortOption === opt.value ? "active" : ""
+                                        }`}
+                                    onClick={() => {
+                                        setTaskSortOption(opt.value);
+                                        setIsTaskSortOpen(false);
+                                    }}
+                                >
+                                    {opt.label}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* ソート後のタスクリスト */}
                     <div className="sidebar-task-list">
-                        {indirectTasks.map((task) => (
-                            <label key={task.id} className="sidebar-task-radio">
+                        {sortedTasks.map((task) => (
+                            <label
+                                key={task.id}
+                                className="sidebar-task-radio"
+                                onClick={() => setSelectedTask(task.id)}
+                            >
                                 <input
                                     type="radio"
                                     name="indirectTask"
                                     value={task.id}
                                     checked={selectedTask === task.id}
                                     onChange={() => setSelectedTask(task.id)}
-                                />{" "}
+                                />
                                 <div className="sidebar-task-lines">
                                     <span className="sidebar-task-category">{task.category}</span>
                                     <span className="sidebar-task-name">{task.task}</span>

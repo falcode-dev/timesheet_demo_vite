@@ -1,5 +1,8 @@
 :root {
     --main-color: rgb(0, 137, 186);
+    --main-light: rgba(0, 137, 186, 0.08);
+    --white: #fff;
+    --shadow-light: rgba(0, 0, 0, 0.1);
 }
 
 /* =============================
@@ -34,14 +37,40 @@
 .sidebar-radios label {
     display: flex;
     align-items: center;
-    color: var(--main-color);
-    font-weight: 500;
     font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--main-color);
+    cursor: pointer;
 }
 
 .sidebar-radios input[type="radio"] {
-    accent-color: var(--main-color);
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--main-color);
+    background-color: var(--white);
+    box-shadow: 0 1px 2px var(--shadow-light);
     margin-right: 6px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.sidebar-radios input[type="radio"]:checked {
+    background-color: var(--main-color);
+    box-shadow: 0 0 0 3px var(--main-light);
+}
+
+.sidebar-radios input[type="radio"]:checked::after {
+    content: "";
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--white);
 }
 
 /* =============================
@@ -64,17 +93,47 @@
 .sidebar-self-top {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
     gap: 10px;
     width: 100%;
 }
 
-.sidebar-self-checkbox {
-    width: 18px;
-    height: 18px;
-    accent-color: var(--main-color);
+/* ✅ チェックボックス（ResourceModalと統一） */
+.sidebar-self-checkbox,
+.sidebar-result-item input[type="checkbox"] {
+    width: 25px;
+    height: 25px;
+    border-radius: 6px;
+    appearance: none;
+    background-color: var(--white);
+    border: 2px solid var(--main-color);
+    cursor: pointer;
+    box-shadow: 0 1px 2px var(--shadow-light);
+    transition: all 0.2s ease;
+    position: relative;
 }
 
+.sidebar-self-checkbox:checked,
+.sidebar-result-item input[type="checkbox"]:checked {
+    background-color: var(--main-color);
+    box-shadow: 0 0 0 3px var(--main-light);
+}
+
+.sidebar-self-checkbox:checked::after,
+.sidebar-result-item input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: 2px;
+    width: 6px;
+    height: 11px;
+    border-right: 2px solid white;
+    border-bottom: 2px solid white;
+    transform: rotate(45deg);
+}
+
+/* =============================
+   自分のテキスト
+============================= */
 .sidebar-self-text {
     display: flex;
     flex-direction: column;
@@ -100,7 +159,6 @@
     width: 100%;
     display: flex;
     align-items: center;
-    justify-content: flex-start;
     gap: 10px;
     margin-top: 8px;
 }
@@ -123,30 +181,40 @@
     margin-top: 10px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    max-height: 180px;
+    gap: 8px;
+    max-height: 200px;
     overflow-y: auto;
     padding-right: 4px;
 }
 
+.sidebar-results::-webkit-scrollbar {
+    display: none;
+}
+
+.sidebar-results {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* ✅ 各ユーザー項目 */
 .sidebar-result-item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    color: #333;
-    font-size: 0.9rem;
+    gap: 10px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s ease;
 }
 
-.sidebar-result-item input[type="checkbox"] {
-    accent-color: var(--main-color);
-    height: 20px;
-    width: 20px;
-    border-radius: 8px;
+.sidebar-result-item:hover {
+    background: var(--main-light);
 }
 
 .sidebar-result-text {
     color: var(--main-color);
     font-weight: 500;
+    font-size: 0.9rem;
 }
 
 /* =============================
@@ -159,6 +227,7 @@
     margin-top: 10px;
 }
 
+/* ✅ ラジオボタン（モダン化） */
 .sidebar-task-radio {
     display: flex;
     align-items: flex-start;
@@ -166,13 +235,46 @@
     color: var(--main-color);
     font-size: 0.9rem;
     line-height: 1.4;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    border-radius: 6px;
+    padding: 4px 6px;
+}
+
+.sidebar-task-radio:hover {
+    background: var(--main-light);
 }
 
 .sidebar-task-radio input[type="radio"] {
-    accent-color: var(--main-color);
-    margin-top: 3px;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--main-color);
+    background: var(--white);
+    cursor: pointer;
+    position: relative;
+    box-shadow: 0 1px 2px var(--shadow-light);
+    transition: all 0.2s ease;
 }
 
+.sidebar-task-radio input[type="radio"]:checked {
+    background: var(--main-color);
+    box-shadow: 0 0 0 3px var(--main-light);
+}
+
+.sidebar-task-radio input[type="radio"]:checked::after {
+    content: "";
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: white;
+}
+
+/* タスク名テキスト */
 .sidebar-task-lines {
     display: flex;
     flex-direction: column;
@@ -187,6 +289,163 @@
     font-size: 0.85rem;
 }
 
+/* ✅ クリック全体反応＆モダンチェックボックス */
+.sidebar-result-item,
+.sidebar-self-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.sidebar-result-item:hover,
+.sidebar-self-item:hover {
+    background: var(--main-light);
+}
+
+.sidebar-checkbox {
+    width: 25px;
+    height: 25px;
+    border-radius: 6px;
+    appearance: none;
+    background-color: var(--white);
+    border: 2px solid var(--main-color);
+    cursor: pointer;
+    box-shadow: 0 1px 2px var(--shadow-light);
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.sidebar-checkbox:checked {
+    background-color: var(--main-color);
+    box-shadow: 0 0 0 3px var(--main-light);
+}
+
+.sidebar-checkbox:checked::after {
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: 2px;
+    width: 6px;
+    height: 11px;
+    border-right: 2px solid white;
+    border-bottom: 2px solid white;
+    transform: rotate(45deg);
+}
+
+/* =============================
+   ソートグループ
+============================= */
+.sidebar-sort-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 6px 0;
+}
+
+.sidebar-sort-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sidebar-sort-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+/* ✅ ボタンデザイン（既存dividerと統一トーン） */
+.sidebar-sort-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: 1.5px solid var(--main-color);
+    background: var(--white);
+    color: var(--main-color);
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px var(--shadow-light);
+}
+
+.sidebar-sort-btn:hover {
+    background: var(--main-light);
+}
+
+.sidebar-sort-btn.active {
+    background: var(--main-color);
+    color: var(--white);
+    box-shadow: 0 0 0 3px var(--main-light);
+}
+
+.sidebar-sort-btn svg {
+    font-size: 1rem;
+}
+
+/* =============================
+   クリック可能な見出し
+============================= */
+.sidebar-self-divider.clickable {
+    cursor: pointer;
+    transition: background 0.2s ease;
+    border-radius: 6px;
+    padding: 6px 4px;
+}
+
+.sidebar-self-divider.clickable:hover {
+    background-color: rgba(0, 137, 186, 0.08);
+}
+
+/* ↓ 開閉時の矢印回転 */
+.sidebar-self-icon.rotated {
+    transform: rotate(180deg);
+    transition: transform 0.2s ease;
+}
+
+/* =============================
+   ソートドロップダウン
+============================= */
+.sidebar-sort-dropdown {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 6px 8px;
+    background-color: #fff;
+    border: 1px solid rgba(0, 137, 186, 0.3);
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 6px;
+}
+
+.sidebar-sort-option {
+    color: rgb(0, 137, 186);
+    font-weight: 500;
+    font-size: 0.9rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.sidebar-sort-option:hover {
+    background-color: rgba(0, 137, 186, 0.08);
+}
+
+.sidebar-sort-option.active {
+    background-color: rgb(0, 137, 186);
+    color: #fff;
+}
+
+
 /* =============================
    レスポンシブ対応
 ============================= */
@@ -194,7 +453,6 @@
     .sidebar-container {
         width: 100%;
         padding: 8px 12px;
-        /* border-bottom: 1px solid #ccc; */
     }
 
     .sidebar-title {
@@ -209,8 +467,4 @@
     .sidebar-self {
         gap: 6px;
     }
-
-    /* .sidebar-self-divider {
-        justify-content: center;
-    } */
 }

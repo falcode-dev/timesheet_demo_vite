@@ -96,7 +96,7 @@ export const DataverseApp = () => {
                 {/* 中央エリア：サイドバー＋カレンダー */}
                 <div className="content-middle">
                     {/* <Sidebar userName="テストユーザー" /> */}
-                    <Sidebar userName="テストユーザー" mainTab={mainTab} />
+                    <Sidebar mainTab={mainTab} />
 
                     <div className="content-main">
                         <CalendarView
