@@ -171,23 +171,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
                     />
 
                     {/* ✅ 自分もON/OFFできる */}
-                    <label
-                        className="sidebar-self-item"
-                        onClick={() => toggleSelect("self")}
-                    >
+                    <label className="sidebar-self-item clickable">
                         <input
                             type="checkbox"
+                            className="sidebar-checkbox"
                             checked={selectedUsers.includes("self")}
                             onChange={() => toggleSelect("self")}
-                            className="sidebar-checkbox"
                         />
                         <div className="sidebar-self-text">
                             <span className="sidebar-self-number">
                                 {`${displaySelf.number}（自分）`}
                             </span>
-                            <span className="sidebar-self-roman">
-                                {displaySelf.fullName}
-                            </span>
+                            <span className="sidebar-self-roman">{displaySelf.fullName}</span>
                         </div>
                     </label>
 
@@ -225,16 +220,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
                     {!isResourceLoading && filteredUsers.length > 0 && (
                         <div className="sidebar-results">
                             {filteredUsers.map((user) => (
-                                <label
-                                    key={user.id}
-                                    className="sidebar-result-item"
-                                    onClick={() => toggleSelect(user.id)}
-                                >
+                                <label key={user.id} className="sidebar-result-item clickable">
                                     <input
                                         type="checkbox"
+                                        className="sidebar-checkbox"
                                         checked={selectedUsers.includes(user.id)}
                                         onChange={() => toggleSelect(user.id)}
-                                        className="sidebar-checkbox"
                                     />
                                     <span className="sidebar-result-text">
                                         {(user.number || "不明")} {(user.name || "名称未設定")}
@@ -242,7 +233,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
                                 </label>
                             ))}
                         </div>
+
                     )}
+
                 </>
             )}
 

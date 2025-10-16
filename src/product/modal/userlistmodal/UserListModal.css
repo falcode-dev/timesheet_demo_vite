@@ -272,6 +272,7 @@
     gap: 10px;
     padding: 8px 6px;
     border-bottom: 1px solid #f1f1f1;
+    cursor: pointer;
 }
 
 .list-item-2line:last-child {

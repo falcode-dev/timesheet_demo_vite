@@ -113,17 +113,22 @@ export const UserListModal: React.FC<UserListModalProps> = ({
        ▼ 移動（右へ）
     ======================== */
     const moveToSelected = () => {
-        const toAdd = searchResults.filter((r) =>
-            checkedResults.includes(r.id)
-        );
+        const toAdd = searchResults.filter((r) => checkedResults.includes(r.id));
+
+        // ✅ 右側（selectedUsers）に追加
         const updated = [...selectedUsers];
+        const newChecked = [...checkedSelected]; // ✅ 右側チェックも管理
+
         toAdd.forEach((r) => {
             if (!updated.some((u) => u.id === r.id)) {
                 updated.push(r);
+                newChecked.push(r.id); // ✅ 新しく追加されたユーザーを右側でチェックON
             }
         });
+
         setSelectedUsers(updated);
-        setCheckedResults([]);
+        setCheckedSelected(newChecked); // ✅ 右側チェックONを反映
+        setCheckedResults([]); // 左側のチェック解除
         setIsLeftHeaderChecked(false);
     };
 
