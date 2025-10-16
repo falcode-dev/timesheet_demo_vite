@@ -5,6 +5,7 @@ import { BaseModal } from "../BaseModal";
 import { Button } from "../../../component/button/Button";
 import { Input } from "../../../component/input/Input";
 import { useResources } from "../../../hooks/useResources";
+import { useAllowedUsers } from "../../../context/UserListContext"; // ✅ 追加
 import "./UserListModal.css";
 
 export interface BaseModalProps {
@@ -31,6 +32,7 @@ export const UserListModal: React.FC<UserListModalProps> = ({
        ▼ Dataverseからリソース取得
     ======================== */
     const { resources, isLoading } = useResources();
+    const { setAllowedUsers } = useAllowedUsers(); // ✅ Contextへ反映
 
     type Resource = { id: string; number: string; name: string };
 
@@ -141,6 +143,16 @@ export const UserListModal: React.FC<UserListModalProps> = ({
     };
 
     /* ========================
+       ▼ 保存処理（Contextへ反映）
+    ======================== */
+    const handleSave = () => {
+        const ids = selectedUsers.map((u) => u.id);
+        setAllowedUsers(ids); // ✅ グローバルに保存
+        onSave(ids); // 既存のコールバックも呼ぶ
+        onClose();
+    };
+
+    /* ========================
        ▼ JSX
     ======================== */
     return (
@@ -161,7 +173,7 @@ export const UserListModal: React.FC<UserListModalProps> = ({
                     key="save"
                     label="保存"
                     color="primary"
-                    onClick={() => onSave(selectedUsers.map((u) => u.id))}
+                    onClick={handleSave}
                     className="userlist-create-button"
                 />,
             ]}
@@ -238,34 +250,39 @@ export const UserListModal: React.FC<UserListModalProps> = ({
 
                             {/* ✅ 初期でもリスト枠は残す */}
                             <div className="list-box">
-
-                                {searchResults.map((r) => {
-                                    const isSelected = selectedUsers.some(
-                                        (u) => u.id === r.id
-                                    );
-                                    return (
-                                        <label
-                                            key={r.id}
-                                            className={`list-item-2line ${isSelected ? "disabled-item" : ""
-                                                }`}
-                                        >
-                                            <input
-                                                type="checkbox"
-                                                disabled={isSelected}
-                                                checked={checkedResults.includes(r.id)}
-                                                onChange={() => toggleCheck(r.id)}
-                                            />
-                                            <div className="list-text">
-                                                <div className="category-name">
-                                                    {r.number || "-"}
+                                {searchResults.length === 0 ? (
+                                    <p className="no-results">
+                                        検索条件を入力して検索してください。
+                                    </p>
+                                ) : (
+                                    searchResults.map((r) => {
+                                        const isSelected = selectedUsers.some(
+                                            (u) => u.id === r.id
+                                        );
+                                        return (
+                                            <label
+                                                key={r.id}
+                                                className={`list-item-2line ${isSelected ? "disabled-item" : ""
+                                                    }`}
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    disabled={isSelected}
+                                                    checked={checkedResults.includes(r.id)}
+                                                    onChange={() => toggleCheck(r.id)}
+                                                />
+                                                <div className="list-text">
+                                                    <div className="category-name">
+                                                        {r.number || "-"}
+                                                    </div>
+                                                    <div className="task-name">
+                                                        {r.name || "(名前なし)"}
+                                                    </div>
                                                 </div>
-                                                <div className="task-name">
-                                                    {r.name || "(名前なし)"}
-                                                </div>
-                                            </div>
-                                        </label>
-                                    );
-                                })}
+                                            </label>
+                                        );
+                                    })
+                                )}
                             </div>
                         </div>
 
@@ -309,31 +326,39 @@ export const UserListModal: React.FC<UserListModalProps> = ({
                             </div>
 
                             <div className="list-box">
-                                {selectedUsers.map((r) => (
-                                    <div key={r.id} className="list-item-favorite">
-                                        <div className="list-item-favorite-left">
-                                            <input
-                                                type="checkbox"
-                                                checked={checkedSelected.includes(r.id)}
-                                                onChange={() => toggleSelectedCheck(r.id)}
-                                            />
-                                            <div className="list-text">
-                                                <div className="category-name">
-                                                    {r.number}
+                                {selectedUsers.length === 0 ? (
+                                    <p className="no-results">
+                                        まだユーザーが追加されていません。
+                                    </p>
+                                ) : (
+                                    selectedUsers.map((r) => (
+                                        <div key={r.id} className="list-item-favorite">
+                                            <div className="list-item-favorite-left">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={checkedSelected.includes(r.id)}
+                                                    onChange={() =>
+                                                        toggleSelectedCheck(r.id)
+                                                    }
+                                                />
+                                                <div className="list-text">
+                                                    <div className="category-name">
+                                                        {r.number}
+                                                    </div>
+                                                    <div className="task-name">{r.name}</div>
                                                 </div>
-                                                <div className="task-name">{r.name}</div>
+                                            </div>
+                                            <div className="list-item-favorite-right">
+                                                <Button
+                                                    label=""
+                                                    icon={<FaIcons.FaTimes />}
+                                                    onClick={() => removeUser(r.id)}
+                                                    className="delete-list-button"
+                                                />
                                             </div>
                                         </div>
-                                        <div className="list-item-favorite-right">
-                                            <Button
-                                                label=""
-                                                icon={<FaIcons.FaTimes />}
-                                                onClick={() => removeUser(r.id)}
-                                                className="delete-list-button"
-                                            />
-                                        </div>
-                                    </div>
-                                ))}
+                                    ))
+                                )}
                             </div>
                         </div>
                     </div>

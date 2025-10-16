@@ -15,14 +15,16 @@
     background: #f9f9f9;
     box-sizing: border-box;
     color: var(--main-color);
+    height: 100%;
+    overflow: hidden;
 }
 
 /* =============================
-   ラジオボタン群
+   ラジオボタン群（安定版）
 ============================= */
 .resource-radios {
     display: flex;
-    gap: 16px;
+    /* gap: 16px; */
 }
 
 .resource-radios label {
@@ -31,14 +33,62 @@
     font-size: 0.95rem;
     font-weight: 500;
     color: var(--main-color);
+    cursor: pointer;
 }
 
+/* ✅ 再描画に強い：各ブラウザ対応 */
 .resource-radios input[type="radio"] {
-    accent-color: var(--main-color);
-    width: 18px;
-    height: 18px;
-    margin-right: 6px;
+    -webkit-appearance: none;
+    /* Safari対応 */
+    -moz-appearance: none;
+    /* Firefox対応 */
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--main-color);
+    border-radius: 50%;
+    background-color: var(--white);
+    margin: 0;
+    margin-right: 8px;
     cursor: pointer;
+    position: relative;
+    box-shadow: 0 1px 2px var(--shadow-light);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+/* hover時に軽い強調 */
+.resource-radios input[type="radio"]:hover {
+    box-shadow: 0 0 0 3px var(--main-light);
+}
+
+/* ✅ checked時も背景を白に固定してチラつき防止 */
+.resource-radios input[type="radio"]:checked {
+    border-color: var(--main-color);
+    background-color: var(--white);
+}
+
+/* ✅ 中央の青ドット（安定アニメーション） */
+.resource-radios input[type="radio"]::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--main-color);
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.resource-radios input[type="radio"]:checked::after {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+}
+
+#radio-number {
+    margin-left: 20px;
 }
 
 /* =============================
@@ -67,12 +117,12 @@
     font-size: 0.9rem;
     cursor: pointer;
     transition: all 0.2s ease;
+    border-radius: 6px;
+    padding: 4px 8px;
 }
 
 .resource-sort-btn:hover {
     background: var(--main-light);
-    border-radius: 6px;
-    /* padding: 4px 8px; */
 }
 
 .resource-sort-icon {
@@ -88,21 +138,22 @@
     gap: 12px;
     padding: 8px 10px;
     border-radius: 8px;
-    transition: background 0.2s ease, transform 0.15s ease;
+    transition: background 0.2s ease;
     cursor: pointer;
 }
 
 .resource-item:hover {
     background: var(--main-light);
-    /* transform: translateX(2px); */
 }
 
-/* チェックボックスのモダン化 */
+/* ✅ チェックボックス */
 .resource-checkbox {
-    width: 25px;
-    height: 25px;
-    border-radius: 6px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
     appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
     background-color: var(--white);
     border: 2px solid var(--main-color);
     cursor: pointer;
@@ -119,8 +170,7 @@
 .resource-checkbox:checked::after {
     content: "";
     position: absolute;
-    left: 6px;
-    top: 2px;
+    left: 5px;
     width: 6px;
     height: 11px;
     border-right: 2px solid white;
@@ -136,6 +186,7 @@
     align-items: center;
     flex-direction: row;
     line-height: 1.5;
+    gap: 10px;
 }
 
 .resource-number {
@@ -158,6 +209,20 @@
     flex-direction: column;
     gap: 6px;
     margin-top: 6px;
+    flex: 1;
+    overflow-y: auto;
+    max-height: 250px;
+    padding-right: 6px;
+}
+
+/* ✅ スクロールバー非表示 */
+.resource-list::-webkit-scrollbar {
+    display: none;
+}
+
+.resource-list {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
 /* =============================
@@ -178,52 +243,6 @@
 .resource-modal-button {
     margin-left: 10px;
 }
-
-/* =============================
-   リスト
-============================= */
-.resource-list {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin-top: 6px;
-
-    /* ✅ スクロール関連 */
-    flex: 1;
-    overflow-y: auto;
-    max-height: 250px;
-    /* モーダル内でのスクロール範囲を制限 */
-    padding-right: 6px;
-}
-
-/* ✅ スクロールバー非表示 */
-.resource-list::-webkit-scrollbar {
-    display: none;
-    /* Chrome, Safari */
-}
-
-.resource-list {
-    -ms-overflow-style: none;
-    /* IE, Edge */
-    scrollbar-width: none;
-    /* Firefox */
-}
-
-/* =============================
-   モーダル本体調整
-============================= */
-.resource-modal-body {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    background: #f9f9f9;
-    box-sizing: border-box;
-    color: var(--main-color);
-    height: 100%;
-    overflow: hidden;
-    /* ✅ 全体でのスクロールを防ぐ */
-}
-
 
 /* =============================
    レスポンシブ

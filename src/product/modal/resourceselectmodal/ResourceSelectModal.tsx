@@ -1,13 +1,14 @@
-// src/layout/modal/resourceselectmodal/ResourceSelectModal.tsx
 import React, { useState, useMemo } from "react";
 import * as FaIcons from "react-icons/fa";
 import { BaseModal } from "../BaseModal";
 import { Button } from "../../../component/button/Button";
 import { Input } from "../../../component/input/Input";
-import { useCurrentUser } from "../../../hooks/useCurrentUser"; // ✅ 追加
+import { useCurrentUser } from "../../../hooks/useCurrentUser";
+import { useResources } from "../../../hooks/useResources";
+import { useAllowedUsers } from "../../../context/UserListContext";
 import "./ResourceSelectModal.css";
 
-interface User {
+interface Resource {
     id: string;
     number: string;
     name: string;
@@ -16,22 +17,21 @@ interface User {
 interface ResourceSelectModalProps {
     isOpen: boolean;
     onClose: () => void;
-    userName?: string;
-    onSave?: () => void;
+    onSave?: (selectedIds: string[]) => void;
 }
 
 export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
     isOpen,
     onClose,
-    // userName,
     onSave,
 }) => {
-    // ✅ Dataverseのログインユーザー情報取得
-    const { currentUser, isLoading } = useCurrentUser();
+    /* ========================
+       ▼ Dataverseのログインユーザー情報
+    ======================== */
+    const { currentUser, isLoading: isUserLoading } = useCurrentUser();
 
-    // ✅ ログインユーザー情報を整形
     const displaySelf = useMemo(() => {
-        if (isLoading) {
+        if (isUserLoading) {
             return { number: "取得中...", fullName: "ユーザー情報を取得中..." };
         }
         if (!currentUser) {
@@ -40,30 +40,35 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
         const number = currentUser.employeeid || "社員番号未登録";
         const fullName = `${currentUser.lastName || ""} ${currentUser.firstName || ""}`.trim();
         return { number, fullName };
-    }, [currentUser, isLoading]);
+    }, [currentUser, isUserLoading]);
 
-    // 仮ユーザー一覧
-    const users: User[] = [
-        { id: "1", number: "0001", name: "田中 太郎" },
-        { id: "2", number: "0002", name: "佐藤 花子" },
-        { id: "3", number: "0003", name: "鈴木 次郎" },
-        { id: "4", number: "0004", name: "高橋 美咲" },
-        { id: "5", number: "0005", name: "山本 健" },
-    ];
+    /* ========================
+       ▼ Dataverseのリソース一覧
+    ======================== */
+    const { resources, isLoading: isResourcesLoading } = useResources();
+    const { allowedUsers } = useAllowedUsers();
 
+    // ✅ 許可されたユーザーのみ抽出
+    const visibleResources = useMemo(() => {
+        if (isResourcesLoading) return [];
+        return resources.filter((r) => allowedUsers.includes(r.id));
+    }, [resources, allowedUsers, isResourcesLoading]);
+
+    /* ========================
+       ▼ 検索・ソート
+    ======================== */
     const [searchType, setSearchType] = useState<"name" | "number">("name");
     const [keyword, setKeyword] = useState("");
-    const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+    const [selectedUsers, setSelectedUsers] = useState<string[]>(["self"]);
     const [sortByNumberAsc, setSortByNumberAsc] = useState(true);
     const [sortByNameAsc, setSortByNameAsc] = useState(true);
 
-    // ✅ 検索・ソート済みデータ
+    // ✅ 検索＋ソート結果
     const filteredUsers = useMemo(() => {
-        const filtered = users.filter((u) =>
+        let filtered =
             searchType === "name"
-                ? u.name.includes(keyword)
-                : u.number.includes(keyword)
-        );
+                ? visibleResources.filter((u) => u.name?.includes(keyword))
+                : visibleResources.filter((u) => u.number?.includes(keyword));
 
         const sorted = [...filtered]
             .sort((a, b) =>
@@ -78,10 +83,10 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
             );
 
         return sorted;
-    }, [keyword, searchType, sortByNumberAsc, sortByNameAsc]);
+    }, [keyword, searchType, sortByNumberAsc, sortByNameAsc, visibleResources]);
 
-    // ✅ 自分のデータを先頭に追加
-    const displayUsers: User[] = [
+    // ✅ 表示用配列（常に自分を先頭に表示）
+    const displayUsers: Resource[] = [
         {
             id: "self",
             number: `${displaySelf.number}(自分)`,
@@ -90,7 +95,9 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
         ...filteredUsers,
     ];
 
-    // ✅ チェック状態
+    /* ========================
+       ▼ チェック操作
+    ======================== */
     const toggleSelect = (id: string) =>
         setSelectedUsers((prev) =>
             prev.includes(id)
@@ -98,12 +105,18 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
                 : [...prev, id]
         );
 
+    /* ========================
+       ▼ 保存処理
+    ======================== */
     const handleSave = () => {
         console.log("✅ 選択されたユーザー:", selectedUsers);
-        onSave?.();
+        onSave?.(selectedUsers);
         onClose();
     };
 
+    /* ========================
+       ▼ JSX
+    ======================== */
     return (
         <BaseModal
             isOpen={isOpen}
@@ -128,26 +141,25 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
             <div className="resource-modal-body">
                 {/* 検索条件 */}
                 <div className="resource-radios">
-                    <label>
-                        <input
-                            type="radio"
-                            name="searchType"
-                            value="name"
-                            checked={searchType === "name"}
-                            onChange={() => setSearchType("name")}
-                        />
-                        ユーザー名
-                    </label>
-                    <label>
-                        <input
-                            type="radio"
-                            name="searchType"
-                            value="number"
-                            checked={searchType === "number"}
-                            onChange={() => setSearchType("number")}
-                        />
-                        社員番号
-                    </label>
+                    <input
+                        id="radio-name"
+                        type="radio"
+                        name="searchTypeResource"
+                        value="name"
+                        checked={searchType === "name"}
+                        onChange={() => setSearchType("name")}
+                    />
+                    <label htmlFor="radio-name">ユーザー名</label>
+
+                    <input
+                        id="radio-number"
+                        type="radio"
+                        name="searchTypeResource"
+                        value="number"
+                        checked={searchType === "number"}
+                        onChange={() => setSearchType("number")}
+                    />
+                    <label htmlFor="radio-number">社員番号</label>
                 </div>
 
                 <Input
@@ -188,25 +200,18 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
                     </button>
                 </div>
 
-                {/* ✅ 一覧（自分 + 検索結果） */}
+                {/* ✅ 自分は常に表示 */}
                 <div className="resource-list">
                     {displayUsers.map((u) => (
                         <label key={u.id} className="resource-item">
                             <input
                                 type="checkbox"
-                                checked={
-                                    u.id === "self"
-                                        ? true
-                                        : selectedUsers.includes(u.id)
-                                }
-                                readOnly={u.id === "self"}
-                                onChange={() =>
-                                    u.id !== "self" && toggleSelect(u.id)
-                                }
+                                checked={selectedUsers.includes(u.id)}
+                                onChange={() => toggleSelect(u.id)}
                                 className="resource-checkbox"
                             />
                             <div className="resource-text">
-                                <span className="resource-number">{u.number}_</span>
+                                <span className="resource-number">{u.number}</span>
                                 <span className="resource-name">{u.name}</span>
                             </div>
                         </label>
