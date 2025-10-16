@@ -1,4 +1,4 @@
-// hooks/useCalendarController.ts
+// src/hooks/useCalendarController.ts
 import type { Dispatch, SetStateAction } from "react";
 
 /**
@@ -11,7 +11,16 @@ export const useCalendarController = (
     setCurrentDate: Dispatch<SetStateAction<Date>>
 ) => {
     /** シフトする日数をモードに応じて取得 */
-    const getShiftDays = () => (viewMode === "1日" ? 1 : viewMode === "3日" ? 3 : 7);
+    const getShiftDays = () => {
+        switch (viewMode) {
+            case "1日":
+                return 1;
+            case "3日":
+                return 3;
+            default:
+                return 7;
+        }
+    };
 
     /** 前の期間へ移動 */
     const handlePrev = () => {

@@ -43,7 +43,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     const [endUser, setEndUser] = useState("");
     const [location, setLocation] = useState("");
     const [timeCategory, setTimeCategory] = useState("");
-    const [category, setCategory] = useState("");
+    const [mainCategory, setMainCategory] = useState("");
     const [paymentType, setPaymentType] = useState("");
     const [task, setTask] = useState("");
     const [resource, setResource] = useState(""); // ✅ 選択したリソース名
@@ -110,30 +110,34 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     };
 
     // =============================
-    // 初期化処理
+    // 初期化処理（Dataverseの詳細反映）
     // =============================
     useEffect(() => {
         if (!isOpen) return;
 
         if (selectedEvent) {
             setMode("edit");
+
+            // 日時を分解してセット
             const start = new Date(selectedEvent.start);
             const end = new Date(selectedEvent.end);
-            setComment(selectedEvent.extendedProps?.comment || "");
             setStartDate(formatLocalDate(start));
             setStartHour(start.getHours().toString().padStart(2, "0"));
             setStartMinute(start.getMinutes().toString().padStart(2, "0"));
             setEndDate(formatLocalDate(end));
             setEndHour(end.getHours().toString().padStart(2, "0"));
             setEndMinute(end.getMinutes().toString().padStart(2, "0"));
-            setWo(selectedEvent.extendedProps?.wo || "");
-            setEndUser(selectedEvent.extendedProps?.endUser || "");
-            setLocation(selectedEvent.extendedProps?.location || "");
-            setTimeCategory(selectedEvent.extendedProps?.timeCategory || "");
-            setCategory(selectedEvent.extendedProps?.category || "");
-            setPaymentType(selectedEvent.extendedProps?.paymentType || "");
-            setTask(selectedEvent.extendedProps?.task || "");
-            setResource(selectedEvent.extendedProps?.resource || "");
+
+            // ✅ Dataverseから取得したフィールドを反映
+            setWo(selectedEvent.workOrder || "");
+            setMainCategory(String(selectedEvent.maincategory || ""));
+            setTimeCategory(String(selectedEvent.timecategory || ""));
+            setPaymentType(String(selectedEvent.paymenttype || ""));
+            setComment(selectedEvent.comment || "");
+            setEndUser(selectedEvent.endUser || "");
+            setTask(selectedEvent.task || "");
+            setLocation(selectedEvent.location || "");
+            setResource(selectedEvent.resource || "");
         } else if (selectedDateTime) {
             setMode("create");
             const { start, end } = selectedDateTime;
@@ -143,11 +147,13 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setEndDate(formatLocalDate(end));
             setEndHour(end.getHours().toString().padStart(2, "0"));
             setEndMinute(end.getMinutes().toString().padStart(2, "0"));
+
+            // クリア
             setWo("");
             setEndUser("");
             setLocation("");
             setTimeCategory("");
-            setCategory("");
+            setMainCategory("");
             setPaymentType("");
             setTask("");
             setComment("");
@@ -161,19 +167,20 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     const handleSave = () => {
         const start = new Date(`${startDate}T${startHour}:${startMinute}`);
         const end = new Date(`${endDate}T${endHour}:${endMinute}`);
+
         const data = {
             id: selectedEvent?.id || "",
-            comment,
             wo,
-            endUser,
-            location,
-            timeCategory,
-            category,
-            paymentType,
-            task,
-            resource,
             start,
             end,
+            endUser,
+            location,
+            resource,
+            timeCategory,
+            mainCategory,
+            paymentType,
+            task,
+            comment,
         };
         onSubmit(data);
         onClose();
@@ -269,8 +276,8 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             </div>
                             <Textarea
                                 placeholder="リソースの詳細を入力"
-                                value=""
-                                onChange={() => { }}
+                                value={resource}
+                                onChange={setResource}
                                 rows={4}
                                 onClick={openResourceModal}
                             />
@@ -282,7 +289,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             <Select options={timecategoryOptions} value={timeCategory} onChange={setTimeCategory} />
 
                             <label className="modal-label">カテゴリ</label>
-                            <Select options={maincategoryOptions} value={category} onChange={setCategory} />
+                            <Select options={maincategoryOptions} value={mainCategory} onChange={setMainCategory} />
 
                             <label className="modal-label">ペイメントタイプ</label>
                             <Select options={paymenttypeOptions} value={paymentType} onChange={setPaymentType} />

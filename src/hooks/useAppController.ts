@@ -1,215 +1,96 @@
 // src/hooks/useAppController.ts
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getXrm } from "../utils/xrmUtils";
-import { dataverseClient } from "../api/dataverseClient";
+import { useWorkOrders } from "./useWorkOrders";
+import { useOptionSets } from "./useOptionSets";
+import { useEvents } from "./useEvents";
+import { useCalendarController } from "./useCalendarController";
 import { getUrlParams } from "../utils/url";
-import { fromUtcToJst } from "../utils/dateUtils";
 
-/* ===============================
-   型定義
-=============================== */
-export interface EventData {
-    id: string;
-    title: string;
-    start: string;
-    end: string;
-    workOrderId: string;
-    extendedProps?: Record<string, any>;
-}
-
-interface OptionSets {
-    maincategory?: { value: string; label: string }[];
-    timecategory?: { value: string; label: string }[];
-    paymenttype?: { value: string; label: string }[];
-    timezone?: { value: string; label: string }[];
-}
-
-/* ===============================
-   API取得関数群
-=============================== */
-
-/** WorkOrder一覧 */
-const fetchWorkOrders = async (): Promise<{ id: string; name: string }[]> => {
-    const xrm = getXrm();
-    if (!xrm) {
-        // ✅ ローカルモックデータ
-        return [
-            { id: "wo-001", name: "ワークオーダサンプル①" },
-            { id: "wo-002", name: "ワークオーダサンプル②" },
-        ];
-    }
-
-    const result = await xrm.WebApi.retrieveMultipleRecords(
-        "proto_workorder",
-        "?$select=proto_workorderid,proto_wonumber"
-    );
-    return result.entities.map((r: any) => ({
-        id: r.proto_workorderid,
-        name: r.proto_wonumber,
-    }));
-};
-
-/** OptionSet一覧 */
-const fetchOptionSets = async (): Promise<OptionSets> => {
-    const maincategory = await dataverseClient.getOptionSets("proto_timeentry", ["proto_maincategory"]);
-    const timecategory = await dataverseClient.getOptionSets("proto_timeentry", ["proto_timecategory"]);
-    const paymenttype = await dataverseClient.getOptionSets("proto_timeentry", ["proto_paymenttype"]);
-    const timezone = await dataverseClient.getTimeZones();
-
-    return {
-        maincategory: maincategory["proto_maincategory"] || [],
-        timecategory: timecategory["proto_timecategory"] || [],
-        paymenttype: paymenttype["proto_paymenttype"] || [],
-        timezone,
-    };
-};
-
-/** TimeEntry一覧 */
-const fetchEvents = async (selectedWO: string): Promise<EventData[]> => {
-    const xrm = getXrm();
-
-    // ✅ ローカルモック（Dataverseなし環境用）
-    if (!xrm) {
-        const localMock = JSON.parse(localStorage.getItem("mockEvents") || "[]");
-        return localMock.length
-            ? localMock
-            : [
-                {
-                    id: "1",
-                    title: "モック会議",
-                    start: "2025-10-14T09:00:00",
-                    end: "2025-10-14T10:00:00",
-                    workOrderId: "wo-001",
-                },
-            ];
-    }
-
-    // ✅ Dataverse環境
-    const entityName = "proto_workorder";
-    const navigationName = "proto_timeentry_wonumber_proto_workorder";
-    const globalCtx = xrm.Utility.getGlobalContext();
-    const userId = globalCtx.userSettings.userId.replace(/[{}]/g, "");
-
-    const query =
-        `?$select=proto_workorderid,proto_wonumber&$filter=_createdby_value eq ${userId}` +
-        `&$expand=${navigationName}(` +
-        `$select=proto_timeentryid,proto_name,proto_startdatetime,proto_enddatetime,` +
-        `proto_maincategory,proto_paymenttype,proto_timecategory` +
-        `)`;
-
-    const result = await xrm.WebApi.retrieveMultipleRecords(entityName, query);
-
-    const formatted: EventData[] = result.entities.flatMap((wo: any) =>
-        (wo[navigationName] || []).map((t: any) => ({
-            id: t.proto_timeentryid,
-            title: t.proto_name || "作業",
-            start: fromUtcToJst(t.proto_startdatetime),
-            end: fromUtcToJst(t.proto_enddatetime),
-            workOrderId: wo.proto_workorderid,
-        }))
-    );
-
-    return selectedWO === "all"
-        ? formatted
-        : formatted.filter((e) => e.workOrderId === selectedWO);
-};
-
-/* ===============================
-   useAppController本体
-=============================== */
+/**
+ * DataverseApp 全体を統括するHook
+ * - WorkOrder / OptionSet / Eventデータの取得と管理
+ * - カレンダー操作（前・次・今日）
+ * - モーダル状態制御
+ * - イベントクリック時の詳細取得
+ */
 export const useAppController = () => {
+    // -----------------------------
+    // URLパラメータから recordid を取得
+    // -----------------------------
     const { recordid } = getUrlParams();
-    const queryClient = useQueryClient();
-    const xrm = getXrm();
 
     // -----------------------------
-    // UI状態
+    // データ取得Hooks
+    // -----------------------------
+    const { workOrders, isLoading: woLoading } = useWorkOrders();
+    const { optionSets, isLoading: osLoading } = useOptionSets();
+
+    // -----------------------------
+    // UIステート管理
     // -----------------------------
     const [selectedWO, setSelectedWO] = useState<string>(recordid || "all");
-    const [viewMode, setViewMode] = useState<"1日" | "3日" | "週">("週");
-    const [currentDate, setCurrentDate] = useState(new Date());
+    const [viewMode, setViewMode] = useState<"1日" | "3日" | "週">("週"); // カレンダー表示モード
+    const [currentDate, setCurrentDate] = useState(new Date()); // 現在表示中の日付
     const [isTimeEntryModalOpen, setIsTimeEntryModalOpen] = useState(false);
     const [selectedDateTime, setSelectedDateTime] = useState<{ start: Date; end: Date } | null>(null);
-    const [selectedEvent, setSelectedEvent] = useState<EventData | null>(null);
+    const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
 
     // -----------------------------
-    // データ取得（React Query）
+    // イベント関連Hooks
     // -----------------------------
-    const { data: workOrders = [] } = useQuery({
-        queryKey: ["workOrders"],
-        queryFn: fetchWorkOrders,
-    });
-
-    const { data: optionSets = {} } = useQuery({
-        queryKey: ["optionSets"],
-        queryFn: fetchOptionSets,
-        staleTime: Infinity,
-    });
-
     const {
-        data: events = [],
-        refetch: refetchEvents,
-    } = useQuery({
-        queryKey: ["events", selectedWO],
-        queryFn: () => fetchEvents(selectedWO),
-        enabled: !!selectedWO,
-    });
+        events,
+        createOrUpdateEvent,
+        refetchEvents,
+        fetchEventDetail, // ✅ 追加：詳細取得関数
+        isLoading: evLoading,
+    } = useEvents(selectedWO);
 
     // -----------------------------
-    // TimeEntry 登録・更新
+    // カレンダー操作
     // -----------------------------
-    const mutation = useMutation({
-        mutationFn: async (data: any) => {
-            const isUpdate = !!data.id;
+    const { handlePrev, handleNext, handleToday } = useCalendarController(viewMode, setCurrentDate);
 
-            // ✅ Dataverseありの場合
-            if (xrm) {
-                return isUpdate
-                    ? dataverseClient.updateTimeEntry(data.id, data)
-                    : dataverseClient.createTimeEntry(data);
-            }
-
-            // ✅ ローカルモード：localStorageを直接操作
-            const current = JSON.parse(localStorage.getItem("mockEvents") || "[]");
-            if (isUpdate) {
-                const updated = current.map((e: any) => (e.id === data.id ? { ...e, ...data } : e));
-                localStorage.setItem("mockEvents", JSON.stringify(updated));
-            } else {
-                const newItem = { ...data, id: String(Date.now()) };
-                localStorage.setItem("mockEvents", JSON.stringify([...current, newItem]));
-            }
-            return true;
-        },
-        onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ["events", selectedWO] });
-            await queryClient.refetchQueries({ queryKey: ["events", selectedWO] });
-        },
-        onError: (err) => {
-            console.error("❌ TimeEntry登録/更新失敗:", err);
-            alert("保存に失敗しました。詳細はコンソールを確認してください。");
-        },
-    });
-
-    // ✅ モーダル送信処理
+    // -----------------------------
+    // TimeEntry登録・更新時の送信ハンドラ
+    // -----------------------------
     const handleTimeEntrySubmit = async (data: any) => {
-        await mutation.mutateAsync(data);
-        await refetchEvents(); // ✅ Dataverseでもローカルでも即反映
+        await createOrUpdateEvent(data);
+        await refetchEvents();
         setIsTimeEntryModalOpen(false);
         setSelectedEvent(null);
         setSelectedDateTime(null);
     };
 
     // -----------------------------
-    // カレンダー操作
+    // ✅ イベントクリック時の詳細取得処理
     // -----------------------------
-    const getShiftDays = () => (viewMode === "1日" ? 1 : viewMode === "3日" ? 3 : 7);
-    const handlePrev = () => setCurrentDate((prev) => new Date(prev.setDate(prev.getDate() - getShiftDays())));
-    const handleNext = () => setCurrentDate((prev) => new Date(prev.setDate(prev.getDate() + getShiftDays())));
-    const handleToday = () => setCurrentDate(new Date());
+    const handleEventClick = async (event: any) => {
+        try {
+            const detail = await fetchEventDetail(event.id);
+            if (detail) {
+                setSelectedEvent(detail);
+                setSelectedDateTime({
+                    start: new Date(detail.start),
+                    end: new Date(detail.end),
+                });
+                setIsTimeEntryModalOpen(true);
+            } else {
+                console.warn("⚠️ 該当イベントが見つかりません:", event.id);
+            }
+        } catch (error) {
+            console.error("❌ イベント詳細取得失敗:", error);
+            alert("イベントの詳細取得に失敗しました。");
+        }
+    };
 
     // -----------------------------
-    // 返却値
+    // 全体ローディング状態
+    // -----------------------------
+    const isLoading = woLoading || osLoading || evLoading;
+
+    // -----------------------------
+    // 返却値（DataverseApp.tsxに渡される）
     // -----------------------------
     return {
         // データ
@@ -233,11 +114,15 @@ export const useAppController = () => {
 
         // 操作
         handleTimeEntrySubmit,
+        handleEventClick, // ✅ 追加：クリック時処理
         handlePrev,
         handleNext,
         handleToday,
 
         // 手動リフェッチ
         refetchEvents,
+
+        // ローディング状態
+        isLoading,
     };
 };

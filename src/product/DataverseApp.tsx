@@ -28,6 +28,7 @@ export const DataverseApp = () => {
         selectedEvent,
         setSelectedEvent,
         handleTimeEntrySubmit,
+        handleEventClick, // ✅ ← 追加
         handlePrev,
         handleNext,
         handleToday,
@@ -61,8 +62,8 @@ export const DataverseApp = () => {
     return (
         <div className="app-container">
             {/* =============================
-          ヘッダー
-      ============================= */}
+                ヘッダー
+            ============================= */}
             <Header
                 workOrders={workOrders}
                 selectedWO={selectedWO}
@@ -70,13 +71,13 @@ export const DataverseApp = () => {
             />
 
             {/* =============================
-          コンテンツ
-      ============================= */}
+                コンテンツ
+            ============================= */}
             <section className="content-card">
                 {/* 上部タブ＆日付ナビ */}
                 <ContentHeader
-                    mainTab={mainTab}              // ✅ 状態を渡す
-                    setMainTab={setMainTab}        // ✅ setterを渡す（ここが重要）
+                    mainTab={mainTab}
+                    setMainTab={setMainTab}
                     viewMode={viewMode}
                     setViewMode={setViewMode}
                     formattedToday={formattedToday}
@@ -95,7 +96,6 @@ export const DataverseApp = () => {
 
                 {/* 中央エリア：サイドバー＋カレンダー */}
                 <div className="content-middle">
-                    {/* <Sidebar userName="テストユーザー" /> */}
                     <Sidebar mainTab={mainTab} />
 
                     <div className="content-main">
@@ -109,15 +109,8 @@ export const DataverseApp = () => {
                                 setSelectedEvent(null);
                                 setIsTimeEntryModalOpen(true);
                             }}
-                            onEventClick={(event) => {
-                                // ✅ 編集モード
-                                setSelectedEvent(event);
-                                setSelectedDateTime({
-                                    start: event.start,
-                                    end: event.end,
-                                });
-                                setIsTimeEntryModalOpen(true);
-                            }}
+                            // ✅ 修正：クリック時は詳細取得ハンドラを呼び出す
+                            onEventClick={handleEventClick}
                             events={events}
                         />
                     </div>
@@ -131,8 +124,8 @@ export const DataverseApp = () => {
             </section>
 
             {/* =============================
-          モーダル群
-      ============================= */}
+                モーダル群
+            ============================= */}
             <TimeEntryModal
                 isOpen={isTimeEntryModalOpen}
                 onClose={() => setIsTimeEntryModalOpen(false)}
