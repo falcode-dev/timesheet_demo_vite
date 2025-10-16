@@ -8,10 +8,11 @@ type TextareaProps = {
     placeholder?: string;
     rows?: number;
     disabled?: boolean;
+    readOnly?: boolean; // ✅ ← 追加！
     showCount?: boolean; // ✅ カウンター表示
     maxLength?: number;  // ✅ 最大文字数
     className?: string;
-    onClick?: () => void; // ✅ ← 追加！
+    onClick?: () => void;
 };
 
 export const Textarea: React.FC<TextareaProps> = ({
@@ -21,10 +22,11 @@ export const Textarea: React.FC<TextareaProps> = ({
     placeholder = "",
     rows = 4,
     disabled = false,
+    readOnly = false, // ✅ 追加：デフォルト false
     showCount = false,
     maxLength,
     className = "",
-    onClick, // ✅ 追加
+    onClick,
 }) => {
     const charCount = useMemo(() => value.replace(/\n/g, "").length, [value]);
     const isOverLimit = maxLength !== undefined && charCount > maxLength;
@@ -48,10 +50,11 @@ export const Textarea: React.FC<TextareaProps> = ({
                 <textarea
                     value={value}
                     onChange={(e) => onChange?.(e.target.value)}
-                    onClick={onClick} // ✅ 追加：クリックイベントを許可
+                    onClick={onClick}
                     placeholder={placeholder}
                     rows={rows}
                     disabled={disabled}
+                    readOnly={readOnly} // ✅ ← 追加！
                     className={`textarea-field ${disabled ? "disabled" : ""}`}
                 />
             </div>

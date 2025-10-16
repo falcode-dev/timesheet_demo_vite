@@ -17,7 +17,7 @@ interface Resource {
 interface ResourceSelectModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSave?: (selectedIds: string[]) => void;
+    onSave?: (selectedResources: { id: string; label: string }[]) => void; // ✅ 修正
 }
 
 export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
@@ -63,7 +63,7 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
     const [sortByNumberAsc, setSortByNumberAsc] = useState(true);
     const [sortByNameAsc, setSortByNameAsc] = useState(true);
 
-    // ✅ 検索＋ソート結果（安全版）
+    // ✅ 検索＋ソート結果
     const filteredUsers = useMemo(() => {
         let filtered =
             searchType === "name"
@@ -108,11 +108,20 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
         );
 
     /* ========================
-       ▼ 保存処理
+       ▼ 保存処理（ラベル形式で返す）
     ======================== */
     const handleSave = () => {
-        console.log("✅ 選択されたユーザー:", selectedUsers);
-        onSave?.(selectedUsers);
+        // ✅ idと表示ラベルをまとめて返す
+        const selectedResources = displayUsers
+            .filter((u) => selectedUsers.includes(u.id))
+            .map((u) => ({
+                id: u.id,
+                label: `${u.number} ${u.name}`,
+            }));
+
+        console.log("✅ 選択されたリソース:", selectedResources);
+
+        onSave?.(selectedResources);
         onClose();
     };
 

@@ -19,7 +19,7 @@ interface TimeEntryModalProps {
     maincategoryOptions: SelectOption[];
     paymenttypeOptions: SelectOption[];
     timecategoryOptions: SelectOption[];
-    locationOptions: SelectOption[]; // ✅ DataverseのLocation
+    locationOptions: SelectOption[];
 }
 
 export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
@@ -46,7 +46,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     const [mainCategory, setMainCategory] = useState("");
     const [paymentType, setPaymentType] = useState("");
     const [task, setTask] = useState("");
-    const [resource, setResource] = useState(""); // ✅ 選択したリソース名
+    const [resource, setResource] = useState(""); // ✅ 選択されたリソース表示用
 
     const [startDate, setStartDate] = useState("");
     const [startHour, setStartHour] = useState("");
@@ -63,9 +63,11 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     const openResourceModal = () => setIsResourceModalOpen(true);
     const closeResourceModal = () => setIsResourceModalOpen(false);
 
-    // ✅ モーダルの保存時にリソース名を受け取る（今は仮で固定）
-    const handleResourceSave = () => {
-        setResource("山田 太郎（自分）");
+    // ✅ ResourceSelectModalから受け取った選択結果を反映
+    const handleResourceSave = (selectedResources: { id: string; label: string }[]) => {
+        // ラベル文字列を改行で結合して表示
+        const labelText = selectedResources.map((r) => r.label).join("\n");
+        setResource(labelText);
         closeResourceModal();
     };
 
@@ -117,8 +119,6 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
 
         if (selectedEvent) {
             setMode("edit");
-
-            // 日時を分解してセット
             const start = new Date(selectedEvent.start);
             const end = new Date(selectedEvent.end);
             setStartDate(formatLocalDate(start));
@@ -128,7 +128,6 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setEndHour(end.getHours().toString().padStart(2, "0"));
             setEndMinute(end.getMinutes().toString().padStart(2, "0"));
 
-            // ✅ Dataverseから取得したフィールドを反映
             setWo(selectedEvent.workOrder || "");
             setMainCategory(String(selectedEvent.maincategory || ""));
             setTimeCategory(String(selectedEvent.timecategory || ""));
@@ -148,7 +147,6 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setEndHour(end.getHours().toString().padStart(2, "0"));
             setEndMinute(end.getMinutes().toString().padStart(2, "0"));
 
-            // クリア
             setWo("");
             setEndUser("");
             setLocation("");
@@ -274,12 +272,13 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                     リソース選択
                                 </a>
                             </div>
+
                             <Textarea
-                                placeholder="リソースの詳細を入力"
+                                placeholder="リソースがここに表示されます"
                                 value={resource}
                                 onChange={setResource}
                                 rows={4}
-                                onClick={openResourceModal}
+                                readOnly
                             />
                         </div>
 
@@ -306,7 +305,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                 onChange={setComment}
                                 placeholder="コメントを入力"
                                 rows={4}
-                                showCount={true}
+                                showCount
                                 maxLength={2000}
                             />
                         </div>
@@ -319,7 +318,6 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                 isOpen={isResourceModalOpen}
                 onClose={closeResourceModal}
                 onSave={handleResourceSave}
-            // userName="山田 太郎"
             />
         </>
     );
