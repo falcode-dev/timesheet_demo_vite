@@ -1,24 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import * as FaIcons from 'react-icons/fa';
-import { IoIosArrowForward } from 'react-icons/io';
-import { BaseModal } from '../BaseModal';
+import React, { useState, useEffect } from "react";
+import * as FaIcons from "react-icons/fa";
+import { IoIosArrowForward } from "react-icons/io";
+import { BaseModal } from "../BaseModal";
 import { Button } from "../../../component/button/Button";
 import { Input } from "../../../component/input/Input";
-import './UserListModal.css';
+import { useResources } from "../../../hooks/useResources";
+import "./UserListModal.css";
 
-/** ✅ BaseModalProps（ファイル分割せずここに定義） */
 export interface BaseModalProps {
     isOpen: boolean;
     onClose: () => void;
     title?: string;
     description?: string;
-    size?: 'small' | 'medium' | 'large';
+    size?: "small" | "medium" | "large";
     children?: React.ReactNode;
     footerButtons?: React.ReactNode[];
 }
 
 interface UserListModalProps
-    extends Omit<BaseModalProps, 'children' | 'footerButtons'> {
+    extends Omit<BaseModalProps, "children" | "footerButtons"> {
     onSave: (selectedUsers: string[]) => void;
 }
 
@@ -27,116 +27,122 @@ export const UserListModal: React.FC<UserListModalProps> = ({
     onClose,
     onSave,
 }) => {
-    // ========================
-    // ▼ ステート管理
-    // ========================
-    const [employeeid, setEmployeeid] = useState('');
-    const [userName, setUserName] = useState('');
-    const [searchResults, setSearchResults] = useState<string[]>([]);
-    const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+    /* ========================
+       ▼ Dataverseからリソース取得
+    ======================== */
+    const { resources, isLoading } = useResources();
+
+    type Resource = { id: string; number: string; name: string };
+
+    /* ========================
+       ▼ ステート管理
+    ======================== */
+    const [employeeid, setEmployeeid] = useState("");
+    const [userName, setUserName] = useState("");
+    const [searchResults, setSearchResults] = useState<Resource[]>([]); // 初期は空
+    const [selectedUsers, setSelectedUsers] = useState<Resource[]>([]);
     const [checkedResults, setCheckedResults] = useState<string[]>([]);
     const [checkedSelected, setCheckedSelected] = useState<string[]>([]);
 
-    // ✅ サブヘッダー用チェックボックス状態
     const [isLeftHeaderChecked, setIsLeftHeaderChecked] = useState(false);
     const [isRightHeaderChecked, setIsRightHeaderChecked] = useState(false);
 
-    const users = ['田中 太郎', '佐藤 花子', '鈴木 次郎', '高橋 美咲', '山本 健'];
-
-    // ========================
-    // ▼ 初期化
-    // ========================
-    useEffect(() => setSearchResults(users), []);
-
-    // ========================
-    // ▼ 個別チェック
-    // ========================
-    const toggleCheck = (user: string) => {
-        setCheckedResults((prev) =>
-            prev.includes(user)
-                ? prev.filter((u) => u !== user)
-                : [...prev, user]
-        );
-    };
-
-    const toggleSelectedCheck = (user: string) => {
-        setCheckedSelected((prev) =>
-            prev.includes(user)
-                ? prev.filter((u) => u !== user)
-                : [...prev, user]
-        );
-    };
-
-    // ========================
-    // ▼ 上部チェック（全選択／全解除）
-    // ========================
-    const toggleLeftHeaderCheck = () => {
-        const newState = !isLeftHeaderChecked;
-        setIsLeftHeaderChecked(newState);
-        const availableUsers = searchResults.filter((u) => !selectedUsers.includes(u));
-        setCheckedResults(newState ? availableUsers : []);
-    };
-
-    const toggleRightHeaderCheck = () => {
-        const newState = checkedSelected.length < selectedUsers.length;
-        setCheckedSelected(newState ? [...selectedUsers] : []);
-    };
-
-    // ========================
-    // ▼ 右リストにチェックがあるか監視してヘッダー更新
-    // ========================
-    useEffect(() => {
-        setIsRightHeaderChecked(checkedSelected.length > 0);
-    }, [checkedSelected]);
-
-    // ========================
-    // ▼ 移動（右へ）
-    // ========================
-    const moveToSelected = () => {
-        const newSelected = [...selectedUsers];
-        const newCheckedSelected = [...checkedSelected];
-
-        checkedResults.forEach((user) => {
-            if (!newSelected.includes(user)) {
-                newSelected.push(user);
-                newCheckedSelected.push(user);
-            }
-        });
-
-        setSelectedUsers(newSelected);
-        setCheckedSelected(newCheckedSelected);
-        setCheckedResults([]);
-        setIsLeftHeaderChecked(false);
-    };
-
-    // ========================
-    // ▼ 削除
-    // ========================
-    const removeCheckedSelected = () => {
-        setSelectedUsers((prev) => prev.filter((u) => !checkedSelected.includes(u)));
-        setCheckedSelected([]);
-    };
-
-    const removeUser = (user: string) => {
-        setSelectedUsers((prev) => prev.filter((u) => u !== user));
-        setCheckedSelected((prev) => prev.filter((u) => u !== user));
-    };
-
-    // ========================
-    // ▼ 検索処理
-    // ========================
+    /* ========================
+       ▼ 検索処理（ボタンクリック時のみ）
+    ======================== */
     const handleSearch = () => {
-        const filtered = users.filter(
-            (u) =>
-                (!employeeid || u.includes(employeeid)) &&
-                (!userName || u.includes(userName))
+        if (!employeeid && !userName) {
+            setSearchResults([]);
+            return;
+        }
+
+        const filtered = resources.filter(
+            (r) =>
+                (!employeeid || r.number.includes(employeeid)) &&
+                (!userName || r.name.includes(userName))
         );
         setSearchResults(filtered);
     };
 
-    // ========================
-    // ▼ JSX
-    // ========================
+    /* ========================
+       ▼ 個別チェック操作
+    ======================== */
+    const toggleCheck = (id: string) => {
+        setCheckedResults((prev) =>
+            prev.includes(id)
+                ? prev.filter((u) => u !== id)
+                : [...prev, id]
+        );
+    };
+
+    const toggleSelectedCheck = (id: string) => {
+        setCheckedSelected((prev) =>
+            prev.includes(id)
+                ? prev.filter((u) => u !== id)
+                : [...prev, id]
+        );
+    };
+
+    /* ========================
+       ▼ 全選択・全解除
+    ======================== */
+    const toggleLeftHeaderCheck = () => {
+        const newState = !isLeftHeaderChecked;
+        setIsLeftHeaderChecked(newState);
+        const available = searchResults.filter(
+            (r) => !selectedUsers.some((s) => s.id === r.id)
+        );
+        setCheckedResults(newState ? available.map((r) => r.id) : []);
+    };
+
+    const toggleRightHeaderCheck = () => {
+        const newState = checkedSelected.length < selectedUsers.length;
+        setCheckedSelected(newState ? selectedUsers.map((r) => r.id) : []);
+    };
+
+    /* ========================
+       ▼ 右リストチェック監視
+    ======================== */
+    useEffect(() => {
+        setIsRightHeaderChecked(checkedSelected.length > 0);
+    }, [checkedSelected]);
+
+    /* ========================
+       ▼ 移動（右へ）
+    ======================== */
+    const moveToSelected = () => {
+        const toAdd = searchResults.filter((r) =>
+            checkedResults.includes(r.id)
+        );
+        const updated = [...selectedUsers];
+        toAdd.forEach((r) => {
+            if (!updated.some((u) => u.id === r.id)) {
+                updated.push(r);
+            }
+        });
+        setSelectedUsers(updated);
+        setCheckedResults([]);
+        setIsLeftHeaderChecked(false);
+    };
+
+    /* ========================
+       ▼ 削除（右側）
+    ======================== */
+    const removeCheckedSelected = () => {
+        setSelectedUsers((prev) =>
+            prev.filter((r) => !checkedSelected.includes(r.id))
+        );
+        setCheckedSelected([]);
+    };
+
+    const removeUser = (id: string) => {
+        setSelectedUsers((prev) => prev.filter((r) => r.id !== id));
+        setCheckedSelected((prev) => prev.filter((u) => u !== id));
+    };
+
+    /* ========================
+       ▼ JSX
+    ======================== */
     return (
         <BaseModal
             isOpen={isOpen}
@@ -155,19 +161,17 @@ export const UserListModal: React.FC<UserListModalProps> = ({
                     key="save"
                     label="保存"
                     color="primary"
-                    onClick={() => onSave(selectedUsers)}
+                    onClick={() => onSave(selectedUsers.map((u) => u.id))}
                     className="userlist-create-button"
                 />,
             ]}
         >
             <div className="modal-body">
-                {/* 上部検索フォーム */}
+                {/* 検索フォーム */}
                 <div className="modal-grid">
-                    {/* 左：社員番号（Input） */}
                     <div className="grid-left">
                         <label className="modal-label">社員番号</label>
                         <Input
-                            // label="社員番号"
                             value={employeeid}
                             onChange={setEmployeeid}
                             placeholder="社員番号を入力"
@@ -178,16 +182,14 @@ export const UserListModal: React.FC<UserListModalProps> = ({
                             <Button
                                 label="クリア"
                                 color="secondary"
-                                onClick={() => setEmployeeid('')}
+                                onClick={() => setEmployeeid("")}
                             />
                         </div>
                     </div>
 
-                    {/* 右：ユーザー名（Input） */}
                     <div className="grid-right">
                         <label className="modal-label">ユーザー名</label>
                         <Input
-                            // label="ユーザー名"
                             value={userName}
                             onChange={setUserName}
                             placeholder="ユーザー名を入力"
@@ -207,122 +209,135 @@ export const UserListModal: React.FC<UserListModalProps> = ({
                 <hr className="divider" />
 
                 <p className="list-description">
-                    検索結果の項目を選択して追加し保存を押してください。
+                    社員番号またはユーザー名を入力し、検索してください。
                 </p>
 
-                <div className="task-grid">
-                    {/* 左：検索結果 */}
-                    <div className="task-list">
-                        <div className="list-header">
-                            <span className="modal-label">検索結果</span>
-                            <span className="count">{searchResults.length}件</span>
-                        </div>
-
-                        <div className="list-subheader">
-                            <div className="list-subheader-left">
-                                <input
-                                    type="checkbox"
-                                    checked={isLeftHeaderChecked}
-                                    onChange={toggleLeftHeaderCheck}
-                                    className="subheader-checkbox"
-                                />
-                                <FaIcons.FaChevronDown className="task-icon" />
-                                <span className="label-text">ユーザー名</span>
-                                <FaIcons.FaTasks className="task-icon" />
+                {isLoading ? (
+                    <p>リソースを読み込み中...</p>
+                ) : (
+                    <div className="task-grid">
+                        {/* 左：検索結果 */}
+                        <div className="task-list">
+                            <div className="list-header">
+                                <span className="modal-label">検索結果</span>
+                                <span className="count">{searchResults.length}件</span>
                             </div>
-                        </div>
 
-                        <div className="list-box">
-                            {searchResults.map((user) => {
-                                const isSelected = selectedUsers.includes(user);
-                                return (
-                                    <label
-                                        key={user}
-                                        className={`list-item-2line ${isSelected ? 'disabled-item' : ''}`}
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            disabled={isSelected}
-                                            checked={checkedResults.includes(user)}
-                                            onChange={() => toggleCheck(user)}
-                                        />
-                                        <div className="list-text">
-                                            <div className="category-name">社員</div>
-                                            <div className="task-name">{user}</div>
-                                        </div>
-                                    </label>
-                                );
-                            })}
-                        </div>
-                    </div>
-
-                    {/* 中央：移動ボタン */}
-                    <div className="move-button-container">
-                        <button
-                            onClick={moveToSelected}
-                            className="move-button"
-                            title="選択したユーザーを右へ移動"
-                        >
-                            <IoIosArrowForward />
-                        </button>
-                    </div>
-
-                    {/* 右：選択済みユーザー */}
-                    <div className="task-list">
-                        <div className="list-header">
-                            <span className="modal-label">設定済ユーザー</span>
-                            <span className="count">{selectedUsers.length}件</span>
-                        </div>
-
-                        <div className="list-subheader">
-                            <div className="list-subheader-left">
-                                <input
-                                    type="checkbox"
-                                    checked={isRightHeaderChecked}
-                                    onChange={toggleRightHeaderCheck}
-                                    className="subheader-checkbox"
-                                />
-                                <FaIcons.FaChevronDown className="task-icon" />
-                                <span className="label-text">ユーザー名</span>
-                                <FaIcons.FaTasks className="task-icon" />
-                            </div>
-                            {selectedUsers.length > 0 && (
-                                <Button
-                                    label=""
-                                    icon={<FaIcons.FaRegTrashAlt />}
-                                    onClick={removeCheckedSelected}
-                                    className="trash-icon-button"
-                                />
-                            )}
-                        </div>
-
-                        <div className="list-box">
-                            {selectedUsers.map((user) => (
-                                <div key={user} className="list-item-favorite">
-                                    <div className="list-item-favorite-left">
-                                        <input
-                                            type="checkbox"
-                                            checked={checkedSelected.includes(user)}
-                                            onChange={() => toggleSelectedCheck(user)}
-                                        />
-                                        <div className="list-text">
-                                            <div className="category-name">社員</div>
-                                            <div className="task-name">{user}</div>
-                                        </div>
-                                    </div>
-                                    <div className="list-item-favorite-right">
-                                        <Button
-                                            label=""
-                                            icon={<FaIcons.FaTimes />}
-                                            onClick={() => removeUser(user)}
-                                            className="delete-list-button"
-                                        />
-                                    </div>
+                            <div className="list-subheader">
+                                <div className="list-subheader-left">
+                                    <input
+                                        type="checkbox"
+                                        checked={isLeftHeaderChecked}
+                                        onChange={toggleLeftHeaderCheck}
+                                        className="subheader-checkbox"
+                                    />
+                                    <FaIcons.FaChevronDown className="task-icon" />
+                                    <span className="label-text">ユーザー名</span>
                                 </div>
-                            ))}
+                            </div>
+
+                            {/* ✅ 初期でもリスト枠は残す */}
+                            <div className="list-box">
+
+                                {searchResults.map((r) => {
+                                    const isSelected = selectedUsers.some(
+                                        (u) => u.id === r.id
+                                    );
+                                    return (
+                                        <label
+                                            key={r.id}
+                                            className={`list-item-2line ${isSelected ? "disabled-item" : ""
+                                                }`}
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                disabled={isSelected}
+                                                checked={checkedResults.includes(r.id)}
+                                                onChange={() => toggleCheck(r.id)}
+                                            />
+                                            <div className="list-text">
+                                                <div className="category-name">
+                                                    {r.number || "-"}
+                                                </div>
+                                                <div className="task-name">
+                                                    {r.name || "(名前なし)"}
+                                                </div>
+                                            </div>
+                                        </label>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {/* 中央：移動ボタン */}
+                        <div className="move-button-container">
+                            <button
+                                onClick={moveToSelected}
+                                className="move-button"
+                                title="選択したユーザーを右へ移動"
+                            >
+                                <IoIosArrowForward />
+                            </button>
+                        </div>
+
+                        {/* 右：設定済ユーザー */}
+                        <div className="task-list">
+                            <div className="list-header">
+                                <span className="modal-label">設定済ユーザー</span>
+                                <span className="count">{selectedUsers.length}件</span>
+                            </div>
+
+                            <div className="list-subheader">
+                                <div className="list-subheader-left">
+                                    <input
+                                        type="checkbox"
+                                        checked={isRightHeaderChecked}
+                                        onChange={toggleRightHeaderCheck}
+                                        className="subheader-checkbox"
+                                    />
+                                    <FaIcons.FaChevronDown className="task-icon" />
+                                    <span className="label-text">ユーザー名</span>
+                                </div>
+                                {selectedUsers.length > 0 && (
+                                    <Button
+                                        label=""
+                                        icon={<FaIcons.FaRegTrashAlt />}
+                                        onClick={removeCheckedSelected}
+                                        className="trash-icon-button"
+                                    />
+                                )}
+                            </div>
+
+                            <div className="list-box">
+                                {selectedUsers.map((r) => (
+                                    <div key={r.id} className="list-item-favorite">
+                                        <div className="list-item-favorite-left">
+                                            <input
+                                                type="checkbox"
+                                                checked={checkedSelected.includes(r.id)}
+                                                onChange={() => toggleSelectedCheck(r.id)}
+                                            />
+                                            <div className="list-text">
+                                                <div className="category-name">
+                                                    {r.number}
+                                                </div>
+                                                <div className="task-name">{r.name}</div>
+                                            </div>
+                                        </div>
+                                        <div className="list-item-favorite-right">
+                                            <Button
+                                                label=""
+                                                icon={<FaIcons.FaTimes />}
+                                                onClick={() => removeUser(r.id)}
+                                                className="delete-list-button"
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
             </div>
         </BaseModal>
     );

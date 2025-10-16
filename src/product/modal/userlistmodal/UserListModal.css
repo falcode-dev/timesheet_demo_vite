@@ -364,6 +364,48 @@
     margin-left: 10px;
 }
 
+/* ===========================
+   空リスト・メッセージ表示用
+=========================== */
+
+/* メッセージテキスト */
+.no-results {
+    text-align: center;
+    color: #888;
+    font-size: 0.9rem;
+    margin: 40px 0;
+    user-select: none;
+}
+
+/* 空リスト時でも枠を維持 */
+.list-box {
+    position: relative;
+    min-height: 220px;
+    /* ← 高さを確保 */
+    max-height: 400px;
+    overflow-y: auto;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box;
+    padding: 6px 8px;
+}
+
+/* スクロールバー調整 */
+.list-box::-webkit-scrollbar {
+    width: 6px;
+}
+
+.list-box::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
+
+.list-box::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+
 /* ===========================================
    レスポンシブ
 =========================================== */
