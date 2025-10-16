@@ -1,7 +1,9 @@
+// src/layout/Sidebar.tsx
 import React, { useState, useMemo } from "react";
 import "./Sidebar.css";
 import * as FaIcons from "react-icons/fa";
 import { Input } from "../../component/input/Input";
+import { useCurrentUser } from "../../hooks/useCurrentUser"; // ✅ 追加
 
 interface User {
     id: string;
@@ -20,7 +22,7 @@ interface SidebarProps {
     mainTab: "user" | "indirect";
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ userName, mainTab }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
     const [searchType, setSearchType] = useState<"name" | "number">("name");
     const [keyword, setKeyword] = useState("");
     const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
@@ -32,7 +34,23 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, mainTab }) => {
     const [userSortOption, setUserSortOption] = useState<string>("numberAsc");
     const [taskSortOption, setTaskSortOption] = useState<string>("categoryAsc");
 
-    // 仮ユーザー
+    // ✅ 現在ログイン中のユーザー情報を取得（Dataverse）
+    const { currentUser, isLoading } = useCurrentUser();
+
+    // ✅ Dataverse から取得したログインユーザー情報を整形
+    const displaySelf = useMemo(() => {
+        if (isLoading) {
+            return { number: "取得中...", fullName: "ユーザー情報を取得中..." };
+        }
+        if (!currentUser) {
+            return { number: "社員番号未取得", fullName: "ユーザー情報未取得" };
+        }
+        const number = currentUser.employeeid || "社員番号未登録";
+        const fullName = `${currentUser.lastName || ""} ${currentUser.firstName || ""}`.trim();
+        return { number, fullName };
+    }, [currentUser, isLoading]);
+
+    // 仮ユーザー（別のユーザー検索用）
     const users: User[] = [
         { id: "1", number: "0001", name: "田中 太郎" },
         { id: "2", number: "0002", name: "佐藤 花子" },
@@ -155,7 +173,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, mainTab }) => {
                         onChange={setKeyword}
                     />
 
-                    {/* 自分 */}
+                    {/* ✅ Dataverseユーザー情報表示 */}
                     <label className="sidebar-self-item">
                         <input
                             type="checkbox"
@@ -164,9 +182,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, mainTab }) => {
                             className="sidebar-checkbox"
                         />
                         <div className="sidebar-self-text">
-                            <span className="sidebar-self-number">社員番号（自分）</span>
+                            <span className="sidebar-self-number">
+                                {`${displaySelf.number}（自分）`}
+                            </span>
                             <span className="sidebar-self-roman">
-                                {userName || "未取得"}
+                                {displaySelf.fullName}
                             </span>
                         </div>
                     </label>
@@ -189,8 +209,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, mainTab }) => {
                             {userSortOptions.map((opt) => (
                                 <div
                                     key={opt.value}
-                                    className={`sidebar-sort-option ${userSortOption === opt.value ? "active" : ""
-                                        }`}
+                                    className={`sidebar-sort-option ${userSortOption === opt.value ? "active" : ""}`}
                                     onClick={() => {
                                         setUserSortOption(opt.value);
                                         setIsUserSortOpen(false);
@@ -232,7 +251,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, mainTab }) => {
             ============================= */}
             {mainTab === "indirect" && (
                 <>
-                    {/* 見出しクリックで開閉 */}
                     <div
                         className="sidebar-self-divider clickable"
                         onClick={() => setIsTaskSortOpen((p) => !p)}
@@ -244,14 +262,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, mainTab }) => {
                         <FaIcons.FaSortAmountDown className="sidebar-self-icon" />
                     </div>
 
-                    {/* 並び替えメニュー */}
                     {isTaskSortOpen && (
                         <div className="sidebar-sort-dropdown">
                             {taskSortOptions.map((opt) => (
                                 <div
                                     key={opt.value}
-                                    className={`sidebar-sort-option ${taskSortOption === opt.value ? "active" : ""
-                                        }`}
+                                    className={`sidebar-sort-option ${taskSortOption === opt.value ? "active" : ""}`}
                                     onClick={() => {
                                         setTaskSortOption(opt.value);
                                         setIsTaskSortOpen(false);
@@ -263,7 +279,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, mainTab }) => {
                         </div>
                     )}
 
-                    {/* ソート後のタスクリスト */}
                     <div className="sidebar-task-list">
                         {sortedTasks.map((task) => (
                             <label

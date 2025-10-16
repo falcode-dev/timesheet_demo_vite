@@ -1,8 +1,10 @@
+// src/layout/modal/resourceselectmodal/ResourceSelectModal.tsx
 import React, { useState, useMemo } from "react";
 import * as FaIcons from "react-icons/fa";
 import { BaseModal } from "../BaseModal";
 import { Button } from "../../../component/button/Button";
 import { Input } from "../../../component/input/Input";
+import { useCurrentUser } from "../../../hooks/useCurrentUser"; // ✅ 追加
 import "./ResourceSelectModal.css";
 
 interface User {
@@ -21,9 +23,26 @@ interface ResourceSelectModalProps {
 export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
     isOpen,
     onClose,
-    userName,
+    // userName,
     onSave,
 }) => {
+    // ✅ Dataverseのログインユーザー情報取得
+    const { currentUser, isLoading } = useCurrentUser();
+
+    // ✅ ログインユーザー情報を整形
+    const displaySelf = useMemo(() => {
+        if (isLoading) {
+            return { number: "取得中...", fullName: "ユーザー情報を取得中..." };
+        }
+        if (!currentUser) {
+            return { number: "社員番号未取得", fullName: "ユーザー情報未取得" };
+        }
+        const number = currentUser.employeeid || "社員番号未登録";
+        const fullName = `${currentUser.lastName || ""} ${currentUser.firstName || ""}`.trim();
+        return { number, fullName };
+    }, [currentUser, isLoading]);
+
+    // 仮ユーザー一覧
     const users: User[] = [
         { id: "1", number: "0001", name: "田中 太郎" },
         { id: "2", number: "0002", name: "佐藤 花子" },
@@ -65,8 +84,8 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
     const displayUsers: User[] = [
         {
             id: "self",
-            number: "社員番号_",
-            name: `${userName || "未取得"}（自分）`,
+            number: `${displaySelf.number}(自分)`,
+            name: displaySelf.fullName,
         },
         ...filteredUsers,
     ];
@@ -187,7 +206,7 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
                                 className="resource-checkbox"
                             />
                             <div className="resource-text">
-                                <span className="resource-number">{u.number}</span>
+                                <span className="resource-number">{u.number}_</span>
                                 <span className="resource-name">{u.name}</span>
                             </div>
                         </label>

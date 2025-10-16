@@ -30,7 +30,7 @@ export const UserListModal: React.FC<UserListModalProps> = ({
     // ========================
     // ▼ ステート管理
     // ========================
-    const [employeeNumber, setEmployeeNumber] = useState('');
+    const [employeeid, setEmployeeid] = useState('');
     const [userName, setUserName] = useState('');
     const [searchResults, setSearchResults] = useState<string[]>([]);
     const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
@@ -128,7 +128,7 @@ export const UserListModal: React.FC<UserListModalProps> = ({
     const handleSearch = () => {
         const filtered = users.filter(
             (u) =>
-                (!employeeNumber || u.includes(employeeNumber)) &&
+                (!employeeid || u.includes(employeeid)) &&
                 (!userName || u.includes(userName))
         );
         setSearchResults(filtered);
@@ -168,8 +168,8 @@ export const UserListModal: React.FC<UserListModalProps> = ({
                         <label className="modal-label">社員番号</label>
                         <Input
                             // label="社員番号"
-                            value={employeeNumber}
-                            onChange={setEmployeeNumber}
+                            value={employeeid}
+                            onChange={setEmployeeid}
                             placeholder="社員番号を入力"
                             width="100%"
                             type="text"
@@ -178,7 +178,7 @@ export const UserListModal: React.FC<UserListModalProps> = ({
                             <Button
                                 label="クリア"
                                 color="secondary"
-                                onClick={() => setEmployeeNumber('')}
+                                onClick={() => setEmployeeid('')}
                             />
                         </div>
                     </div>
