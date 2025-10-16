@@ -20,7 +20,7 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
     const [searchType, setSearchType] = useState<"name" | "number">("name");
     const [keyword, setKeyword] = useState("");
-    const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+    const [selectedUsers, setSelectedUsers] = useState<string[]>(["self"]); // ✅ 初期状態で自分をON
     const [selectedTask, setSelectedTask] = useState<string>("");
 
     // ✅ ソート状態
@@ -57,22 +57,22 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
         return resources.filter((r) => allowedUsers.includes(r.id));
     }, [resources, allowedUsers, isResourceLoading]);
 
-    // ✅ 検索・ソート適用
+    // ✅ 検索・ソート適用（安全版）
     const filteredUsers = useMemo(() => {
         let result =
             searchType === "name"
-                ? visibleUsers.filter((u) => u.name.includes(keyword))
-                : visibleUsers.filter((u) => u.number.includes(keyword));
+                ? visibleUsers.filter((u) => (u.name || "").includes(keyword))
+                : visibleUsers.filter((u) => (u.number || "").includes(keyword));
 
         switch (userSortOption) {
             case "numberAsc":
-                return result.sort((a, b) => a.number.localeCompare(b.number));
+                return result.sort((a, b) => (a.number || "").localeCompare(b.number || ""));
             case "numberDesc":
-                return result.sort((a, b) => b.number.localeCompare(a.number));
+                return result.sort((a, b) => (b.number || "").localeCompare(a.number || ""));
             case "nameAsc":
-                return result.sort((a, b) => a.name.localeCompare(b.name));
+                return result.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
             case "nameDesc":
-                return result.sort((a, b) => b.name.localeCompare(a.name));
+                return result.sort((a, b) => (b.name || "").localeCompare(a.name || ""));
             default:
                 return result;
         }
@@ -103,7 +103,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
         }
     }, [taskSortOption]);
 
-    // ✅ 選択トグル
+    // ✅ 選択トグル（自分も含め全体統一）
     const toggleSelect = (userId: string) => {
         setSelectedUsers((prev) =>
             prev.includes(userId)
@@ -138,26 +138,25 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
 
                     {/* 検索タイプ切り替え */}
                     <div className="sidebar-radios">
-                        <label>
-                            <input
-                                type="radio"
-                                name="searchType"
-                                value="name"
-                                checked={searchType === "name"}
-                                onChange={() => setSearchType("name")}
-                            />
-                            ユーザー名
-                        </label>
-                        <label>
-                            <input
-                                type="radio"
-                                name="searchType"
-                                value="number"
-                                checked={searchType === "number"}
-                                onChange={() => setSearchType("number")}
-                            />
-                            社員番号
-                        </label>
+                        <input
+                            id="sidebar-radio-name"
+                            type="radio"
+                            name="sidebarSearchType"
+                            value="name"
+                            checked={searchType === "name"}
+                            onChange={() => setSearchType("name")}
+                        />
+                        <label htmlFor="sidebar-radio-name">ユーザー名</label>
+
+                        <input
+                            id="sidebar-radio-number"
+                            type="radio"
+                            name="sidebarSearchType"
+                            value="number"
+                            checked={searchType === "number"}
+                            onChange={() => setSearchType("number")}
+                        />
+                        <label htmlFor="sidebar-radio-number">社員番号</label>
                     </div>
 
                     <Input
@@ -171,12 +170,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
                         onChange={setKeyword}
                     />
 
-                    {/* ✅ Dataverseユーザー情報（自分） */}
-                    <label className="sidebar-self-item">
+                    {/* ✅ 自分もON/OFFできる */}
+                    <label
+                        className="sidebar-self-item"
+                        onClick={() => toggleSelect("self")}
+                    >
                         <input
                             type="checkbox"
-                            checked
-                            readOnly
+                            checked={selectedUsers.includes("self")}
+                            onChange={() => toggleSelect("self")}
                             className="sidebar-checkbox"
                         />
                         <div className="sidebar-self-text">
@@ -235,7 +237,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
                                         className="sidebar-checkbox"
                                     />
                                     <span className="sidebar-result-text">
-                                        {user.number}：{user.name}
+                                        {(user.number || "不明")} {(user.name || "名称未設定")}
                                     </span>
                                 </label>
                             ))}
@@ -282,12 +284,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
                         {sortedTasks.map((task) => (
                             <label
                                 key={task.id}
+                                htmlFor={`sidebar-task-${task.id}`}
                                 className="sidebar-task-radio"
-                                onClick={() => setSelectedTask(task.id)}
                             >
                                 <input
+                                    id={`sidebar-task-${task.id}`}
                                     type="radio"
-                                    name="indirectTask"
+                                    name="sidebarTaskType"
                                     value={task.id}
                                     checked={selectedTask === task.id}
                                     onChange={() => setSelectedTask(task.id)}

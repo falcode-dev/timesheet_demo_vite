@@ -201,8 +201,8 @@
 .subheader-checkbox {
     appearance: none;
     -webkit-appearance: none;
-    width: 22px;
-    height: 22px;
+    min-width: 22px;
+    min-height: 22px;
     margin-right: 10px;
     border: 2px solid var(--main-color);
     border-radius: 4px;

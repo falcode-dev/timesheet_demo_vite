@@ -319,7 +319,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                 isOpen={isResourceModalOpen}
                 onClose={closeResourceModal}
                 onSave={handleResourceSave}
-                userName="山田 太郎"
+            // userName="山田 太郎"
             />
         </>
     );

@@ -59,33 +59,35 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
     ======================== */
     const [searchType, setSearchType] = useState<"name" | "number">("name");
     const [keyword, setKeyword] = useState("");
-    const [selectedUsers, setSelectedUsers] = useState<string[]>(["self"]);
+    const [selectedUsers, setSelectedUsers] = useState<string[]>(["self"]); // ✅ 自分を初期ON
     const [sortByNumberAsc, setSortByNumberAsc] = useState(true);
     const [sortByNameAsc, setSortByNameAsc] = useState(true);
 
-    // ✅ 検索＋ソート結果
+    // ✅ 検索＋ソート結果（安全版）
     const filteredUsers = useMemo(() => {
         let filtered =
             searchType === "name"
-                ? visibleResources.filter((u) => u.name?.includes(keyword))
-                : visibleResources.filter((u) => u.number?.includes(keyword));
+                ? visibleResources.filter((u) => (u.name || "").includes(keyword))
+                : visibleResources.filter((u) => (u.number || "").includes(keyword));
 
         const sorted = [...filtered]
             .sort((a, b) =>
                 sortByNumberAsc
-                    ? a.number.localeCompare(b.number)
-                    : b.number.localeCompare(a.number)
+                    ? (a.number || "").localeCompare(b.number || "")
+                    : (b.number || "").localeCompare(a.number || "")
             )
             .sort((a, b) =>
                 sortByNameAsc
-                    ? a.name.localeCompare(b.name)
-                    : b.name.localeCompare(a.name)
+                    ? (a.name || "").localeCompare(b.name || "")
+                    : (b.name || "").localeCompare(a.name || "")
             );
 
         return sorted;
     }, [keyword, searchType, sortByNumberAsc, sortByNameAsc, visibleResources]);
 
-    // ✅ 表示用配列（常に自分を先頭に表示）
+    /* ========================
+       ▼ 表示用配列（常に自分を先頭に表示）
+    ======================== */
     const displayUsers: Resource[] = [
         {
             id: "self",
@@ -200,7 +202,7 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
                     </button>
                 </div>
 
-                {/* ✅ 自分は常に表示 */}
+                {/* ✅ リスト */}
                 <div className="resource-list">
                     {displayUsers.map((u) => (
                         <label key={u.id} className="resource-item">
@@ -211,8 +213,12 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
                                 className="resource-checkbox"
                             />
                             <div className="resource-text">
-                                <span className="resource-number">{u.number}</span>
-                                <span className="resource-name">{u.name}</span>
+                                <span className="resource-number">
+                                    {u.number || "社員番号不明"}
+                                </span>
+                                <span className="resource-name">
+                                    {u.name || "名称未設定"}
+                                </span>
                             </div>
                         </label>
                     ))}
