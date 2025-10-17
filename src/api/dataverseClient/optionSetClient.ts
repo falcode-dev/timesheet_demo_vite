@@ -11,6 +11,7 @@ export type OptionSetMap = Record<string, OptionItem[]>;
 
 /**
  * OptionSet および TimeZone 定義を取得する Dataverse クライアント
+ * - getOptionSets: 指定エンティティの OptionSet メタデータを取得
  */
 export const optionSetClient = {
     /**
@@ -26,6 +27,7 @@ export const optionSetClient = {
             const metadata = await xrm.Utility.getEntityMetadata(entity, fields);
             if (!metadata?.Attributes) return {};
 
+            // Attributes の取得（Map形式 or 配列形式の両対応）
             const attributes =
                 typeof metadata.Attributes.get === "function"
                     ? fields.map((f) => metadata.Attributes.get(f)).filter(Boolean)
@@ -37,11 +39,12 @@ export const optionSetClient = {
                     ? attributes.find((a: any) => a.LogicalName === logicalName)
                     : metadata.Attributes.get(logicalName);
 
-                if (!attr?.attributeDescriptor?.OptionSet?.Options) return [];
+                if (!attr?.attributeDescriptor) return [];
 
-                return attr.attributeDescriptor.OptionSet.Options.map((opt: any) => ({
+                const options = attr.attributeDescriptor.OptionSet || [];
+                return options.map((opt: any) => ({
                     value: String(opt.Value),
-                    label: opt.Label?.LocalizedLabels?.[0]?.Label || "(ラベル未定義)",
+                    label: opt.Label || "(ラベル未定義)",
                 }));
             };
 
