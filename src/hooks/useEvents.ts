@@ -1,4 +1,3 @@
-// src/hooks/useEvents.ts
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getXrm } from "../utils/xrmUtils";
 import { dataverseClient } from "../api/dataverseClient";
@@ -53,7 +52,7 @@ const fetchEvents = async (): Promise<EventData[]> => {
         `&$filter=_createdby_value eq ${userId}` +
         `&$expand=${navigationName}(` +
         `$select=proto_timeentryid,proto_name,proto_startdatetime,proto_enddatetime,` +
-        `proto_maincategory,proto_paymenttype,proto_timecategory)`;
+        `proto_maincategory,proto_paymenttype,proto_timecategory,proto_timezone)`;
 
     const result = await xrm.WebApi.retrieveMultipleRecords(entityName, query);
 
@@ -65,6 +64,9 @@ const fetchEvents = async (): Promise<EventData[]> => {
             start: fromUtcToJst(t.proto_startdatetime),
             end: fromUtcToJst(t.proto_enddatetime),
             workOrderId: wo.proto_workorderid,
+            extendedProps: {
+                timezone: t.proto_timezone ?? null,
+            },
         }))
     );
 };
@@ -85,8 +87,8 @@ const fetchEventDetail = async (id: string) => {
     const entityName = "proto_timeentry";
     const query =
         `?$select=proto_name,proto_startdatetime,proto_enddatetime,` +
-        `proto_maincategory,proto_paymenttype,proto_timecategory` +
-        `&$expand=proto_wonumber($select=proto_wonumber,proto_workorderid)`;
+        `proto_maincategory,proto_paymenttype,proto_timecategory,proto_timezone` +
+        `&$expand=proto_wonumber($select=proto_wonumber,proto_workorderid,proto_description)`;
 
     const record = await xrm.WebApi.retrieveRecord(entityName, id, query);
 
@@ -98,6 +100,7 @@ const fetchEventDetail = async (id: string) => {
         maincategory: record.proto_maincategory,
         timecategory: record.proto_timecategory,
         paymenttype: record.proto_paymenttype,
+        timezone: record.proto_timezone ?? null,
         workOrder: record.proto_wonumber?.proto_workorderid,
         workOrderDesc: record.proto_wonumber?.proto_description,
     };
@@ -126,8 +129,6 @@ export const useEvents = (selectedWO: string) => {
         ...e,
         extendedProps: {
             ...e.extendedProps,
-            // selectedWO が "all" の場合 → 全件強調
-            // それ以外 → 一致する WorkOrder のみ強調
             isTargetWO: selectedWO === "all" || e.workOrderId === selectedWO,
         },
     }));
