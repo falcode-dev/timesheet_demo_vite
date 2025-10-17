@@ -22,7 +22,7 @@ export interface TimeEntryModalProps {
     maincategoryOptions: SelectOption[];
     paymenttypeOptions: SelectOption[];
     timecategoryOptions: SelectOption[];
-    locationOptions: SelectOption[];
+    timezoneOptions: SelectOption[];
 }
 
 /* =========================================================
@@ -38,7 +38,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     maincategoryOptions,
     paymenttypeOptions,
     timecategoryOptions,
-    locationOptions,
+    timezoneOptions,
 }) => {
     /* -------------------------------
        🧭 状態管理
@@ -47,7 +47,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     const [comment, setComment] = useState("");
     const [wo, setWo] = useState("");
     const [endUser, setEndUser] = useState("");
-    const [location, setLocation] = useState("");
+    const [timezone, setTimezone] = useState("");
     const [timeCategory, setTimeCategory] = useState("");
     const [mainCategory, setMainCategory] = useState("");
     const [paymentType, setPaymentType] = useState("");
@@ -148,7 +148,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setComment(selectedEvent.comment ?? "");
             setEndUser(selectedEvent.endUser ?? "");
             setTask(selectedEvent.task ?? "");
-            setLocation(selectedEvent.location ?? "");
+            setTimezone(String(selectedEvent.timezone ?? ""));
             setResource(selectedEvent.resource ?? "");
         } else if (selectedDateTime) {
             // 新規作成モード
@@ -164,7 +164,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
 
             setWo("");
             setEndUser("");
-            setLocation("");
+            setTimezone("");
             setTimeCategory("");
             setMainCategory("");
             setPaymentType("");
@@ -187,7 +187,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             start,
             end,
             endUser,
-            location,
+            timezone,
             resource,
             timeCategory,
             mainCategory,
@@ -279,7 +279,11 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             <Select options={endUserOptions} value={endUser} onChange={setEndUser} />
 
                             <label className="modal-label">Location</label>
-                            <Select options={locationOptions} value={location} onChange={setLocation} />
+                            <Select
+                                options={timezoneOptions}
+                                value={timezone}
+                                onChange={setTimezone}
+                            />
 
                             <div className="resource-header">
                                 <label className="modal-label">リソース</label>
@@ -328,7 +332,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                 </div>
             </BaseModal>
 
-            {/* ✅ リソース選択モーダル */}
+            {/* リソース選択モーダル */}
             <ResourceSelectModal
                 isOpen={isResourceModalOpen}
                 onClose={closeResourceModal}

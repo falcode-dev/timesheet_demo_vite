@@ -1,3 +1,4 @@
+// src/api/dataverseClient/timeEntryClient.ts
 import { getXrm } from "../../utils/xrmUtils";
 
 /** TimeEntry 登録・更新時の入力データ型 */
@@ -7,7 +8,7 @@ export type TimeEntryInput = {
     mainCategory?: string | number | null;
     timeCategory?: string | number | null;
     paymentType?: string | number | null;
-    location?: string | number | null;
+    timezone?: string | number | null;
     start?: Date;
     end?: Date;
     wo?: string; // WorkOrder ID
@@ -20,7 +21,7 @@ export type TimeEntryRecord = {
     mainCategory: number | null;
     timeCategory: number | null;
     paymentType: number | null;
-    location: number | null;
+    timezone: number | null;
     start: string;
     end: string;
     wo?: string;
@@ -47,12 +48,13 @@ export const timeEntryClient = {
         const xrm = getXrm();
         const entityName = "proto_timeentry";
 
-        const record = {
+        const record: TimeEntryRecord = {
+            id: "",
             title: data.title || "現場作業",
             mainCategory: data.mainCategory ? Number(data.mainCategory) : null,
             timeCategory: data.timeCategory ? Number(data.timeCategory) : null,
             paymentType: data.paymentType ? Number(data.paymentType) : null,
-            location: data.location ? Number(data.location) : null,
+            timezone: data.timezone ? Number(data.timezone) : null,
             start: toJstString(data.start),
             end: toJstString(data.end),
             wo: data.wo,
@@ -64,7 +66,7 @@ export const timeEntryClient = {
             proto_maincategory: record.mainCategory,
             proto_timecategory: record.timeCategory,
             proto_paymenttype: record.paymentType,
-            proto_timezone: record.location,
+            proto_timezone: record.timezone,
             proto_startdatetime: record.start,
             proto_enddatetime: record.end,
         };
@@ -73,12 +75,12 @@ export const timeEntryClient = {
             payload["proto_wonumber@odata.bind"] = `/proto_workorders(${record.wo})`;
         }
 
-        // Dataverse 環境
+        // Dataverse 登録
         if (xrm?.WebApi?.createRecord) {
             try {
                 const result = await xrm.WebApi.createRecord(entityName, payload);
                 console.log("Dataverse 登録成功:", result);
-                return { id: result.id, ...record };
+                return { ...record, id: result.id };
             } catch (error) {
                 console.error("Dataverse 登録失敗:", error);
                 throw error;
@@ -88,11 +90,11 @@ export const timeEntryClient = {
         // ローカル環境フォールバック
         const mockId = `local-${Date.now()}`;
         const existing = JSON.parse(localStorage.getItem("localEvents") || "[]");
-        const updated = [...existing, { id: mockId, ...record }];
+        const updated = [...existing, { ...record, id: mockId }];
         localStorage.setItem("localEvents", JSON.stringify(updated));
 
         console.log("ローカル登録:", record);
-        return { id: mockId, ...record };
+        return { ...record, id: mockId };
     },
 
     /** 更新 */
@@ -100,12 +102,13 @@ export const timeEntryClient = {
         const xrm = getXrm();
         const entityName = "proto_timeentry";
 
-        const record = {
+        const record: TimeEntryRecord = {
+            id,
             title: data.title || "現場作業",
             mainCategory: data.mainCategory ? Number(data.mainCategory) : null,
             timeCategory: data.timeCategory ? Number(data.timeCategory) : null,
             paymentType: data.paymentType ? Number(data.paymentType) : null,
-            location: data.location ? Number(data.location) : null,
+            timezone: data.timezone ? Number(data.timezone) : null,
             start: toJstString(data.start),
             end: toJstString(data.end),
             wo: data.wo,
@@ -116,7 +119,7 @@ export const timeEntryClient = {
             proto_maincategory: record.mainCategory,
             proto_timecategory: record.timeCategory,
             proto_paymenttype: record.paymentType,
-            proto_timezone: record.location,
+            proto_timezone: record.timezone,
             proto_startdatetime: record.start,
             proto_enddatetime: record.end,
         };
@@ -125,24 +128,24 @@ export const timeEntryClient = {
             payload["proto_wonumber@odata.bind"] = `/proto_workorders(${record.wo})`;
         }
 
-        // Dataverse 環境
+        // Dataverse 更新
         if (xrm?.WebApi?.updateRecord) {
             try {
                 await xrm.WebApi.updateRecord(entityName, id, payload);
                 console.log("Dataverse 更新成功:", id);
-                return { id, ...record };
+                return record;
             } catch (error) {
                 console.error("Dataverse 更新失敗:", error);
                 throw error;
             }
         }
 
-        // ローカル環境フォールバック
+        // ローカル更新
         const existing = JSON.parse(localStorage.getItem("localEvents") || "[]");
         const updated = existing.map((ev: any) => (ev.id === id ? { ...ev, ...record } : ev));
         localStorage.setItem("localEvents", JSON.stringify(updated));
 
         console.log("ローカル更新:", record);
-        return { id, ...record };
+        return record;
     },
 };

@@ -131,7 +131,7 @@ export const DataverseApp = () => {
                 maincategoryOptions={optionSets?.maincategory ?? []}
                 timecategoryOptions={optionSets?.timecategory ?? []}
                 paymenttypeOptions={optionSets?.paymenttype ?? []}
-                locationOptions={optionSets?.timezone ?? []}
+                timezoneOptions={optionSets?.timezone ?? []}
             />
 
             <FavoriteTaskModal
