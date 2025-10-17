@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import * as FaIcons from "react-icons/fa";
 import { IoIosArrowForward } from "react-icons/io";
 import { BaseModal } from "../BaseModal";
@@ -36,113 +36,104 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
     onClose,
     onSave,
 }) => {
-    // ========================
-    // ▼ ステート管理
-    // ========================
+    /* ======================================================
+       ▼ ステート管理
+    ======================================================= */
     const [selectedCategory, setSelectedCategory] = useState("");
     const [taskName, setTaskName] = useState("");
     const [searchResults, setSearchResults] = useState<string[]>([]);
     const [favoriteTasks, setFavoriteTasks] = useState<string[]>([]);
     const [checkedResults, setCheckedResults] = useState<string[]>([]);
     const [checkedFavorites, setCheckedFavorites] = useState<string[]>([]);
-
-    // ✅ サブヘッダー用チェックボックス状態
     const [isLeftHeaderChecked, setIsLeftHeaderChecked] = useState(false);
     const [isRightHeaderChecked, setIsRightHeaderChecked] = useState(false);
 
+    /* ======================================================
+       ▼ ダミーデータ（後でDataverse化可能）
+    ======================================================= */
     const categories = ["業務改善", "品質向上", "教育・育成"];
     const tasks = ["資料整理", "会議準備", "テスト計画", "レビュー対応", "定例会参加"];
 
-    // ========================
-    // ▼ 初期化
-    // ========================
-    useEffect(() => setSearchResults(tasks), []);
+    /* ======================================================
+       ▼ 初期化
+    ======================================================= */
+    useEffect(() => {
+        setSearchResults(tasks);
+    }, []);
 
-    // ========================
-    // ▼ 個別チェック
-    // ========================
-    const toggleCheck = (task: string) => {
+    /* ======================================================
+       ▼ 個別チェック操作
+    ======================================================= */
+    const toggleCheck = useCallback((task: string) => {
         setCheckedResults((prev) =>
             prev.includes(task) ? prev.filter((t) => t !== task) : [...prev, task]
         );
-    };
+    }, []);
 
-    const toggleFavoriteCheck = (task: string) => {
+    const toggleFavoriteCheck = useCallback((task: string) => {
         setCheckedFavorites((prev) =>
             prev.includes(task) ? prev.filter((t) => t !== task) : [...prev, task]
         );
-    };
+    }, []);
 
-    // ========================
-    // ▼ 上部チェック（全選択／全解除）
-    // ========================
-    const toggleLeftHeaderCheck = () => {
+    /* ======================================================
+       ▼ ヘッダー全選択・全解除
+    ======================================================= */
+    const toggleLeftHeaderCheck = useCallback(() => {
         const newState = !isLeftHeaderChecked;
         setIsLeftHeaderChecked(newState);
-        const availableTasks = searchResults.filter((t) => !favoriteTasks.includes(t));
-        setCheckedResults(newState ? availableTasks : []);
-    };
+        const available = searchResults.filter((t) => !favoriteTasks.includes(t));
+        setCheckedResults(newState ? available : []);
+    }, [isLeftHeaderChecked, searchResults, favoriteTasks]);
 
-    const toggleRightHeaderCheck = () => {
+    const toggleRightHeaderCheck = useCallback(() => {
         const newState = checkedFavorites.length < favoriteTasks.length;
         setCheckedFavorites(newState ? [...favoriteTasks] : []);
-    };
+    }, [checkedFavorites.length, favoriteTasks]);
 
-    // ========================
-    // ▼ 右リストにチェックがあるか監視してヘッダー更新
-    // ========================
     useEffect(() => {
         setIsRightHeaderChecked(checkedFavorites.length > 0);
     }, [checkedFavorites]);
 
-    // ========================
-    // ▼ 移動（右へ）
-    // ========================
-    const moveToFavorite = () => {
-        const newFavorites = [...favoriteTasks];
-        const newCheckedFavorites = [...checkedFavorites];
-
-        checkedResults.forEach((task) => {
-            if (!newFavorites.includes(task)) {
-                newFavorites.push(task);
-                newCheckedFavorites.push(task);
-            }
-        });
-
-        setFavoriteTasks(newFavorites);
-        setCheckedFavorites(newCheckedFavorites);
+    /* ======================================================
+       ▼ 移動（右へ）
+    ======================================================= */
+    const moveToFavorite = useCallback(() => {
+        const toAdd = checkedResults.filter((t) => !favoriteTasks.includes(t));
+        setFavoriteTasks((prev) => [...prev, ...toAdd]);
+        setCheckedFavorites((prev) => [...prev, ...toAdd]);
         setCheckedResults([]);
         setIsLeftHeaderChecked(false);
-    };
+    }, [checkedResults, favoriteTasks]);
 
-    // ========================
-    // ▼ 削除
-    // ========================
-    const removeSelectedFavorites = () => {
+    /* ======================================================
+       ▼ 削除操作
+    ======================================================= */
+    const removeSelectedFavorites = useCallback(() => {
         setFavoriteTasks((prev) => prev.filter((t) => !checkedFavorites.includes(t)));
         setCheckedFavorites([]);
-    };
+    }, [checkedFavorites]);
 
-    const removeFavorite = (task: string) => {
+    const removeFavorite = useCallback((task: string) => {
         setFavoriteTasks((prev) => prev.filter((t) => t !== task));
         setCheckedFavorites((prev) => prev.filter((t) => t !== task));
-    };
+    }, []);
 
-    // ========================
-    // ▼ 検索処理
-    // ========================
-    const handleSearch = () => {
+    /* ======================================================
+       ▼ 検索処理
+    ======================================================= */
+    const handleSearch = useCallback(() => {
         const filtered = tasks.filter(
             (t) =>
                 (!selectedCategory || t.includes(selectedCategory)) &&
                 (!taskName || t.includes(taskName))
         );
         setSearchResults(filtered);
-    };
+    }, [selectedCategory, taskName, tasks]);
 
-    // ========================
-    // ▼ JSX
-    // ========================
+    /* ======================================================
+       ▼ JSX
+    ======================================================= */
     return (
         <BaseModal
             isOpen={isOpen}
@@ -162,7 +153,9 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
             ]}
         >
             <div className="modal-body">
-                {/* 上部フィルタ */}
+                {/* -------------------------------
+                    上部フィルタ
+                ------------------------------- */}
                 <div className="modal-grid">
                     {/* サブカテゴリ：Select */}
                     <div className="grid-left">
@@ -205,8 +198,11 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
                     検索結果の項目を選択して追加し保存を押してください。
                 </p>
 
+                {/* -------------------------------
+                    タスクリスト
+                ------------------------------- */}
                 <div className="task-grid">
-                    {/* 左：検索結果 */}
+                    {/* ---------- 左：検索結果 ---------- */}
                     <div className="task-list">
                         <div className="list-header">
                             <span className="modal-label">検索結果</span>
@@ -253,7 +249,7 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
                         </div>
                     </div>
 
-                    {/* 中央：移動ボタン */}
+                    {/* ---------- 中央：移動ボタン ---------- */}
                     <div className="move-button-container">
                         <button
                             onClick={moveToFavorite}
@@ -264,7 +260,7 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
                         </button>
                     </div>
 
-                    {/* 右：お気に入り */}
+                    {/* ---------- 右：お気に入り ---------- */}
                     <div className="task-list">
                         <div className="list-header">
                             <span className="modal-label">お気に入り間接タスク項目</span>

@@ -1,7 +1,3 @@
-:root {
-    --main-color: rgb(0, 137, 186);
-}
-
 /* =============================
    ヘッダー全体
 ============================= */
@@ -13,9 +9,12 @@
     flex-shrink: 0;
     padding: 0 12px;
     box-sizing: border-box;
+    font-family: var(--font-family);
 }
 
-/* タイトル部分 */
+/* =============================
+   タイトル部分
+============================= */
 .header-title {
     font-size: 1.6rem;
     font-weight: bold;
@@ -24,7 +23,9 @@
     white-space: nowrap;
 }
 
-/* 右側グループ */
+/* =============================
+   右側グループ
+============================= */
 .header-right {
     display: flex;
     align-items: center;
@@ -33,7 +34,9 @@
     flex-direction: row;
 }
 
-/* ラベル */
+/* =============================
+   ラベル
+============================= */
 .header-label {
     font-size: 0.9rem;
     color: var(--main-color);

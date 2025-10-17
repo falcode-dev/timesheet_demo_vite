@@ -9,7 +9,10 @@ import { Textarea } from "../../../component/textarea/Textarea";
 import { ResourceSelectModal } from "../resourceselectmodal/ResourceSelectModal";
 import "./TimeEntryModal.css";
 
-interface TimeEntryModalProps {
+/* =========================================================
+   型定義
+========================================================= */
+export interface TimeEntryModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSubmit: (data: any) => void;
@@ -22,6 +25,9 @@ interface TimeEntryModalProps {
     locationOptions: SelectOption[];
 }
 
+/* =========================================================
+   メインコンポーネント
+========================================================= */
 export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     isOpen,
     onClose,
@@ -34,9 +40,9 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     timecategoryOptions,
     locationOptions,
 }) => {
-    // =============================
-    // 状態管理
-    // =============================
+    /* -------------------------------
+       🧭 状態管理
+    ------------------------------- */
     const [mode, setMode] = useState<"create" | "edit">("create");
     const [comment, setComment] = useState("");
     const [wo, setWo] = useState("");
@@ -46,7 +52,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     const [mainCategory, setMainCategory] = useState("");
     const [paymentType, setPaymentType] = useState("");
     const [task, setTask] = useState("");
-    const [resource, setResource] = useState(""); // ✅ 選択されたリソース表示用
+    const [resource, setResource] = useState("");
 
     const [startDate, setStartDate] = useState("");
     const [startHour, setStartHour] = useState("");
@@ -58,36 +64,41 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     const startDateRef = useRef<HTMLInputElement>(null);
     const endDateRef = useRef<HTMLInputElement>(null);
 
-    // ✅ リソース選択モーダルの状態
+    /* -------------------------------
+       🧩 リソースモーダル
+    ------------------------------- */
     const [isResourceModalOpen, setIsResourceModalOpen] = useState(false);
     const openResourceModal = () => setIsResourceModalOpen(true);
     const closeResourceModal = () => setIsResourceModalOpen(false);
 
-    // ✅ ResourceSelectModalから受け取った選択結果を反映
     const handleResourceSave = (selectedResources: { id: string; label: string }[]) => {
-        // ラベル文字列を改行で結合して表示
-        const labelText = selectedResources.map((r) => r.label).join("\n");
-        setResource(labelText);
+        setResource(selectedResources.map((r) => r.label).join("\n"));
         closeResourceModal();
     };
 
-    // =============================
-    // 選択肢
-    // =============================
+    /* -------------------------------
+       ⏰ 選択肢（Select用）
+    ------------------------------- */
     const filteredWoOptions = useMemo(
         () => woOptions.filter((opt) => opt.value !== "all"),
         [woOptions]
     );
 
-    const hours: SelectOption[] = Array.from({ length: 24 }, (_, i) => ({
-        value: String(i).padStart(2, "0"),
-        label: `${String(i).padStart(2, "0")}時`,
-    }));
+    const hours = useMemo<SelectOption[]>(
+        () => Array.from({ length: 24 }, (_, i) => ({
+            value: String(i).padStart(2, "0"),
+            label: `${String(i).padStart(2, "0")}時`,
+        })),
+        []
+    );
 
-    const minutes: SelectOption[] = Array.from({ length: 60 }, (_, i) => ({
-        value: String(i).padStart(2, "0"),
-        label: `${String(i).padStart(2, "0")}分`,
-    }));
+    const minutes = useMemo<SelectOption[]>(
+        () => Array.from({ length: 60 }, (_, i) => ({
+            value: String(i).padStart(2, "0"),
+            label: `${String(i).padStart(2, "0")}分`,
+        })),
+        []
+    );
 
     const endUserOptions: SelectOption[] = [
         { value: "abc", label: "株式会社ABC" },
@@ -101,51 +112,55 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
         { value: "test", label: "テスト" },
     ];
 
-    // =============================
-    // 日付フォーマット関数
-    // =============================
-    const formatLocalDate = (date: Date) => {
+    /* -------------------------------
+       📅 日付フォーマット関数
+    ------------------------------- */
+    const formatLocalDate = (date: Date): string => {
         const y = date.getFullYear();
         const m = String(date.getMonth() + 1).padStart(2, "0");
         const d = String(date.getDate()).padStart(2, "0");
         return `${y}-${m}-${d}`;
     };
 
-    // =============================
-    // 初期化処理（Dataverseの詳細反映）
-    // =============================
+    /* -------------------------------
+       🪄 初期化処理
+    ------------------------------- */
     useEffect(() => {
         if (!isOpen) return;
 
         if (selectedEvent) {
+            // 編集モード
             setMode("edit");
             const start = new Date(selectedEvent.start);
             const end = new Date(selectedEvent.end);
-            setStartDate(formatLocalDate(start));
-            setStartHour(start.getHours().toString().padStart(2, "0"));
-            setStartMinute(start.getMinutes().toString().padStart(2, "0"));
-            setEndDate(formatLocalDate(end));
-            setEndHour(end.getHours().toString().padStart(2, "0"));
-            setEndMinute(end.getMinutes().toString().padStart(2, "0"));
 
-            setWo(selectedEvent.workOrder || "");
-            setMainCategory(String(selectedEvent.maincategory || ""));
-            setTimeCategory(String(selectedEvent.timecategory || ""));
-            setPaymentType(String(selectedEvent.paymenttype || ""));
-            setComment(selectedEvent.comment || "");
-            setEndUser(selectedEvent.endUser || "");
-            setTask(selectedEvent.task || "");
-            setLocation(selectedEvent.location || "");
-            setResource(selectedEvent.resource || "");
+            setStartDate(formatLocalDate(start));
+            setStartHour(String(start.getHours()).padStart(2, "0"));
+            setStartMinute(String(start.getMinutes()).padStart(2, "0"));
+            setEndDate(formatLocalDate(end));
+            setEndHour(String(end.getHours()).padStart(2, "0"));
+            setEndMinute(String(end.getMinutes()).padStart(2, "0"));
+
+            setWo(selectedEvent.workOrder ?? "");
+            setMainCategory(String(selectedEvent.maincategory ?? ""));
+            setTimeCategory(String(selectedEvent.timecategory ?? ""));
+            setPaymentType(String(selectedEvent.paymenttype ?? ""));
+            setComment(selectedEvent.comment ?? "");
+            setEndUser(selectedEvent.endUser ?? "");
+            setTask(selectedEvent.task ?? "");
+            setLocation(selectedEvent.location ?? "");
+            setResource(selectedEvent.resource ?? "");
         } else if (selectedDateTime) {
+            // 新規作成モード
             setMode("create");
             const { start, end } = selectedDateTime;
+
             setStartDate(formatLocalDate(start));
-            setStartHour(start.getHours().toString().padStart(2, "0"));
-            setStartMinute(start.getMinutes().toString().padStart(2, "0"));
+            setStartHour(String(start.getHours()).padStart(2, "0"));
+            setStartMinute(String(start.getMinutes()).padStart(2, "0"));
             setEndDate(formatLocalDate(end));
-            setEndHour(end.getHours().toString().padStart(2, "0"));
-            setEndMinute(end.getMinutes().toString().padStart(2, "0"));
+            setEndHour(String(end.getHours()).padStart(2, "0"));
+            setEndMinute(String(end.getMinutes()).padStart(2, "0"));
 
             setWo("");
             setEndUser("");
@@ -159,14 +174,14 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
         }
     }, [isOpen, selectedEvent, selectedDateTime]);
 
-    // =============================
-    // 保存処理
-    // =============================
+    /* -------------------------------
+       💾 保存処理
+    ------------------------------- */
     const handleSave = () => {
         const start = new Date(`${startDate}T${startHour}:${startMinute}`);
         const end = new Date(`${endDate}T${endHour}:${endMinute}`);
 
-        const data = {
+        onSubmit({
             id: selectedEvent?.id || "",
             wo,
             start,
@@ -179,14 +194,13 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             paymentType,
             task,
             comment,
-        };
-        onSubmit(data);
+        });
         onClose();
     };
 
-    // =============================
-    // JSX
-    // =============================
+    /* -------------------------------
+       🎨 JSX
+    ------------------------------- */
     return (
         <>
             <BaseModal
@@ -211,6 +225,8 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                 size="large"
             >
                 <div className="timeentry-modal-body">
+                    {/* ================= 左列 ================= */}
+
                     <label className="modal-label">WO番号</label>
                     <Select
                         options={filteredWoOptions}
@@ -220,7 +236,6 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                     />
 
                     <div className="modal-grid">
-                        {/* 左列 */}
                         <div>
                             <label className="modal-label">スケジュール開始日</label>
                             <div className="datetime-row">
@@ -228,8 +243,8 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                     ref={startDateRef}
                                     type="date"
                                     value={startDate}
-                                    className="datetime-row-input"
                                     onChange={setStartDate}
+                                    className="datetime-row-input"
                                     suffix={
                                         <FaIcons.FaRegCalendarAlt
                                             className="icon"
@@ -247,8 +262,8 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                     ref={endDateRef}
                                     type="date"
                                     value={endDate}
-                                    className="datetime-row-input"
                                     onChange={setEndDate}
+                                    className="datetime-row-input"
                                     suffix={
                                         <FaIcons.FaRegCalendarAlt
                                             className="icon"
@@ -282,7 +297,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             />
                         </div>
 
-                        {/* 右列 */}
+                        {/* ================= 右列 ================= */}
                         <div>
                             <label className="modal-label">タイムカテゴリ</label>
                             <Select options={timecategoryOptions} value={timeCategory} onChange={setTimeCategory} />

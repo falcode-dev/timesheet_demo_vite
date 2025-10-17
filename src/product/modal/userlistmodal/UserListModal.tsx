@@ -1,165 +1,153 @@
-import React, { useState, useEffect } from "react";
+// src/product/modal/userlistmodal/UserListModal.tsx
+import React, { useState, useEffect, useCallback } from "react";
 import * as FaIcons from "react-icons/fa";
 import { IoIosArrowForward } from "react-icons/io";
 import { BaseModal } from "../BaseModal";
 import { Button } from "../../../component/button/Button";
 import { Input } from "../../../component/input/Input";
 import { useResources } from "../../../hooks/useResources";
-import { useAllowedUsers } from "../../../context/UserListContext"; // ✅ 追加
+import { useAllowedUsers } from "../../../context/UserListContext";
+import type { Resource } from "../../../hooks/useResources";
 import "./UserListModal.css";
 
-export interface BaseModalProps {
+/* =========================================================
+   型定義
+========================================================= */
+export interface UserListModalProps {
     isOpen: boolean;
     onClose: () => void;
-    title?: string;
-    description?: string;
-    size?: "small" | "medium" | "large";
-    children?: React.ReactNode;
-    footerButtons?: React.ReactNode[];
-}
-
-interface UserListModalProps
-    extends Omit<BaseModalProps, "children" | "footerButtons"> {
     onSave: (selectedUsers: string[]) => void;
 }
 
+/* =========================================================
+   コンポーネント
+========================================================= */
 export const UserListModal: React.FC<UserListModalProps> = ({
     isOpen,
     onClose,
     onSave,
 }) => {
-    /* ========================
-       ▼ Dataverseからリソース取得
-    ======================== */
+    /* ---------------------------
+       Dataverseから取得
+    --------------------------- */
     const { resources, isLoading } = useResources();
-    const { setAllowedUsers } = useAllowedUsers(); // ✅ Contextへ反映
+    const { setAllowedUsers } = useAllowedUsers();
 
-    type Resource = { id: string; number: string; name: string };
-
-    /* ========================
-       ▼ ステート管理
-    ======================== */
-    const [employeeid, setEmployeeid] = useState("");
+    /* ---------------------------
+       状態管理
+    --------------------------- */
+    const [employeeId, setEmployeeId] = useState("");
     const [userName, setUserName] = useState("");
-    const [searchResults, setSearchResults] = useState<Resource[]>([]); // 初期は空
+
+    const [searchResults, setSearchResults] = useState<Resource[]>([]);
     const [selectedUsers, setSelectedUsers] = useState<Resource[]>([]);
+
     const [checkedResults, setCheckedResults] = useState<string[]>([]);
     const [checkedSelected, setCheckedSelected] = useState<string[]>([]);
 
     const [isLeftHeaderChecked, setIsLeftHeaderChecked] = useState(false);
     const [isRightHeaderChecked, setIsRightHeaderChecked] = useState(false);
 
-    /* ========================
-       ▼ 検索処理（ボタンクリック時のみ）
-    ======================== */
-    const handleSearch = () => {
-        if (!employeeid && !userName) {
+    /* =========================================================
+       検索処理
+    ========================================================= */
+    const handleSearch = useCallback(() => {
+        if (!employeeId && !userName) {
             setSearchResults([]);
             return;
         }
 
         const filtered = resources.filter(
             (r) =>
-                (!employeeid || r.number.includes(employeeid)) &&
-                (!userName || r.name.includes(userName))
+                (!employeeId || (r.number ?? "").includes(employeeId)) &&
+                (!userName || (r.name ?? "").includes(userName))
         );
         setSearchResults(filtered);
-    };
+    }, [employeeId, userName, resources]);
 
-    /* ========================
-       ▼ 個別チェック操作
-    ======================== */
-    const toggleCheck = (id: string) => {
+    /* =========================================================
+       チェックボックス操作
+    ========================================================= */
+    const toggleCheck = useCallback((id: string) => {
         setCheckedResults((prev) =>
-            prev.includes(id)
-                ? prev.filter((u) => u !== id)
-                : [...prev, id]
+            prev.includes(id) ? prev.filter((u) => u !== id) : [...prev, id]
         );
-    };
+    }, []);
 
-    const toggleSelectedCheck = (id: string) => {
+    const toggleSelectedCheck = useCallback((id: string) => {
         setCheckedSelected((prev) =>
-            prev.includes(id)
-                ? prev.filter((u) => u !== id)
-                : [...prev, id]
+            prev.includes(id) ? prev.filter((u) => u !== id) : [...prev, id]
         );
-    };
+    }, []);
 
-    /* ========================
-       ▼ 全選択・全解除
-    ======================== */
-    const toggleLeftHeaderCheck = () => {
+    /* =========================================================
+       全選択・全解除
+    ========================================================= */
+    const toggleLeftHeaderCheck = useCallback(() => {
         const newState = !isLeftHeaderChecked;
         setIsLeftHeaderChecked(newState);
         const available = searchResults.filter(
             (r) => !selectedUsers.some((s) => s.id === r.id)
         );
         setCheckedResults(newState ? available.map((r) => r.id) : []);
-    };
+    }, [isLeftHeaderChecked, searchResults, selectedUsers]);
 
-    const toggleRightHeaderCheck = () => {
+    const toggleRightHeaderCheck = useCallback(() => {
         const newState = checkedSelected.length < selectedUsers.length;
         setCheckedSelected(newState ? selectedUsers.map((r) => r.id) : []);
-    };
+    }, [checkedSelected.length, selectedUsers]);
 
-    /* ========================
-       ▼ 右リストチェック監視
-    ======================== */
     useEffect(() => {
         setIsRightHeaderChecked(checkedSelected.length > 0);
     }, [checkedSelected]);
 
-    /* ========================
-       ▼ 移動（右へ）
-    ======================== */
-    const moveToSelected = () => {
+    /* =========================================================
+       移動・削除操作
+    ========================================================= */
+    const moveToSelected = useCallback(() => {
         const toAdd = searchResults.filter((r) => checkedResults.includes(r.id));
 
-        // ✅ 右側（selectedUsers）に追加
         const updated = [...selectedUsers];
-        const newChecked = [...checkedSelected]; // ✅ 右側チェックも管理
+        const newChecked = [...checkedSelected];
 
         toAdd.forEach((r) => {
             if (!updated.some((u) => u.id === r.id)) {
                 updated.push(r);
-                newChecked.push(r.id); // ✅ 新しく追加されたユーザーを右側でチェックON
+                newChecked.push(r.id);
             }
         });
 
         setSelectedUsers(updated);
-        setCheckedSelected(newChecked); // ✅ 右側チェックONを反映
-        setCheckedResults([]); // 左側のチェック解除
+        setCheckedSelected(newChecked);
+        setCheckedResults([]);
         setIsLeftHeaderChecked(false);
-    };
+    }, [searchResults, checkedResults, selectedUsers, checkedSelected]);
 
-    /* ========================
-       ▼ 削除（右側）
-    ======================== */
-    const removeCheckedSelected = () => {
+    const removeCheckedSelected = useCallback(() => {
         setSelectedUsers((prev) =>
             prev.filter((r) => !checkedSelected.includes(r.id))
         );
         setCheckedSelected([]);
-    };
+    }, [checkedSelected]);
 
-    const removeUser = (id: string) => {
+    const removeUser = useCallback((id: string) => {
         setSelectedUsers((prev) => prev.filter((r) => r.id !== id));
         setCheckedSelected((prev) => prev.filter((u) => u !== id));
-    };
+    }, []);
 
-    /* ========================
-       ▼ 保存処理（Contextへ反映）
-    ======================== */
-    const handleSave = () => {
+    /* =========================================================
+       保存処理
+    ========================================================= */
+    const handleSave = useCallback(() => {
         const ids = selectedUsers.map((u) => u.id);
-        setAllowedUsers(ids); // ✅ グローバルに保存
-        onSave(ids); // 既存のコールバックも呼ぶ
+        setAllowedUsers(ids);
+        onSave(ids);
         onClose();
-    };
+    }, [selectedUsers, setAllowedUsers, onSave, onClose]);
 
-    /* ========================
-       ▼ JSX
-    ======================== */
+    /* =========================================================
+       JSX
+    ========================================================= */
     return (
         <BaseModal
             isOpen={isOpen}
@@ -189,8 +177,8 @@ export const UserListModal: React.FC<UserListModalProps> = ({
                     <div className="grid-left">
                         <label className="modal-label">社員番号</label>
                         <Input
-                            value={employeeid}
-                            onChange={setEmployeeid}
+                            value={employeeId}
+                            onChange={setEmployeeId}
                             placeholder="社員番号を入力"
                             width="100%"
                             type="text"
@@ -199,7 +187,7 @@ export const UserListModal: React.FC<UserListModalProps> = ({
                             <Button
                                 label="クリア"
                                 color="secondary"
-                                onClick={() => setEmployeeid("")}
+                                onClick={() => setEmployeeId("")}
                             />
                         </div>
                     </div>
@@ -214,11 +202,7 @@ export const UserListModal: React.FC<UserListModalProps> = ({
                             type="text"
                         />
                         <div className="left-align">
-                            <Button
-                                label="検索"
-                                color="primary"
-                                onClick={handleSearch}
-                            />
+                            <Button label="検索" color="primary" onClick={handleSearch} />
                         </div>
                     </div>
                 </div>
@@ -253,7 +237,6 @@ export const UserListModal: React.FC<UserListModalProps> = ({
                                 </div>
                             </div>
 
-                            {/* ✅ 初期でもリスト枠は残す */}
                             <div className="list-box">
                                 {searchResults.length === 0 ? (
                                     <p className="no-results">
@@ -278,10 +261,10 @@ export const UserListModal: React.FC<UserListModalProps> = ({
                                                 />
                                                 <div className="list-text">
                                                     <div className="category-name">
-                                                        {r.number || "-"}
+                                                        {r.number ?? "-"}
                                                     </div>
                                                     <div className="task-name">
-                                                        {r.name || "(名前なし)"}
+                                                        {r.name ?? "(名前なし)"}
                                                     </div>
                                                 </div>
                                             </label>
@@ -342,15 +325,13 @@ export const UserListModal: React.FC<UserListModalProps> = ({
                                                 <input
                                                     type="checkbox"
                                                     checked={checkedSelected.includes(r.id)}
-                                                    onChange={() =>
-                                                        toggleSelectedCheck(r.id)
-                                                    }
+                                                    onChange={() => toggleSelectedCheck(r.id)}
                                                 />
                                                 <div className="list-text">
                                                     <div className="category-name">
-                                                        {r.number}
+                                                        {r.number ?? "-"}
                                                     </div>
-                                                    <div className="task-name">{r.name}</div>
+                                                    <div className="task-name">{r.name ?? "(名前なし)"}</div>
                                                 </div>
                                             </div>
                                             <div className="list-item-favorite-right">

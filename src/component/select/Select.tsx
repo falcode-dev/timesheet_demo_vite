@@ -2,20 +2,39 @@ import React, { useState, useRef, useEffect } from "react";
 import * as FaIcons from "react-icons/fa";
 import "./Select.css";
 
+/** Selectのオプション型 */
 export type SelectOption = {
     value: string;
     label: string;
 };
 
-type SelectProps = {
+/** SelectコンポーネントのProps型 */
+export type SelectProps = {
+    /** 選択肢一覧 */
     options: SelectOption[];
+
+    /** 現在の選択値 */
     value?: string;
+
+    /** 値変更時のコールバック */
     onChange?: (value: string) => void;
+
+    /** プレースホルダー */
     placeholder?: string;
+
+    /** 無効状態 */
     disabled?: boolean;
+
+    /** 追加クラス名 */
     className?: string;
 };
 
+/**
+ * 共通Selectコンポーネント
+ * - カスタムドロップダウン
+ * - 外部クリックで閉じる
+ * - disabled / placeholder 対応
+ */
 export const Select: React.FC<SelectProps> = ({
     options,
     value,
@@ -27,7 +46,7 @@ export const Select: React.FC<SelectProps> = ({
     const [open, setOpen] = useState(false);
     const wrapperRef = useRef<HTMLDivElement | null>(null);
 
-    // ✅ 外部クリックで閉じる
+    /** 外部クリックで閉じる */
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
             if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
@@ -38,28 +57,41 @@ export const Select: React.FC<SelectProps> = ({
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+    /** 現在のラベルを取得 */
     const selectedLabel = options.find((opt) => opt.value === value)?.label;
 
+    /** 値選択時の処理 */
     const handleSelect = (val: string) => {
         onChange?.(val);
         setOpen(false);
     };
 
+    /** クラス結合 */
+    const wrapperClass = [
+        "select-wrapper",
+        open && "open",
+        disabled && "disabled",
+        className,
+    ]
+        .filter(Boolean)
+        .join(" ");
+
+    const textClass = ["select-text", !selectedLabel && "placeholder"]
+        .filter(Boolean)
+        .join(" ");
+
     return (
-        <div
-            ref={wrapperRef}
-            className={`select-wrapper ${open ? "open" : ""} ${disabled ? "disabled" : ""
-                } ${className}`.trim()}
-        >
+        <div ref={wrapperRef} className={wrapperClass}>
             {/* 表示部分 */}
             <div
                 className="select-display"
                 onClick={() => !disabled && setOpen((prev) => !prev)}
+                role="button"
+                aria-expanded={open}
+                aria-haspopup="listbox"
+                tabIndex={disabled ? -1 : 0}
             >
-                <span
-                    className={`select-text ${!selectedLabel ? "placeholder" : ""
-                        }`}
-                >
+                <span className={textClass}>
                     {selectedLabel || placeholder}
                 </span>
                 <span className="select-icon">
@@ -67,15 +99,17 @@ export const Select: React.FC<SelectProps> = ({
                 </span>
             </div>
 
-            {/* ドロップダウン */}
+            {/* ドロップダウンリスト */}
             {open && (
-                <div className="select-option-list">
+                <div className="select-option-list" role="listbox">
                     {options.length > 0 ? (
                         options.map((opt) => (
                             <div
                                 key={opt.value}
                                 className={`select-option ${opt.value === value ? "selected" : ""
                                     }`}
+                                role="option"
+                                aria-selected={opt.value === value}
                                 onClick={() => handleSelect(opt.value)}
                             >
                                 {opt.label}

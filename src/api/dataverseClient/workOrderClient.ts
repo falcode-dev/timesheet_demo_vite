@@ -1,16 +1,22 @@
-// src/api/dataverseClient/workOrderClient.ts
 import { getXrm } from "../../utils/xrmUtils";
 
+/** WorkOrder データ型 */
+export type WorkOrder = {
+    id: string;
+    name: string;
+};
+
 /**
- * WorkOrder 関連のAPIクライアント
- * （将来的にCRUDを追加できるよう拡張設計）
+ * WorkOrder 関連の Dataverse API クライアント
+ * - 現在のユーザーが作成した WorkOrder の一覧を取得
+ * - 将来的に CRUD 操作を拡張可能な構成
  */
 export const workOrderClient = {
-    /** WorkOrder 一覧取得（現在のユーザー作成分のみ） */
-    async getWorkOrders(): Promise<{ id: string; name: string }[]> {
+    /** WorkOrder 一覧取得 */
+    async getWorkOrders(): Promise<WorkOrder[]> {
         const xrm = getXrm();
 
-        // ✅ ローカル開発用モックデータ
+        // ローカル環境（モックデータ）
         if (!xrm) {
             return [
                 { id: "wo-001", name: "ワークオーダサンプル①" },
@@ -18,25 +24,24 @@ export const workOrderClient = {
             ];
         }
 
-        // ✅ 現在のユーザー GUID を取得（{ }を除去）
-        const globalCtx = xrm.Utility.getGlobalContext();
-        const userId = globalCtx.userSettings.userId.replace(/[{}]/g, "");
-
-        // ✅ 自分が作成したレコードのみ取得
-        const query =
-            `?$select=proto_workorderid,proto_wonumber` +
-            `&$filter=_createdby_value eq ${userId}`;
-
+        // Dataverse 環境
         try {
+            const userId = xrm.Utility.getGlobalContext().userSettings.userId.replace(/[{}]/g, "");
+
+            // 自分が作成した WorkOrder のみ取得
+            const query =
+                `?$select=proto_workorderid,proto_wonumber` +
+                `&$filter=_createdby_value eq ${userId}`;
+
             const result = await xrm.WebApi.retrieveMultipleRecords("proto_workorder", query);
 
-            // ✅ Dataverse → アプリ用データ形式に整形
-            return result.entities.map((r: any) => ({
-                id: r.proto_workorderid,  // GUID
-                name: r.proto_wonumber,   // 表示用WO番号
+            // データ整形
+            return result.entities.map((record: any) => ({
+                id: record.proto_workorderid,
+                name: record.proto_wonumber,
             }));
         } catch (error) {
-            console.error("❌ WorkOrder取得失敗:", error);
+            console.error("WorkOrder取得エラー:", error);
             return [];
         }
     },

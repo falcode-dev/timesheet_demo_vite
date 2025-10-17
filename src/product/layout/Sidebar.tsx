@@ -6,79 +6,85 @@ import { useCurrentUser } from "../../hooks/useCurrentUser";
 import { useResources } from "../../hooks/useResources";
 import { useAllowedUsers } from "../../context/UserListContext";
 
-interface IndirectTask {
+/** 間接タスク型 */
+type IndirectTask = {
     id: string;
     category: string;
     task: string;
-}
+};
 
-interface SidebarProps {
+/** 並び替えオプションの型 */
+type UserSortKey = "numberAsc" | "numberDesc" | "nameAsc" | "nameDesc";
+type TaskSortKey = "categoryAsc" | "categoryDesc" | "taskAsc" | "taskDesc";
+
+/** Sidebar プロパティ */
+type SidebarProps = {
     userName?: string;
     mainTab: "user" | "indirect";
-}
+};
 
+/**
+ * Sidebar コンポーネント
+ */
 export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
+    /** 検索・選択状態 */
     const [searchType, setSearchType] = useState<"name" | "number">("name");
     const [keyword, setKeyword] = useState("");
-    const [selectedUsers, setSelectedUsers] = useState<string[]>(["self"]); // ✅ 初期状態で自分をON
+    const [selectedUsers, setSelectedUsers] = useState<string[]>(["self"]);
     const [selectedTask, setSelectedTask] = useState<string>("");
 
-    // ✅ ソート状態
+    /** 並び替え設定 */
     const [isUserSortOpen, setIsUserSortOpen] = useState(false);
     const [isTaskSortOpen, setIsTaskSortOpen] = useState(false);
-    const [userSortOption, setUserSortOption] = useState<string>("numberAsc");
-    const [taskSortOption, setTaskSortOption] = useState<string>("categoryAsc");
+    const [userSortOption, setUserSortOption] = useState<UserSortKey>("numberAsc");
+    const [taskSortOption, setTaskSortOption] = useState<TaskSortKey>("categoryAsc");
 
-    // ✅ Dataverseからログイン中ユーザー取得
+    /** Dataverse: 現在ユーザー情報 */
     const { currentUser, isLoading: isUserLoading } = useCurrentUser();
 
-    // ✅ Dataverseからリソース全件取得
+    /** Dataverse: リソース一覧 */
     const { resources, isLoading: isResourceLoading } = useResources();
 
-    // ✅ Contextから登録済みユーザー一覧取得
+    /** コンテキスト: 許可ユーザー一覧 */
     const { allowedUsers } = useAllowedUsers();
 
-    // ✅ Dataverseユーザー情報整形
+    /** ログイン中ユーザー表示用 */
     const displaySelf = useMemo(() => {
-        if (isUserLoading) {
+        if (isUserLoading)
             return { number: "取得中...", fullName: "ユーザー情報を取得中..." };
-        }
-        if (!currentUser) {
+        if (!currentUser)
             return { number: "社員番号未取得", fullName: "ユーザー情報未取得" };
-        }
-        const number = currentUser.employeeid || "社員番号未登録";
-        const fullName = `${currentUser.lastName || ""} ${currentUser.firstName || ""}`.trim();
-        return { number, fullName };
+
+        return {
+            number: currentUser.employeeid || "社員番号未登録",
+            fullName: `${currentUser.lastName || ""} ${currentUser.firstName || ""}`.trim(),
+        };
     }, [currentUser, isUserLoading]);
 
-    // ✅ 許可されたユーザーのみ表示
+    /** 表示対象ユーザー（許可済みのみ） */
     const visibleUsers = useMemo(() => {
         if (isResourceLoading) return [];
         return resources.filter((r) => allowedUsers.includes(r.id));
     }, [resources, allowedUsers, isResourceLoading]);
 
-    // ✅ 検索・ソート適用（安全版）
+    /** 検索・ソート適用後のユーザー一覧 */
     const filteredUsers = useMemo(() => {
-        let result =
+        const list =
             searchType === "name"
                 ? visibleUsers.filter((u) => (u.name || "").includes(keyword))
                 : visibleUsers.filter((u) => (u.number || "").includes(keyword));
 
-        switch (userSortOption) {
-            case "numberAsc":
-                return result.sort((a, b) => (a.number || "").localeCompare(b.number || ""));
-            case "numberDesc":
-                return result.sort((a, b) => (b.number || "").localeCompare(a.number || ""));
-            case "nameAsc":
-                return result.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
-            case "nameDesc":
-                return result.sort((a, b) => (b.name || "").localeCompare(a.name || ""));
-            default:
-                return result;
-        }
+        const sortBy: Record<UserSortKey, (a: any, b: any) => number> = {
+            numberAsc: (a, b) => (a.number || "").localeCompare(b.number || ""),
+            numberDesc: (a, b) => (b.number || "").localeCompare(a.number || ""),
+            nameAsc: (a, b) => (a.name || "").localeCompare(b.name || ""),
+            nameDesc: (a, b) => (b.name || "").localeCompare(a.name || ""),
+        };
+
+        return [...list].sort(sortBy[userSortOption]);
     }, [keyword, searchType, visibleUsers, userSortOption]);
 
-    // ✅ 仮タスク
+    /** 仮タスク一覧 */
     const indirectTasks: IndirectTask[] = [
         { id: "t1", category: "会議", task: "定例ミーティング" },
         { id: "t2", category: "教育", task: "新入社員研修資料作成" },
@@ -86,24 +92,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
         { id: "t4", category: "その他", task: "社内イベント準備" },
     ];
 
-    // ✅ タスクソート
+    /** タスクソート結果 */
     const sortedTasks = useMemo(() => {
-        const copy = [...indirectTasks];
-        switch (taskSortOption) {
-            case "categoryAsc":
-                return copy.sort((a, b) => a.category.localeCompare(b.category));
-            case "categoryDesc":
-                return copy.sort((a, b) => b.category.localeCompare(a.category));
-            case "taskAsc":
-                return copy.sort((a, b) => a.task.localeCompare(b.task));
-            case "taskDesc":
-                return copy.sort((a, b) => b.task.localeCompare(a.task));
-            default:
-                return copy;
-        }
+        const sortBy: Record<TaskSortKey, (a: IndirectTask, b: IndirectTask) => number> = {
+            categoryAsc: (a, b) => a.category.localeCompare(b.category),
+            categoryDesc: (a, b) => b.category.localeCompare(a.category),
+            taskAsc: (a, b) => a.task.localeCompare(b.task),
+            taskDesc: (a, b) => b.task.localeCompare(a.task),
+        };
+        return [...indirectTasks].sort(sortBy[taskSortOption]);
     }, [taskSortOption]);
 
-    // ✅ 選択トグル（自分も含め全体統一）
+    /** ユーザー選択トグル（自分含む） */
     const toggleSelect = (userId: string) => {
         setSelectedUsers((prev) =>
             prev.includes(userId)
@@ -112,7 +112,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
         );
     };
 
-    // ✅ 並び替え候補
+    /** 並び替え候補 */
     const userSortOptions = [
         { value: "numberAsc", label: "▲ 社員番号昇順" },
         { value: "numberDesc", label: "▼ 社員番号降順" },
@@ -127,38 +127,33 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
         { value: "taskDesc", label: "▼ タスク降順" },
     ];
 
+    // ===================================================
+    // Render
+    // ===================================================
     return (
         <aside className="sidebar-container">
-            {/* =============================
-                USERタブ
-            ============================= */}
+            {/* USERタブ */}
             {mainTab === "user" && (
                 <>
                     <h2 className="sidebar-title">検索</h2>
 
-                    {/* 検索タイプ切り替え */}
+                    {/* 検索タイプ切替 */}
                     <div className="sidebar-radios">
-                        <input
-                            id="sidebar-radio-name"
-                            type="radio"
-                            name="sidebarSearchType"
-                            value="name"
-                            checked={searchType === "name"}
-                            onChange={() => setSearchType("name")}
-                        />
-                        <label htmlFor="sidebar-radio-name">ユーザー名</label>
-
-                        <input
-                            id="sidebar-radio-number"
-                            type="radio"
-                            name="sidebarSearchType"
-                            value="number"
-                            checked={searchType === "number"}
-                            onChange={() => setSearchType("number")}
-                        />
-                        <label htmlFor="sidebar-radio-number">社員番号</label>
+                        {["name", "number"].map((type) => (
+                            <label key={type}>
+                                <input
+                                    type="radio"
+                                    name="sidebarSearchType"
+                                    value={type}
+                                    checked={searchType === type}
+                                    onChange={() => setSearchType(type as "name" | "number")}
+                                />
+                                {type === "name" ? "ユーザー名" : "社員番号"}
+                            </label>
+                        ))}
                     </div>
 
+                    {/* 検索入力 */}
                     <Input
                         placeholder={
                             searchType === "name"
@@ -170,7 +165,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
                         onChange={setKeyword}
                     />
 
-                    {/* ✅ 自分もON/OFFできる */}
+                    {/* 自分の表示 */}
                     <label className="sidebar-self-item clickable">
                         <input
                             type="checkbox"
@@ -186,7 +181,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
                         </div>
                     </label>
 
-                    {/* ✅ 並び替えメニュー開閉 */}
+                    {/* 並び替え */}
                     <div
                         className="sidebar-self-divider clickable"
                         onClick={() => setIsUserSortOpen((p) => !p)}
@@ -203,10 +198,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
                             {userSortOptions.map((opt) => (
                                 <div
                                     key={opt.value}
-                                    className={`sidebar-sort-option ${userSortOption === opt.value ? "active" : ""
-                                        }`}
+                                    className={`sidebar-sort-option ${userSortOption === opt.value ? "active" : ""}`}
                                     onClick={() => {
-                                        setUserSortOption(opt.value);
+                                        setUserSortOption(opt.value as UserSortKey);
                                         setIsUserSortOpen(false);
                                     }}
                                 >
@@ -216,11 +210,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
                         </div>
                     )}
 
-                    {/* ✅ 検索結果（空なら非表示） */}
+                    {/* 検索結果 */}
                     {!isResourceLoading && filteredUsers.length > 0 && (
                         <div className="sidebar-results">
                             {filteredUsers.map((user) => (
-                                <label key={user.id} className="sidebar-result-item clickable">
+                                <label
+                                    key={user.id}
+                                    className="sidebar-result-item clickable"
+                                >
                                     <input
                                         type="checkbox"
                                         className="sidebar-checkbox"
@@ -233,15 +230,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
                                 </label>
                             ))}
                         </div>
-
                     )}
-
                 </>
             )}
 
-            {/* =============================
-                INDIRECTタブ
-            ============================= */}
+            {/* INDIRECTタブ */}
             {mainTab === "indirect" && (
                 <>
                     <div
@@ -260,10 +253,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
                             {taskSortOptions.map((opt) => (
                                 <div
                                     key={opt.value}
-                                    className={`sidebar-sort-option ${taskSortOption === opt.value ? "active" : ""
-                                        }`}
+                                    className={`sidebar-sort-option ${taskSortOption === opt.value ? "active" : ""}`}
                                     onClick={() => {
-                                        setTaskSortOption(opt.value);
+                                        setTaskSortOption(opt.value as TaskSortKey);
                                         setIsTaskSortOpen(false);
                                     }}
                                 >
@@ -273,6 +265,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
                         </div>
                     )}
 
+                    {/* タスクリスト */}
                     <div className="sidebar-task-list">
                         {sortedTasks.map((task) => (
                             <label
@@ -289,12 +282,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
                                     onChange={() => setSelectedTask(task.id)}
                                 />
                                 <div className="sidebar-task-lines">
-                                    <span className="sidebar-task-category">
-                                        {task.category}
-                                    </span>
-                                    <span className="sidebar-task-name">
-                                        {task.task}
-                                    </span>
+                                    <span className="sidebar-task-category">{task.category}</span>
+                                    <span className="sidebar-task-name">{task.task}</span>
                                 </div>
                             </label>
                         ))}

@@ -28,53 +28,59 @@ export const DataverseApp = () => {
         selectedEvent,
         setSelectedEvent,
         handleTimeEntrySubmit,
-        handleEventClick, // ✅ ← 追加
+        handleEventClick,
         handlePrev,
         handleNext,
         handleToday,
     } = useAppController();
 
-    // ✅ mainTabを追加（ユーザー／間接タスク）
+    /** 現在のタブ状態（ユーザー／間接タスク） */
     const [mainTab, setMainTab] = useState<"user" | "indirect">("user");
 
-    // ✅ モーダル開閉状態を追加
+    /** モーダル開閉状態 */
     const [isFavoriteTaskModalOpen, setIsFavoriteTaskModalOpen] = useState(false);
     const [isUserListModalOpen, setIsUserListModalOpen] = useState(false);
 
-    // ✅ 保存ハンドラを追加
+    /** お気に入りタスク保存 */
     const handleSaveFavoriteTasks = (tasks: string[]) => {
-        console.log("✅ 保存されたお気に入りタスク:", tasks);
+        console.log("保存されたお気に入りタスク:", tasks);
         setIsFavoriteTaskModalOpen(false);
     };
 
+    /** ユーザーリスト保存 */
     const handleSaveUserList = (users: string[]) => {
-        console.log("✅ 保存されたユーザー一覧:", users);
+        console.log("保存されたユーザー一覧:", users);
         setIsUserListModalOpen(false);
     };
 
-    // ✅ 日付フォーマット（例：2025/10/14）
+    /** 今日の日付フォーマット（例：2025/10/14） */
     const formattedToday = new Date().toLocaleDateString("ja-JP", {
         year: "numeric",
         month: "2-digit",
         day: "2-digit",
     });
 
+    /** 新規タイムエントリ作成時の共通処理 */
+    const openNewTimeEntry = () => {
+        const start = new Date();
+        const end = new Date(start.getTime() + 60 * 60 * 1000);
+        setSelectedDateTime({ start, end });
+        setSelectedEvent(null);
+        setIsTimeEntryModalOpen(true);
+    };
+
     return (
         <div className="app-container">
-            {/* =============================
-                ヘッダー
-            ============================= */}
+            {/* ヘッダー */}
             <Header
                 workOrders={workOrders}
                 selectedWO={selectedWO}
                 setSelectedWO={setSelectedWO}
             />
 
-            {/* =============================
-                コンテンツ
-            ============================= */}
+            {/* メインコンテンツ */}
             <section className="content-card">
-                {/* 上部タブ＆日付ナビ */}
+                {/* 上部ナビゲーション */}
                 <ContentHeader
                     mainTab={mainTab}
                     setMainTab={setMainTab}
@@ -84,17 +90,10 @@ export const DataverseApp = () => {
                     onPrev={handlePrev}
                     onNext={handleNext}
                     onToday={handleToday}
-                    onCreateNew={() => {
-                        setSelectedDateTime({
-                            start: new Date(),
-                            end: new Date(new Date().getTime() + 60 * 60 * 1000),
-                        });
-                        setSelectedEvent(null);
-                        setIsTimeEntryModalOpen(true);
-                    }}
+                    onCreateNew={openNewTimeEntry}
                 />
 
-                {/* 中央エリア：サイドバー＋カレンダー */}
+                {/* 中央：サイドバー＋カレンダー */}
                 <div className="content-middle">
                     <Sidebar mainTab={mainTab} />
 
@@ -104,28 +103,24 @@ export const DataverseApp = () => {
                             currentDate={currentDate}
                             onDateChange={setCurrentDate}
                             onDateClick={(range) => {
-                                // ✅ 新規作成モード
                                 setSelectedDateTime(range);
                                 setSelectedEvent(null);
                                 setIsTimeEntryModalOpen(true);
                             }}
-                            // ✅ 修正：クリック時は詳細取得ハンドラを呼び出す
                             onEventClick={handleEventClick}
                             events={events}
                         />
                     </div>
                 </div>
 
-                {/* 下部フッター */}
+                {/* フッター */}
                 <Footer
                     onOpenUserList={() => setIsUserListModalOpen(true)}
                     onOpenFavoriteTask={() => setIsFavoriteTaskModalOpen(true)}
                 />
             </section>
 
-            {/* =============================
-                モーダル群
-            ============================= */}
+            {/* モーダル群 */}
             <TimeEntryModal
                 isOpen={isTimeEntryModalOpen}
                 onClose={() => setIsTimeEntryModalOpen(false)}

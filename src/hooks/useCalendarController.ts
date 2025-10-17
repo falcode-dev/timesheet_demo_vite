@@ -1,17 +1,16 @@
-// src/hooks/useCalendarController.ts
 import type { Dispatch, SetStateAction } from "react";
 
 /**
- * カレンダー操作ロジックを分離
- * @param viewMode 現在の表示モード ("1日" | "3日" | "週")
- * @param setCurrentDate 現在日付を更新するステートセッター
+ * カレンダーの日付操作ロジックを管理するカスタムフック
+ * - 表示モードに応じた日数単位で前後に移動
+ * - 今日の日付にリセット
  */
 export const useCalendarController = (
     viewMode: "1日" | "3日" | "週",
     setCurrentDate: Dispatch<SetStateAction<Date>>
 ) => {
-    /** シフトする日数をモードに応じて取得 */
-    const getShiftDays = () => {
+    /** 表示モードに応じて日数を返す */
+    const getShiftDays = (): number => {
         switch (viewMode) {
             case "1日":
                 return 1;
@@ -23,27 +22,29 @@ export const useCalendarController = (
     };
 
     /** 前の期間へ移動 */
-    const handlePrev = () => {
-        const days = getShiftDays();
+    const handlePrev = (): void => {
+        const shift = getShiftDays();
         setCurrentDate((prev) => {
             const newDate = new Date(prev);
-            newDate.setDate(prev.getDate() - days);
+            newDate.setDate(prev.getDate() - shift);
             return newDate;
         });
     };
 
     /** 次の期間へ移動 */
-    const handleNext = () => {
-        const days = getShiftDays();
+    const handleNext = (): void => {
+        const shift = getShiftDays();
         setCurrentDate((prev) => {
             const newDate = new Date(prev);
-            newDate.setDate(prev.getDate() + days);
+            newDate.setDate(prev.getDate() + shift);
             return newDate;
         });
     };
 
     /** 今日に戻る */
-    const handleToday = () => setCurrentDate(new Date());
+    const handleToday = (): void => {
+        setCurrentDate(new Date());
+    };
 
     return { handlePrev, handleNext, handleToday };
 };

@@ -1,9 +1,18 @@
-/** URLパラメータ取得ユーティリティ */
+/**
+ * URL のクエリパラメータをオブジェクト形式で取得するユーティリティ関数
+ * 
+ * 例：
+ *   URL: https://example.com/?RecordId=123&Mode=edit
+ *   戻り値: { recordid: "123", mode: "edit" }
+ */
 export const getUrlParams = (): Record<string, string> => {
-    const params = new URLSearchParams(window.location.search);
-    const obj: Record<string, string> = {};
-    params.forEach((value, key) => {
-        obj[key.toLowerCase()] = value;
+    const searchParams = new URLSearchParams(window.location.search);
+    const result: Record<string, string> = {};
+
+    // すべてのパラメータを小文字キーで格納
+    searchParams.forEach((value, key) => {
+        result[key.toLowerCase()] = value;
     });
-    return obj;
+
+    return result;
 };

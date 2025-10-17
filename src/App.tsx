@@ -1,7 +1,7 @@
 // src/App.tsx
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { DataverseApp } from "./product/DataverseApp";
-import { UserListProvider } from "./context/UserListContext"; // ✅ 追加
+import { UserListProvider } from "./context/UserListContext";
 
 const queryClient = new QueryClient();
 

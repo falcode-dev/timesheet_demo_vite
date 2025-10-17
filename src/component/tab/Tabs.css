@@ -1,39 +1,42 @@
-/* ======================
+/* =============================
    タブ全体
-====================== */
+============================= */
 .tabs-container {
     display: inline-flex;
     align-items: center;
     height: 35px;
-    border: 1px solid #0089ba;
+    border: 1px solid var(--main-color);
     border-radius: 8px;
     overflow: hidden;
     background-color: #fff;
     box-sizing: border-box;
-    font-family: "Inter", "Noto Sans JP", sans-serif;
+    font-family: var(--font-family);
 }
 
-/* ======================
+/* =============================
    各タブ
-====================== */
+============================= */
 .tab-item {
     height: 100%;
     width: 50px;
     border: none;
-    border-right: 1px solid #0089ba;
+    border-right: 1px solid var(--main-color);
     background: #fff;
     cursor: pointer;
     transition: all 0.2s ease;
     font-weight: bold;
     white-space: nowrap;
-    color: #0089ba;
+    color: var(--main-color);
+    box-sizing: border-box;
 }
 
 .tab-item:last-child {
     border-right: none;
 }
 
-/* サイズバリエーション */
+/* =============================
+   サイズバリエーション
+============================= */
 .tab-item.small {
     padding: 4px 10px;
     font-size: 0.8rem;
@@ -49,26 +52,32 @@
     font-size: 1rem;
 }
 
-/* アクティブタブ */
+/* =============================
+   アクティブタブ
+============================= */
 .tab-item.active {
-    background-color: #0089ba;
+    background-color: var(--main-color);
     color: #fff;
 }
 
-/* hover時 */
+/* =============================
+   ホバー時
+============================= */
 .tab-item:hover:not(.active) {
     background-color: #f0f9ff;
 }
 
-/* 無効化 */
+/* =============================
+   無効化
+============================= */
 .tab-item.disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
 
-/* ======================
+/* =============================
    レスポンシブ対応
-====================== */
+============================= */
 @media (max-width: 768px) {
     .tabs-container {
         flex-wrap: wrap;

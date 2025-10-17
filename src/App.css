@@ -1,10 +1,18 @@
+/* ======================================
+   変数（テーマ設定）
+====================================== */
 :root {
   --main-color: rgb(0, 137, 186);
+  --text-color: #333;
+  --bg-color: #f9f9f9;
+  --card-bg: #fff;
+  --border-color: #ccc;
+  --font-family: "Segoe UI", "Hiragino Sans", sans-serif;
 }
 
-/* =============================
-   ページ全体の高さ継承
-============================= */
+/* ======================================
+   全体構造
+====================================== */
 html,
 body,
 #root {
@@ -13,13 +21,11 @@ body,
 }
 
 body {
-  font-family: "Segoe UI", "Hiragino Sans", sans-serif;
-  background-color: #f9f9f9;
+  font-family: var(--font-family);
+  background-color: var(--bg-color);
+  color: var(--text-color);
 }
 
-/* =============================
-   アプリ全体
-============================= */
 .app-container {
   display: flex;
   flex-direction: column;
@@ -28,9 +34,9 @@ body {
   box-sizing: border-box;
 }
 
-/* =============================
+/* ======================================
    ヘッダー
-============================= */
+====================================== */
 .app-header {
   display: flex;
   align-items: center;
@@ -52,7 +58,6 @@ body {
   align-items: center;
   justify-content: flex-end;
   gap: 12px;
-  flex-direction: row;
 }
 
 .header-label {
@@ -61,26 +66,24 @@ body {
   font-weight: bold;
 }
 
-/* =============================
-   カード型コンテナ
-============================= */
+/* ======================================
+   カードコンテナ
+====================================== */
 .content-card {
   flex: 1;
-  background: #fff;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  /* padding: 10px; */
-  width: 100%;
-  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  /* gap: 20px; */
+  width: 100%;
   min-height: 0;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-sizing: border-box;
 }
 
-/* =============================
-   コンテンツエリア区分
-============================= */
+/* ======================================
+   コンテンツ構造
+====================================== */
 .content-top,
 .content-middle,
 .content-bottom {
@@ -89,9 +92,9 @@ body {
   gap: 16px;
 }
 
-/* =============================
+/* ======================================
    タブヘッダー
-============================= */
+====================================== */
 .tab-header {
   display: flex;
   align-items: center;
@@ -102,65 +105,66 @@ body {
   border-bottom: 1px solid #ddd;
 }
 
-.tab-header-left {
+.tab-header-left,
+.tab-header-right {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
-.main-tabs {
+.main-tabs,
+.view-tabs {
   display: flex;
   border: 1px solid var(--main-color);
   border-radius: 6px;
   overflow: hidden;
 }
 
-.main-tabs .tab-item {
-  min-width: 100px;
-  padding: 6px 14px;
+.tab-item,
+.view-tab {
+  min-width: 80px;
+  padding: 6px 12px;
   font-weight: 600;
   color: var(--main-color);
-  background-color: white;
+  background: #fff;
   border: none;
-  border-right: 1px solid var(--main-color);
   cursor: pointer;
   transition: 0.2s ease;
   text-align: center;
 }
 
-.main-tabs .tab-item.active {
-  background-color: var(--main-color);
-  color: white;
+.tab-item.active,
+.view-tab.active {
+  background: var(--main-color);
+  color: #fff;
 }
 
-.main-tabs .tab-item:last-child {
-  border-right: none;
+.tab-item:not(:last-child),
+.view-tab:not(:last-child) {
+  border-right: 1px solid var(--main-color);
 }
 
-/* =============================
+/* ======================================
    日付ナビゲーション
-============================= */
-.tab-header-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-
-.today-button {
+====================================== */
+.today-button,
+.arrow-button {
   background: none;
   border: none;
   color: var(--main-color);
+  cursor: pointer;
+  transition: 0.2s;
+  border-radius: 6px;
+}
+
+.today-button {
   font-size: 15px;
   font-weight: 600;
   display: flex;
   align-items: center;
   gap: 6px;
-  cursor: pointer;
   padding: 6px 10px;
-  transition: 0.2s;
-  border-radius: 6px;
 }
 
 .today-button:hover {
@@ -169,16 +173,8 @@ body {
 }
 
 .arrow-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  border: none;
-  color: var(--main-color);
-  font-weight: bold;
   font-size: 1.5rem;
-  cursor: pointer;
-  transition: 0.2s;
+  font-weight: bold;
   width: 30px;
   height: 30px;
   border-radius: 50%;
@@ -189,75 +185,41 @@ body {
 }
 
 .date-display {
-  height: 35px;
-  width: 170px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  height: 35px;
+  width: 170px;
   font-size: 13px;
   font-weight: 600;
   color: var(--main-color);
-  background-color: #fff;
-  border: 1px solid #ccc;
+  background: #fff;
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   padding: 6px 10px;
-  white-space: nowrap;
   box-sizing: border-box;
 }
 
-.view-tabs {
-  display: flex;
-  border: 1px solid var(--main-color);
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.view-tab {
-  padding: 6px 10px;
-  font-weight: 600;
-  color: var(--main-color);
-  background-color: white;
-  border: none;
-  cursor: pointer;
-  transition: 0.2s;
-  text-align: center;
-  min-width: 50px;
-}
-
-.view-tab.active {
-  background-color: var(--main-color);
-  color: white;
-}
-
-.view-tab:not(:last-child) {
-  border-right: 1px solid var(--main-color);
-}
-
-/* =============================
+/* ======================================
    中央コンテンツ（サイドバー＋カレンダー）
-============================= */
+====================================== */
 .content-middle {
   flex: 1;
   display: flex;
-  gap: 20px;
-  /* padding: 0 10px; */
   flex-direction: row;
   justify-content: space-between;
+  gap: 20px;
   min-height: 600px;
 }
 
-/* ✅ サイドバー復元 */
+/* サイドバー */
 .sidebar-container {
   width: 260px;
   display: flex;
   flex-direction: column;
   gap: 12px;
   padding: 10px;
-  /* background: #fff; */
-  /* border: 1px solid #ddd; */
-  /* border-radius: 8px; */
-  /* box-shadow: 0 0 4px rgba(0, 0, 0, 0.05); */
   box-sizing: border-box;
 }
 
@@ -281,49 +243,22 @@ body {
   font-weight: 500;
 }
 
-.sidebar-radios input[type="radio"] {
+.sidebar-radios input[type="radio"],
+.sidebar-self-checkbox {
   accent-color: var(--main-color);
-  margin-right: 6px;
 }
 
-/* 入力欄 */
-/* .sidebar-input {
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 6px 8px;
-  color: #555;
-  font-size: 0.95rem;
-  box-sizing: border-box;
-} */
-
-.input-wrapper .input-field {
-  width: 100%;
-}
-
-/* 自分情報ボックス */
+/* 自分情報 */
 .sidebar-self {
   display: flex;
   flex-direction: column;
-  /* align-items: center; */
-  /* border: 1px solid #ddd; */
-  /* border-radius: 6px; */
-  /* background: #fff; */
-  /* padding: 10px 8px; */
   box-sizing: border-box;
 }
 
 .sidebar-self-top {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
   gap: 10px;
-  width: 100%;
-}
-
-.sidebar-self-checkbox {
-  width: 20px;
-  height: 20px;
-  accent-color: var(--main-color);
 }
 
 .sidebar-self-text {
@@ -345,26 +280,23 @@ body {
 }
 
 .sidebar-self-divider {
-  width: 100%;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
   gap: 10px;
   margin-top: 10px;
 }
 
-.sidebar-self-icon {
+.sidebar-self-icon,
+.sidebar-self-label {
   color: var(--main-color);
-  font-size: 1rem;
 }
 
 .sidebar-self-label {
-  color: var(--main-color);
   font-weight: 600;
   font-size: 0.95rem;
 }
 
-/* ✅ カレンダー領域 */
+/* カレンダー領域 */
 .content-main {
   flex: 1;
   display: flex;
@@ -373,23 +305,19 @@ body {
   max-width: 1015px;
 }
 
-/* =============================
-   フッターエリア
-============================= */
+/* ======================================
+   フッター
+====================================== */
 .content-bottom {
   display: flex;
-  /* margin-top: 10px; */
+  flex-direction: row;
+  justify-content: space-between;
   gap: 10px;
   padding: 10px;
   border-top: 1px solid #ddd;
-  flex-direction: row;
-  justify-content: space-between;
   flex-shrink: 0;
 }
 
-/* =============================
-   ボタン類
-============================= */
 .content-bottom-left {
   display: flex;
   align-items: center;
@@ -412,10 +340,10 @@ body {
   background-color: rgba(0, 137, 186, 0.08);
 }
 
-/* =============================
-   レスポンシブ対応
-============================= */
-/* @media (max-width: 1024px) {
+/* ======================================
+   レスポンシブ
+====================================== */
+@media (max-width: 1024px) {
   .content-middle {
     gap: 14px;
     min-height: 500px;
@@ -429,7 +357,6 @@ body {
 @media (max-width: 768px) {
   .app-container {
     padding: 6px;
-    min-height: 100vh;
   }
 
   .app-header {
@@ -440,26 +367,16 @@ body {
 
   .header-right {
     width: 100%;
-    justify-content: flex-start;
     flex-wrap: wrap;
     gap: 8px;
   }
 
-  .content-card {
-    flex: none;
-    overflow: visible;
-  }
-
   .content-middle {
     flex-direction: column;
-    min-height: auto;
-    overflow: visible;
+    gap: 14px;
   }
 
-  .sidebar-container {
-    width: 100%;
-  }
-
+  .sidebar-container,
   .content-main {
     width: 100%;
   }
@@ -484,10 +401,9 @@ body {
 
   .content-middle {
     gap: 10px;
-    padding: 6px;
   }
 
   .content-bottom {
     gap: 8px;
   }
-} */
+}

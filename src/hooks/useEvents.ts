@@ -4,28 +4,27 @@ import { getXrm } from "../utils/xrmUtils";
 import { dataverseClient } from "../api/dataverseClient";
 import { fromUtcToJst } from "../utils/dateUtils";
 
-/* ===============================
-   型定義
-=============================== */
-export interface EventData {
+/** イベントデータ型 */
+export type EventData = {
     id: string;
     title: string;
     start: string;
     end: string;
     workOrderId: string;
     extendedProps?: Record<string, any>;
-}
+};
 
-/* ===============================
-   イベント一覧取得（全件取得に変更）
-=============================== */
+/**
+ * Dataverse またはローカルモックからイベント一覧を取得
+ */
 const fetchEvents = async (): Promise<EventData[]> => {
     const xrm = getXrm();
 
-    // ✅ ローカルモック
+    // ローカル環境（モックデータ）
     if (!xrm) {
         const localMock = JSON.parse(localStorage.getItem("mockEvents") || "[]");
         if (localMock.length > 0) return localMock;
+
         return [
             {
                 id: "1",
@@ -44,23 +43,22 @@ const fetchEvents = async (): Promise<EventData[]> => {
         ];
     }
 
-    // ✅ Dataverse環境
+    // Dataverse 環境
     const entityName = "proto_workorder";
     const navigationName = "proto_timeentry_wonumber_proto_workorder";
-    const globalCtx = xrm.Utility.getGlobalContext();
-    const userId = globalCtx.userSettings.userId.replace(/[{}]/g, "");
+    const userId = xrm.Utility.getGlobalContext().userSettings.userId.replace(/[{}]/g, "");
 
     const query =
-        `?$select=proto_workorderid,proto_wonumber&$filter=_createdby_value eq ${userId}` +
+        `?$select=proto_workorderid,proto_wonumber` +
+        `&$filter=_createdby_value eq ${userId}` +
         `&$expand=${navigationName}(` +
         `$select=proto_timeentryid,proto_name,proto_startdatetime,proto_enddatetime,` +
-        `proto_maincategory,proto_paymenttype,proto_timecategory` +
-        `)`;
+        `proto_maincategory,proto_paymenttype,proto_timecategory)`;
 
     const result = await xrm.WebApi.retrieveMultipleRecords(entityName, query);
 
-    // ✅ 全件整形
-    const formatted: EventData[] = result.entities.flatMap((wo: any) =>
+    // データ整形
+    return result.entities.flatMap((wo: any) =>
         (wo[navigationName] || []).map((t: any) => ({
             id: t.proto_timeentryid,
             title: t.proto_name || "作業",
@@ -69,32 +67,29 @@ const fetchEvents = async (): Promise<EventData[]> => {
             workOrderId: wo.proto_workorderid,
         }))
     );
-
-    return formatted;
 };
 
-/* ===============================
-   🔹 イベント詳細取得（クリック時用）
-=============================== */
+/**
+ * イベント詳細を取得（クリック時用）
+ */
 const fetchEventDetail = async (id: string) => {
     const xrm = getXrm();
 
+    // ローカルモード
     if (!xrm) {
-        // ✅ ローカル環境: localStorageから該当イベントを取得
         const local = JSON.parse(localStorage.getItem("mockEvents") || "[]");
         return local.find((e: any) => e.id === id);
     }
 
-    // ✅ Dataverse環境
+    // Dataverse 環境
     const entityName = "proto_timeentry";
     const query =
         `?$select=proto_name,proto_startdatetime,proto_enddatetime,` +
         `proto_maincategory,proto_paymenttype,proto_timecategory` +
         `&$expand=proto_wonumber($select=proto_wonumber,proto_workorderid)`;
 
-    const record = await dataverseClient.retrieve(entityName, id, query);
+    const record = await xrm.WebApi.retrieveRecord(entityName, id, query);
 
-    // ✅ 必要に応じて UTC→JST 変換
     return {
         id,
         title: record.proto_name,
@@ -108,21 +103,26 @@ const fetchEventDetail = async (id: string) => {
     };
 };
 
-/* ===============================
-   useEvents本体
-=============================== */
+/**
+ * イベント一覧・登録・更新・詳細取得を統合管理するフック
+ */
 export const useEvents = (selectedWO: string) => {
     const queryClient = useQueryClient();
     const xrm = getXrm();
 
-    // 一覧取得（全件）
-    const eventsQuery = useQuery({
+    /** イベント一覧取得 */
+    const {
+        data: allEvents = [],
+        isLoading,
+        isError,
+        refetch,
+    } = useQuery({
         queryKey: ["events"],
-        queryFn: () => fetchEvents(),
+        queryFn: fetchEvents,
     });
 
-    // ✅ 選択WOに紐づくイベントに強調フラグ付与
-    const events = (eventsQuery.data ?? []).map((e) => ({
+    /** 選択中の WorkOrder に対応するイベントを強調 */
+    const events = allEvents.map((e) => ({
         ...e,
         extendedProps: {
             ...e.extendedProps,
@@ -130,18 +130,19 @@ export const useEvents = (selectedWO: string) => {
         },
     }));
 
-    // 登録・更新
+    /** 登録・更新処理 */
     const mutation = useMutation({
         mutationFn: async (data: any) => {
             const isUpdate = !!data.id;
 
+            // Dataverse 環境
             if (xrm) {
                 return isUpdate
                     ? dataverseClient.updateTimeEntry(data.id, data)
                     : dataverseClient.createTimeEntry(data);
             }
 
-            // ✅ ローカルモード
+            // ローカルモード
             const current = JSON.parse(localStorage.getItem("mockEvents") || "[]");
             if (isUpdate) {
                 const updated = current.map((e: any) =>
@@ -159,28 +160,23 @@ export const useEvents = (selectedWO: string) => {
             await queryClient.refetchQueries({ queryKey: ["events"] });
         },
         onError: (err) => {
-            console.error("❌ TimeEntry登録/更新失敗:", err);
+            console.error("TimeEntry登録/更新失敗:", err);
             alert("保存に失敗しました。詳細はコンソールを確認してください。");
         },
     });
 
-    // モーダルから呼ばれる送信関数
+    /** モーダル送信処理 */
     const handleSubmit = async (data: any) => {
         await mutation.mutateAsync(data);
-        await eventsQuery.refetch();
+        await refetch();
     };
 
     return {
-        // 一覧
         events,
-        isLoading: eventsQuery.isLoading,
-        isError: eventsQuery.isError,
-        refetchEvents: eventsQuery.refetch,
-
-        // 登録・更新
+        isLoading,
+        isError,
+        refetchEvents: refetch,
         createOrUpdateEvent: handleSubmit,
-
-        // ✅ 詳細取得
         fetchEventDetail,
     };
 };

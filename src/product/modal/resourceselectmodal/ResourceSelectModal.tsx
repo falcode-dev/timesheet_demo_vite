@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import * as FaIcons from "react-icons/fa";
 import { BaseModal } from "../BaseModal";
 import { Button } from "../../../component/button/Button";
@@ -6,28 +6,26 @@ import { Input } from "../../../component/input/Input";
 import { useCurrentUser } from "../../../hooks/useCurrentUser";
 import { useResources } from "../../../hooks/useResources";
 import { useAllowedUsers } from "../../../context/UserListContext";
+import type { Resource } from "../../../hooks/useResources";
 import "./ResourceSelectModal.css";
-
-interface Resource {
-    id: string;
-    number: string;
-    name: string;
-}
 
 interface ResourceSelectModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSave?: (selectedResources: { id: string; label: string }[]) => void; // ✅ 修正
+    onSave?: (selectedResources: { id: string; label: string }[]) => void;
 }
 
+/* =========================================================
+   コンポーネント本体
+========================================================= */
 export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
     isOpen,
     onClose,
     onSave,
 }) => {
-    /* ========================
-       ▼ Dataverseのログインユーザー情報
-    ======================== */
+    /* =========================================================
+       ▼ Dataverse ログインユーザー情報
+    ========================================================= */
     const { currentUser, isLoading: isUserLoading } = useCurrentUser();
 
     const displaySelf = useMemo(() => {
@@ -37,14 +35,16 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
         if (!currentUser) {
             return { number: "社員番号未取得", fullName: "ユーザー情報未取得" };
         }
-        const number = currentUser.employeeid || "社員番号未登録";
-        const fullName = `${currentUser.lastName || ""} ${currentUser.firstName || ""}`.trim();
+
+        const number = currentUser.employeeid ?? "社員番号未登録";
+        const fullName = `${currentUser.lastName ?? ""} ${currentUser.firstName ?? ""}`.trim();
+
         return { number, fullName };
     }, [currentUser, isUserLoading]);
 
-    /* ========================
-       ▼ Dataverseのリソース一覧
-    ======================== */
+    /* =========================================================
+       ▼ Dataverse リソース一覧
+    ========================================================= */
     const { resources, isLoading: isResourcesLoading } = useResources();
     const { allowedUsers } = useAllowedUsers();
 
@@ -54,40 +54,41 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
         return resources.filter((r) => allowedUsers.includes(r.id));
     }, [resources, allowedUsers, isResourcesLoading]);
 
-    /* ========================
-       ▼ 検索・ソート
-    ======================== */
+    /* =========================================================
+       ▼ 検索・ソート設定
+    ========================================================= */
     const [searchType, setSearchType] = useState<"name" | "number">("name");
     const [keyword, setKeyword] = useState("");
     const [selectedUsers, setSelectedUsers] = useState<string[]>(["self"]); // ✅ 自分を初期ON
     const [sortByNumberAsc, setSortByNumberAsc] = useState(true);
     const [sortByNameAsc, setSortByNameAsc] = useState(true);
 
-    // ✅ 検索＋ソート結果
+    /* =========================================================
+       ▼ 検索＋ソート結果
+    ========================================================= */
     const filteredUsers = useMemo(() => {
-        let filtered =
+        const filtered =
             searchType === "name"
-                ? visibleResources.filter((u) => (u.name || "").includes(keyword))
-                : visibleResources.filter((u) => (u.number || "").includes(keyword));
+                ? visibleResources.filter((u) => (u.name ?? "").includes(keyword))
+                : visibleResources.filter((u) => (u.number ?? "").includes(keyword));
 
-        const sorted = [...filtered]
+        // ソート順を安定化
+        return [...filtered]
             .sort((a, b) =>
                 sortByNumberAsc
-                    ? (a.number || "").localeCompare(b.number || "")
-                    : (b.number || "").localeCompare(a.number || "")
+                    ? (a.number ?? "").localeCompare(b.number ?? "")
+                    : (b.number ?? "").localeCompare(a.number ?? "")
             )
             .sort((a, b) =>
                 sortByNameAsc
-                    ? (a.name || "").localeCompare(b.name || "")
-                    : (b.name || "").localeCompare(a.name || "")
+                    ? (a.name ?? "").localeCompare(b.name ?? "")
+                    : (b.name ?? "").localeCompare(a.name ?? "")
             );
-
-        return sorted;
     }, [keyword, searchType, sortByNumberAsc, sortByNameAsc, visibleResources]);
 
-    /* ========================
+    /* =========================================================
        ▼ 表示用配列（常に自分を先頭に表示）
-    ======================== */
+    ========================================================= */
     const displayUsers: Resource[] = [
         {
             id: "self",
@@ -97,37 +98,38 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
         ...filteredUsers,
     ];
 
-    /* ========================
+    /* =========================================================
        ▼ チェック操作
-    ======================== */
-    const toggleSelect = (id: string) =>
-        setSelectedUsers((prev) =>
-            prev.includes(id)
-                ? prev.filter((v) => v !== id)
-                : [...prev, id]
-        );
+    ========================================================= */
+    const toggleSelect = useCallback(
+        (id: string) => {
+            setSelectedUsers((prev) =>
+                prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id]
+            );
+        },
+        [setSelectedUsers]
+    );
 
-    /* ========================
+    /* =========================================================
        ▼ 保存処理（ラベル形式で返す）
-    ======================== */
-    const handleSave = () => {
-        // ✅ idと表示ラベルをまとめて返す
+    ========================================================= */
+    const handleSave = useCallback(() => {
         const selectedResources = displayUsers
             .filter((u) => selectedUsers.includes(u.id))
             .map((u) => ({
                 id: u.id,
-                label: `${u.number} ${u.name}`,
+                label: `${u.number ?? "社員番号不明"} ${u.name ?? "名称未設定"}`,
             }));
 
         console.log("✅ 選択されたリソース:", selectedResources);
 
         onSave?.(selectedResources);
         onClose();
-    };
+    }, [displayUsers, selectedUsers, onSave, onClose]);
 
-    /* ========================
+    /* =========================================================
        ▼ JSX
-    ======================== */
+    ========================================================= */
     return (
         <BaseModal
             isOpen={isOpen}
@@ -150,7 +152,9 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
             ]}
         >
             <div className="resource-modal-body">
-                {/* 検索条件 */}
+                {/* -------------------------------
+                    検索条件
+                ------------------------------- */}
                 <div className="resource-radios">
                     <input
                         id="radio-name"
@@ -184,7 +188,9 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
                     onChange={setKeyword}
                 />
 
-                {/* ソート */}
+                {/* -------------------------------
+                    ソート
+                ------------------------------- */}
                 <div className="resource-sort-row">
                     <button
                         className="resource-sort-btn"
@@ -211,10 +217,12 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
                     </button>
                 </div>
 
-                {/* ✅ リスト */}
+                {/* -------------------------------
+                    リスト表示
+                ------------------------------- */}
                 <div className="resource-list">
                     {displayUsers.map((u) => (
-                        <label key={u.id} className="resource-item">
+                        <label key={u.id} className="resource-item clickable">
                             <input
                                 type="checkbox"
                                 checked={selectedUsers.includes(u.id)}
@@ -223,10 +231,10 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
                             />
                             <div className="resource-text">
                                 <span className="resource-number">
-                                    {u.number || "社員番号不明"}
+                                    {u.number ?? "社員番号不明"}
                                 </span>
                                 <span className="resource-name">
-                                    {u.name || "名称未設定"}
+                                    {u.name ?? "名称未設定"}
                                 </span>
                             </div>
                         </label>

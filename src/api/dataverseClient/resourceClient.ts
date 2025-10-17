@@ -1,13 +1,27 @@
+// src/api/dataverseClient/resourceClient.ts
 import { getXrm } from "../../utils/xrmUtils";
 
+/** Bookable Resource 型定義 */
+export type ResourceRecord = {
+    id: string;
+    number?: string;
+    name: string;
+    lastName?: string;
+    firstName?: string;
+    fullName?: string;
+};
+
 /**
- * Bookable Resource（リソース）APIクライアント
+ * Bookable Resource（リソース）Dataverse クライアント
+ * - Dataverse から proto_bookableresource を取得
+ * - ローカル開発時はモックデータを返す
  */
 export const resourceClient = {
-    async getResources(): Promise<{ id: string; number: string; name: string }[]> {
+    /** リソース一覧取得 */
+    async getResources(): Promise<ResourceRecord[]> {
         const xrm = getXrm();
 
-        // ✅ ローカル開発用モック
+        // ローカル開発環境（Dataverseが無い場合）
         if (!xrm) {
             return [
                 { id: "1", number: "0001", name: "田中 太郎" },
@@ -17,23 +31,24 @@ export const resourceClient = {
         }
 
         try {
-            // Dataverseから proto_bookableresource を取得
-            const result = await xrm.WebApi.retrieveMultipleRecords(
-                "proto_bookableresource",
-                "?$select=proto_bookableresourceid,proto_sei,proto_mei,proto_shimei,proto_name"
-            );
+            const entityName = "proto_bookableresource";
+            const query =
+                "?$select=proto_bookableresourceid,proto_sei,proto_mei,proto_shimei,proto_name";
 
-            return result.entities.map((r: any) => ({
+            // Dataverse からレコード取得
+            const result = await xrm.WebApi.retrieveMultipleRecords(entityName, query);
+
+            // データ整形
+            return result.entities.map((r: any): ResourceRecord => ({
                 id: r.proto_bookableresourceid,
-                lastname: r.proto_sei ?? "",
-                firstname: r.proto_mei ?? "",
-                fullname: r.proto_shimei ?? "",
-                // systemuser: r.proto_systemuser ?? "",
+                number: r.proto_employeeid ?? "",
+                lastName: r.proto_sei ?? "",
+                firstName: r.proto_mei ?? "",
+                fullName: r.proto_shimei ?? "",
                 name: r.proto_name ?? "",
-                // resoursetype: r.proto_resoursetype ?? "",
             }));
         } catch (error) {
-            console.error("❌ リソース取得失敗:", error);
+            console.error("リソース取得エラー:", error);
             return [];
         }
     },

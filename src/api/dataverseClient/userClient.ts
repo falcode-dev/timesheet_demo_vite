@@ -1,20 +1,30 @@
 import { getXrm } from "../../utils/xrmUtils";
 
+/** ユーザー情報の型定義 */
+export type UserRecord = {
+    id: string;
+    firstName: string;
+    lastName: string;
+    employeeId?: string;
+};
+
+/**
+ * Dataverse ユーザー情報取得クライアント
+ * - ログイン中ユーザーの基本情報を取得
+ * - ローカル開発時はモックデータを返す
+ */
 export const userClient = {
-    async getCurrentUser(): Promise<{
-        id: string;
-        firstName: string;
-        lastName: string;
-        employeeid?: string;
-    }> {
+    /** 現在のユーザー情報を取得 */
+    async getCurrentUser(): Promise<UserRecord> {
         const xrm = getXrm();
 
+        // ローカル開発環境（Dataverse が存在しない場合）
         if (!xrm) {
             return {
                 id: "local-user",
                 firstName: "太郎",
                 lastName: "テスト",
-                employeeid: "999999",
+                employeeId: "999999",
             };
         }
 
@@ -22,7 +32,8 @@ export const userClient = {
             const globalCtx = xrm.Utility.getGlobalContext();
             const userId = globalCtx.userSettings.userId.replace(/[{}]/g, "");
 
-            // ✅ 社員番号列のスキーマ名を実際の環境に合わせて変更してください
+            // Dataverse から現在の systemuser レコードを取得
+            // 社員番号列（employeeid）は環境により異なる場合あり
             const result = await xrm.WebApi.retrieveRecord(
                 "systemuser",
                 userId,
@@ -33,11 +44,11 @@ export const userClient = {
                 id: userId,
                 firstName: result.firstname ?? "",
                 lastName: result.lastname ?? "",
-                employeeid: result.employeeid ?? "",
+                employeeId: result.employeeid ?? "",
             };
         } catch (error) {
-            console.error("❌ ユーザー情報取得失敗:", error);
-            throw error;
+            console.error("ユーザー情報取得エラー:", error);
+            throw new Error("Dataverse からユーザー情報の取得に失敗しました。");
         }
     },
 };
