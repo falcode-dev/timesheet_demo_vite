@@ -88,7 +88,7 @@ const fetchEventDetail = async (id: string) => {
     const query =
         `?$select=proto_name,proto_startdatetime,proto_enddatetime,` +
         `proto_maincategory,proto_paymenttype,proto_timecategory,proto_timezone` +
-        `&$expand=proto_wonumber($select=proto_wonumber,proto_workorderid,proto_description)`;
+        `&$expand=proto_wonumber($select=proto_wonumber,proto_workorderid)`;
 
     const record = await xrm.WebApi.retrieveRecord(entityName, id, query);
 
@@ -102,7 +102,6 @@ const fetchEventDetail = async (id: string) => {
         paymenttype: record.proto_paymenttype,
         timezone: record.proto_timezone ?? null,
         workOrder: record.proto_wonumber?.proto_workorderid,
-        workOrderDesc: record.proto_wonumber?.proto_description,
     };
 };
 
