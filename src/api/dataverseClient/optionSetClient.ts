@@ -11,8 +11,6 @@ export type OptionSetMap = Record<string, OptionItem[]>;
 
 /**
  * OptionSet および TimeZone 定義を取得する Dataverse クライアント
- * - getOptionSets: 指定エンティティの OptionSet メタデータを取得
- * - getTimeZones : Dataverse のタイムゾーン定義を取得
  */
 export const optionSetClient = {
     /**
@@ -28,7 +26,6 @@ export const optionSetClient = {
             const metadata = await xrm.Utility.getEntityMetadata(entity, fields);
             if (!metadata?.Attributes) return {};
 
-            // Attributes の取得（Map形式 or 配列形式の両対応）
             const attributes =
                 typeof metadata.Attributes.get === "function"
                     ? fields.map((f) => metadata.Attributes.get(f)).filter(Boolean)
@@ -40,12 +37,11 @@ export const optionSetClient = {
                     ? attributes.find((a: any) => a.LogicalName === logicalName)
                     : metadata.Attributes.get(logicalName);
 
-                if (!attr?.attributeDescriptor) return [];
+                if (!attr?.attributeDescriptor?.OptionSet?.Options) return [];
 
-                const options = attr.attributeDescriptor.OptionSet || [];
-                return options.map((opt: any) => ({
+                return attr.attributeDescriptor.OptionSet.Options.map((opt: any) => ({
                     value: String(opt.Value),
-                    label: opt.Label || "(ラベル未定義)",
+                    label: opt.Label?.LocalizedLabels?.[0]?.Label || "(ラベル未定義)",
                 }));
             };
 
@@ -63,7 +59,7 @@ export const optionSetClient = {
     },
 
     /**
-     * Dataverse のタイムゾーン一覧を取得
+     * Dataverse の全タイムゾーン定義を取得
      * @returns タイムゾーン配列（timezonecode, userinterfacename）
      */
     async getTimeZones(): Promise<OptionItem[]> {
@@ -82,6 +78,29 @@ export const optionSetClient = {
             }));
         } catch (error) {
             console.error("TimeZone取得エラー:", error);
+            return [];
+        }
+    },
+
+    /**
+     * proto_timeentry エンティティのタイムゾーン列を取得
+     * - OptionSet列 or Lookup列 のどちらにも対応
+     */
+    async getProtoTimeEntryTimeZones(): Promise<OptionItem[]> {
+        const xrm = getXrm();
+        if (!xrm) throw new Error("Xrm 環境が存在しません。");
+
+        try {
+            // まず OptionSet として取得を試みる
+            const options = await optionSetClient.getOptionSets("proto_timeentry", ["proto_timezone"]);
+            if (options["proto_timezone"]?.length) {
+                return options["proto_timezone"];
+            }
+
+            // OptionSetが存在しない場合は timezonedefinition から取得
+            return await optionSetClient.getTimeZones();
+        } catch (error) {
+            console.error("proto_timeentry タイムゾーン取得エラー:", error);
             return [];
         }
     },

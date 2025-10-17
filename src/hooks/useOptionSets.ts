@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { dataverseClient } from "../api/dataverseClient";
+import { optionSetClient } from "../api/dataverseClient/optionSetClient";
 
 /**
  * Dataverse から OptionSet 一覧を取得する関数
@@ -12,10 +12,10 @@ const fetchOptionSets = async (): Promise<{
     timezone?: { value: string; label: string }[];
 }> => {
     const [maincategory, timecategory, paymenttype, timezone] = await Promise.all([
-        dataverseClient.getOptionSets("proto_timeentry", ["proto_maincategory"]),
-        dataverseClient.getOptionSets("proto_timeentry", ["proto_timecategory"]),
-        dataverseClient.getOptionSets("proto_timeentry", ["proto_paymenttype"]),
-        dataverseClient.getTimeZones(),
+        optionSetClient.getOptionSets("proto_timeentry", ["proto_maincategory"]),
+        optionSetClient.getOptionSets("proto_timeentry", ["proto_timecategory"]),
+        optionSetClient.getOptionSets("proto_timeentry", ["proto_paymenttype"]),
+        optionSetClient.getProtoTimeEntryTimeZones(),
     ]);
 
     return {
