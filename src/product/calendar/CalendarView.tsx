@@ -104,7 +104,10 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                         buttonText: "3日",
                     },
                 }}
-                // ✅ 変更：currentDate がズレたときだけ更新（無限ループ防止）
+                eventClassNames={(arg) => {
+                    const { isTargetWO } = arg.event.extendedProps;
+                    return isTargetWO ? ["highlight-event"] : [];
+                }}
                 datesSet={(info) => {
                     const newDate = info.start;
                     if (
@@ -115,6 +118,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                     }
                 }}
             />
+
         </div>
     );
 };

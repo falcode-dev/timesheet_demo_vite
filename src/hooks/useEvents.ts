@@ -17,9 +17,9 @@ export interface EventData {
 }
 
 /* ===============================
-   イベント一覧取得
+   イベント一覧取得（全件取得に変更）
 =============================== */
-const fetchEvents = async (selectedWO: string): Promise<EventData[]> => {
+const fetchEvents = async (): Promise<EventData[]> => {
     const xrm = getXrm();
 
     // ✅ ローカルモック
@@ -33,6 +33,13 @@ const fetchEvents = async (selectedWO: string): Promise<EventData[]> => {
                 start: "2025-10-14T09:00:00",
                 end: "2025-10-14T10:00:00",
                 workOrderId: "wo-001",
+            },
+            {
+                id: "2",
+                title: "別WOの打合せ",
+                start: "2025-10-14T13:00:00",
+                end: "2025-10-14T14:00:00",
+                workOrderId: "wo-002",
             },
         ];
     }
@@ -52,6 +59,7 @@ const fetchEvents = async (selectedWO: string): Promise<EventData[]> => {
 
     const result = await xrm.WebApi.retrieveMultipleRecords(entityName, query);
 
+    // ✅ 全件整形
     const formatted: EventData[] = result.entities.flatMap((wo: any) =>
         (wo[navigationName] || []).map((t: any) => ({
             id: t.proto_timeentryid,
@@ -62,9 +70,7 @@ const fetchEvents = async (selectedWO: string): Promise<EventData[]> => {
         }))
     );
 
-    return selectedWO === "all"
-        ? formatted
-        : formatted.filter((e) => e.workOrderId === selectedWO);
+    return formatted;
 };
 
 /* ===============================
@@ -109,12 +115,20 @@ export const useEvents = (selectedWO: string) => {
     const queryClient = useQueryClient();
     const xrm = getXrm();
 
-    // 一覧取得
+    // 一覧取得（全件）
     const eventsQuery = useQuery({
-        queryKey: ["events", selectedWO],
-        queryFn: () => fetchEvents(selectedWO),
-        enabled: !!selectedWO,
+        queryKey: ["events"],
+        queryFn: () => fetchEvents(),
     });
+
+    // ✅ 選択WOに紐づくイベントに強調フラグ付与
+    const events = (eventsQuery.data ?? []).map((e) => ({
+        ...e,
+        extendedProps: {
+            ...e.extendedProps,
+            isTargetWO: selectedWO !== "all" && e.workOrderId === selectedWO,
+        },
+    }));
 
     // 登録・更新
     const mutation = useMutation({
@@ -130,7 +144,9 @@ export const useEvents = (selectedWO: string) => {
             // ✅ ローカルモード
             const current = JSON.parse(localStorage.getItem("mockEvents") || "[]");
             if (isUpdate) {
-                const updated = current.map((e: any) => (e.id === data.id ? { ...e, ...data } : e));
+                const updated = current.map((e: any) =>
+                    e.id === data.id ? { ...e, ...data } : e
+                );
                 localStorage.setItem("mockEvents", JSON.stringify(updated));
             } else {
                 const newItem = { ...data, id: String(Date.now()) };
@@ -139,8 +155,8 @@ export const useEvents = (selectedWO: string) => {
             return true;
         },
         onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ["events", selectedWO] });
-            await queryClient.refetchQueries({ queryKey: ["events", selectedWO] });
+            await queryClient.invalidateQueries({ queryKey: ["events"] });
+            await queryClient.refetchQueries({ queryKey: ["events"] });
         },
         onError: (err) => {
             console.error("❌ TimeEntry登録/更新失敗:", err);
@@ -156,7 +172,7 @@ export const useEvents = (selectedWO: string) => {
 
     return {
         // 一覧
-        events: eventsQuery.data ?? [],
+        events,
         isLoading: eventsQuery.isLoading,
         isError: eventsQuery.isError,
         refetchEvents: eventsQuery.refetch,
@@ -164,7 +180,7 @@ export const useEvents = (selectedWO: string) => {
         // 登録・更新
         createOrUpdateEvent: handleSubmit,
 
-        // ✅ 新規追加：詳細取得
+        // ✅ 詳細取得
         fetchEventDetail,
     };
 };

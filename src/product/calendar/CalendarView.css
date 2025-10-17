@@ -66,7 +66,8 @@
 
 /* イベント */
 .fc .fc-event {
-    background-color: var(--main-color);
+    /* background-color: var(--main-color); */
+    background-color: #79cdeb;
     border: none;
     border-radius: 4px;
     font-weight: bold;
@@ -125,6 +126,14 @@
 .fc .fc-scrollgrid-section-liquid>td {
     border: none;
 }
+
+/* 対象WOのイベントを強調 */
+.highlight-event {
+    /* border: 2px solid rgb(60, 183, 228) !important; */
+    /* box-shadow: 0 0 6px rgba(0, 137, 186, 0.4); */
+    background-color: var(--main-color) !important;
+}
+
 
 /* =============================
    レスポンシブ対応
