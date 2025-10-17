@@ -35,7 +35,7 @@ export const userClient = {
 
             // proto_bookableresource から、対応するユーザーIDのレコードを検索
             const query = `?$select=proto_bookableresourceid,_proto_systemuser_value,proto_shimei,proto_sei,proto_mei
-                           &$filter=_proto_systemuser_value/systemuserid eq ${userId}`;
+                           &$filter=_proto_systemuser_value eq ${userId}`;
 
             const result = await xrm.WebApi.retrieveMultipleRecords(
                 "proto_bookableresource",
