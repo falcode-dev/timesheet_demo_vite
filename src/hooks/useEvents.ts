@@ -126,7 +126,9 @@ export const useEvents = (selectedWO: string) => {
         ...e,
         extendedProps: {
             ...e.extendedProps,
-            isTargetWO: selectedWO !== "all" && e.workOrderId === selectedWO,
+            // selectedWO が "all" の場合 → 全件強調
+            // それ以外 → 一致する WorkOrder のみ強調
+            isTargetWO: selectedWO === "all" || e.workOrderId === selectedWO,
         },
     }));
 
