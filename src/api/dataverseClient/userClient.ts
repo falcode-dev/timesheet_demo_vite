@@ -34,8 +34,8 @@ export const userClient = {
             const userId = globalCtx.userSettings.userId.replace(/[{}]/g, "");
 
             // proto_bookableresource から、対応するユーザーIDのレコードを検索
-            const query = `?$select=proto_bookableresourceid,proto_systemuser,proto_shimei,proto_sei,proto_mei
-                           &$filter=proto_systemuser/systemuserid eq ${userId}`;
+            const query = `?$select=proto_bookableresourceid,_proto_systemuser_value,proto_shimei,proto_sei,proto_mei
+                           &$filter=_proto_systemuser_value/systemuserid eq ${userId}`;
 
             const result = await xrm.WebApi.retrieveMultipleRecords(
                 "proto_bookableresource",
