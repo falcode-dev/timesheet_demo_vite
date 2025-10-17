@@ -2,15 +2,15 @@ import { getXrm } from "../../utils/xrmUtils";
 
 /** ユーザー情報の型定義 */
 export type UserRecord = {
-    id: string;
-    firstName: string;
-    lastName: string;
-    employeeId?: string;
+    id: string;               // proto_bookableresourceid
+    firstName: string;        // 名（proto_mei）
+    lastName: string;         // 姓（proto_sei）
+    employeeId?: string;      // 任意（必要に応じて）
 };
 
 /**
  * Dataverse ユーザー情報取得クライアント
- * - ログイン中ユーザーの基本情報を取得
+ * - ログイン中ユーザーに紐づく proto_bookableresource レコードを取得
  * - ローカル開発時はモックデータを返す
  */
 export const userClient = {
@@ -18,10 +18,10 @@ export const userClient = {
     async getCurrentUser(): Promise<UserRecord> {
         const xrm = getXrm();
 
-        // ローカル開発環境（Dataverse が存在しない場合）
+        // ローカル環境（Dataverseなしの場合）
         if (!xrm) {
             return {
-                id: "local-user",
+                id: "local-resource",
                 firstName: "太郎",
                 lastName: "テスト",
                 employeeId: "999999",
@@ -29,22 +29,30 @@ export const userClient = {
         }
 
         try {
+            // ログイン中のユーザーIDを取得
             const globalCtx = xrm.Utility.getGlobalContext();
             const userId = globalCtx.userSettings.userId.replace(/[{}]/g, "");
 
-            // Dataverse から現在の systemuser レコードを取得
-            // 社員番号列（employeeid）は環境により異なる場合あり
-            const result = await xrm.WebApi.retrieveRecord(
-                "systemuser",
-                userId,
-                "?$select=firstname,lastname,employeeid"
+            // proto_bookableresource から、対応するユーザーIDのレコードを検索
+            const query = `?$select=proto_bookableresourceid,proto_systemuser,proto_shimei,proto_sei,proto_mei
+                           &$filter=proto_systemuser/systemuserid eq ${userId}`;
+
+            const result = await xrm.WebApi.retrieveMultipleRecords(
+                "proto_bookableresource",
+                query
             );
 
+            if (!result.entities.length) {
+                throw new Error("対応する proto_bookableresource レコードが見つかりません。");
+            }
+
+            const record = result.entities[0];
+
             return {
-                id: userId,
-                firstName: result.firstname ?? "",
-                lastName: result.lastname ?? "",
-                employeeId: result.employeeid ?? "",
+                id: record.proto_bookableresourceid,
+                firstName: record.proto_mei ?? "",
+                lastName: record.proto_sei ?? "",
+                employeeId: record.proto_shimei ?? "", // ※社員番号ではなく氏名（必要に応じて変更可）
             };
         } catch (error) {
             console.error("ユーザー情報取得エラー:", error);
