@@ -8,6 +8,7 @@ import { TimeEntryModal } from "./modal/timeentrymodal/TimeEntryModal";
 import { FavoriteTaskModal } from "./modal/favoritetaskmodal/FavoriteTaskModal";
 import { UserListModal } from "./modal/userlistmodal/UserListModal";
 import { useAppController } from "../hooks/useAppController";
+import { FavoriteTaskProvider } from "../context/FavoriteTaskContext";
 import "./DataverseApp.css";
 
 export const DataverseApp = () => {
@@ -70,81 +71,85 @@ export const DataverseApp = () => {
     };
 
     return (
-        <div className="app-container">
-            {/* ヘッダー */}
-            <Header
-                workOrders={workOrders}
-                selectedWO={selectedWO}
-                setSelectedWO={setSelectedWO}
-            />
-
-            {/* メインコンテンツ */}
-            <section className="content-card">
-                {/* 上部ナビゲーション */}
-                <ContentHeader
-                    mainTab={mainTab}
-                    setMainTab={setMainTab}
-                    viewMode={viewMode}
-                    setViewMode={setViewMode}
-                    formattedToday={formattedToday}
-                    onPrev={handlePrev}
-                    onNext={handleNext}
-                    onToday={handleToday}
-                    onCreateNew={openNewTimeEntry}
+        // ✅ Contextで全体をラップ
+        <FavoriteTaskProvider>
+            <div className="app-container">
+                {/* ヘッダー */}
+                <Header
+                    workOrders={workOrders}
+                    selectedWO={selectedWO}
+                    setSelectedWO={setSelectedWO}
                 />
 
-                {/* 中央：サイドバー＋カレンダー */}
-                <div className="content-middle">
-                    <Sidebar mainTab={mainTab} />
+                {/* メインコンテンツ */}
+                <section className="content-card">
+                    {/* 上部ナビゲーション */}
+                    <ContentHeader
+                        mainTab={mainTab}
+                        setMainTab={setMainTab}
+                        viewMode={viewMode}
+                        setViewMode={setViewMode}
+                        formattedToday={formattedToday}
+                        onPrev={handlePrev}
+                        onNext={handleNext}
+                        onToday={handleToday}
+                        onCreateNew={openNewTimeEntry}
+                    />
 
-                    <div className="content-main">
-                        <CalendarView
-                            viewMode={viewMode}
-                            currentDate={currentDate}
-                            onDateChange={setCurrentDate}
-                            onDateClick={(range) => {
-                                setSelectedDateTime(range);
-                                setSelectedEvent(null);
-                                setIsTimeEntryModalOpen(true);
-                            }}
-                            onEventClick={handleEventClick}
-                            events={events}
-                        />
+                    {/* 中央：サイドバー＋カレンダー */}
+                    <div className="content-middle">
+                        {/* ✅ Sidebar が Context からお気に入りタスクを取得 */}
+                        <Sidebar mainTab={mainTab} />
+
+                        <div className="content-main">
+                            <CalendarView
+                                viewMode={viewMode}
+                                currentDate={currentDate}
+                                onDateChange={setCurrentDate}
+                                onDateClick={(range) => {
+                                    setSelectedDateTime(range);
+                                    setSelectedEvent(null);
+                                    setIsTimeEntryModalOpen(true);
+                                }}
+                                onEventClick={handleEventClick}
+                                events={events}
+                            />
+                        </div>
                     </div>
-                </div>
 
-                {/* フッター */}
-                <Footer
-                    onOpenUserList={() => setIsUserListModalOpen(true)}
-                    onOpenFavoriteTask={() => setIsFavoriteTaskModalOpen(true)}
+                    {/* フッター */}
+                    <Footer
+                        onOpenUserList={() => setIsUserListModalOpen(true)}
+                        onOpenFavoriteTask={() => setIsFavoriteTaskModalOpen(true)}
+                    />
+                </section>
+
+                {/* モーダル群 */}
+                <TimeEntryModal
+                    isOpen={isTimeEntryModalOpen}
+                    onClose={() => setIsTimeEntryModalOpen(false)}
+                    onSubmit={handleTimeEntrySubmit}
+                    selectedDateTime={selectedDateTime}
+                    selectedEvent={selectedEvent}
+                    woOptions={workOrders.map((w) => ({ value: w.id, label: w.name }))}
+                    maincategoryOptions={optionSets?.maincategory ?? []}
+                    timecategoryOptions={optionSets?.timecategory ?? []}
+                    paymenttypeOptions={optionSets?.paymenttype ?? []}
+                    timezoneOptions={optionSets?.timezone ?? []}
                 />
-            </section>
 
-            {/* モーダル群 */}
-            <TimeEntryModal
-                isOpen={isTimeEntryModalOpen}
-                onClose={() => setIsTimeEntryModalOpen(false)}
-                onSubmit={handleTimeEntrySubmit}
-                selectedDateTime={selectedDateTime}
-                selectedEvent={selectedEvent}
-                woOptions={workOrders.map((w) => ({ value: w.id, label: w.name }))}
-                maincategoryOptions={optionSets?.maincategory ?? []}
-                timecategoryOptions={optionSets?.timecategory ?? []}
-                paymenttypeOptions={optionSets?.paymenttype ?? []}
-                timezoneOptions={optionSets?.timezone ?? []}
-            />
+                <FavoriteTaskModal
+                    isOpen={isFavoriteTaskModalOpen}
+                    onClose={() => setIsFavoriteTaskModalOpen(false)}
+                    onSave={handleSaveFavoriteTasks}
+                />
 
-            <FavoriteTaskModal
-                isOpen={isFavoriteTaskModalOpen}
-                onClose={() => setIsFavoriteTaskModalOpen(false)}
-                onSave={handleSaveFavoriteTasks}
-            />
-
-            <UserListModal
-                isOpen={isUserListModalOpen}
-                onClose={() => setIsUserListModalOpen(false)}
-                onSave={handleSaveUserList}
-            />
-        </div>
+                <UserListModal
+                    isOpen={isUserListModalOpen}
+                    onClose={() => setIsUserListModalOpen(false)}
+                    onSave={handleSaveUserList}
+                />
+            </div>
+        </FavoriteTaskProvider>
     );
 };

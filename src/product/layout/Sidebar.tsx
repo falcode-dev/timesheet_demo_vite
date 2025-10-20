@@ -5,14 +5,8 @@ import { Input } from "../../component/input/Input";
 import { useCurrentUser } from "../../hooks/useCurrentUser";
 import { useResources } from "../../hooks/useResources";
 import { useAllowedUsers } from "../../context/UserListContext";
+import { useFavoriteTasks } from "../../context/FavoriteTaskContext"; // ✅ 追加
 import { useTranslation } from "react-i18next";
-
-/** 間接タスク型 */
-type IndirectTask = {
-    id: string;
-    category: string;
-    task: string;
-};
 
 /** 並び替えオプションの型 */
 type UserSortKey = "numberAsc" | "numberDesc" | "nameAsc" | "nameDesc";
@@ -29,6 +23,7 @@ type SidebarProps = {
  */
 export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
     const { t } = useTranslation();
+    const { favoriteTasks } = useFavoriteTasks(); // ✅ Contextからお気に入りタスク取得
 
     /** 検索・選択状態 */
     const [searchType, setSearchType] = useState<"name" | "number">("name");
@@ -87,24 +82,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
         return [...list].sort(sortBy[userSortOption]);
     }, [keyword, searchType, visibleUsers, userSortOption]);
 
-    /** 仮タスク一覧（多言語対応） */
-    const indirectTasks: IndirectTask[] = [
-        { id: "t1", category: t("sidebar.tasks.meeting"), task: t("sidebar.tasks.meetingDetail") },
-        { id: "t2", category: t("sidebar.tasks.education"), task: t("sidebar.tasks.educationDetail") },
-        { id: "t3", category: t("sidebar.tasks.docs"), task: t("sidebar.tasks.docsDetail") },
-        { id: "t4", category: t("sidebar.tasks.other"), task: t("sidebar.tasks.otherDetail") },
-    ];
-
-    /** タスクソート結果 */
-    const sortedTasks = useMemo(() => {
-        const sortBy: Record<TaskSortKey, (a: IndirectTask, b: IndirectTask) => number> = {
-            categoryAsc: (a, b) => a.category.localeCompare(b.category),
-            categoryDesc: (a, b) => b.category.localeCompare(a.category),
-            taskAsc: (a, b) => a.task.localeCompare(b.task),
-            taskDesc: (a, b) => b.task.localeCompare(a.task),
+    /** ✅ お気に入りタスクのソート処理 */
+    const sortedFavoriteTasks = useMemo(() => {
+        const sortBy: Record<TaskSortKey, (a: any, b: any) => number> = {
+            categoryAsc: (a, b) => a.subcategoryName.localeCompare(b.subcategoryName),
+            categoryDesc: (a, b) => b.subcategoryName.localeCompare(a.subcategoryName),
+            taskAsc: (a, b) => a.taskName.localeCompare(b.taskName),
+            taskDesc: (a, b) => b.taskName.localeCompare(a.taskName),
         };
-        return [...indirectTasks].sort(sortBy[taskSortOption]);
-    }, [taskSortOption, indirectTasks]);
+        return [...favoriteTasks].sort(sortBy[taskSortOption]);
+    }, [favoriteTasks, taskSortOption]);
 
     /** ユーザー選択トグル */
     const toggleSelect = (userId: string) => {
@@ -194,8 +181,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
                             {userSortOptions.map((opt) => (
                                 <div
                                     key={opt.value}
-                                    className={`sidebar-sort-option ${userSortOption === opt.value ? "active" : ""
-                                        }`}
+                                    className={`sidebar-sort-option ${userSortOption === opt.value ? "active" : ""}`}
                                     onClick={() => {
                                         setUserSortOption(opt.value as UserSortKey);
                                         setIsUserSortOpen(false);
@@ -248,8 +234,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
                             {taskSortOptions.map((opt) => (
                                 <div
                                     key={opt.value}
-                                    className={`sidebar-sort-option ${taskSortOption === opt.value ? "active" : ""
-                                        }`}
+                                    className={`sidebar-sort-option ${taskSortOption === opt.value ? "active" : ""}`}
                                     onClick={() => {
                                         setTaskSortOption(opt.value as TaskSortKey);
                                         setIsTaskSortOpen(false);
@@ -261,23 +246,25 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
                         </div>
                     )}
 
-                    {/* タスクリスト */}
+                    {/* ✅ お気に入りタスクのみ表示 */}
                     <div className="sidebar-task-list">
-                        {sortedTasks.map((task) => (
-                            <label key={task.id} className="sidebar-task-radio">
-                                <input
-                                    type="radio"
-                                    name="sidebarTaskType"
-                                    value={task.id}
-                                    checked={selectedTask === task.id}
-                                    onChange={() => setSelectedTask(task.id)}
-                                />
-                                <div className="sidebar-task-lines">
-                                    <span className="sidebar-task-category">{task.category}</span>
-                                    <span className="sidebar-task-name">{task.task}</span>
-                                </div>
-                            </label>
-                        ))}
+                        {
+                            sortedFavoriteTasks.map((task) => (
+                                <label key={task.id} className="sidebar-task-radio">
+                                    <input
+                                        type="radio"
+                                        name="sidebarTaskType"
+                                        value={task.id}
+                                        checked={selectedTask === task.id}
+                                        onChange={() => setSelectedTask(task.id)}
+                                    />
+                                    <div className="sidebar-task-lines">
+                                        <span className="sidebar-task-category">{task.subcategoryName}</span>
+                                        <span className="sidebar-task-name">{task.taskName}</span>
+                                    </div>
+                                </label>
+                            ))
+                        }
                     </div>
                 </>
             )}

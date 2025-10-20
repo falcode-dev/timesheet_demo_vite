@@ -7,146 +7,187 @@ import { Select } from "../../../component/select/Select";
 import { Input } from "../../../component/input/Input";
 import "./FavoriteTaskModal.css";
 import { useTranslation } from "react-i18next";
+import { useSubcategories } from "../../../hooks/useSubcategories";
+import { useTasks } from "../../../hooks/useTasks";
+import { useFavoriteTasks } from "../../../context/FavoriteTaskContext";
 
-/* ======================================================
-   BaseModalProps
-====================================================== */
-export interface BaseModalProps {
+/* =========================================================
+   型定義
+========================================================= */
+export interface FavoriteTaskModalProps {
     isOpen: boolean;
     onClose: () => void;
-    title?: string;
-    description?: string;
-    size?: "small" | "medium" | "large";
-    children?: React.ReactNode;
-    footerButtons?: React.ReactNode[];
-}
-
-/* ======================================================
-   FavoriteTaskModal Props
-====================================================== */
-interface FavoriteTaskModalProps
-    extends Omit<BaseModalProps, "children" | "footerButtons"> {
     onSave: (selectedTasks: string[]) => void;
 }
 
-/* ======================================================
-   FavoriteTaskModal 本体
-====================================================== */
+/* =========================================================
+   コンポーネント
+========================================================= */
 export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
     isOpen,
     onClose,
     onSave,
 }) => {
     const { t } = useTranslation();
+    const { setFavoriteTasks } = useFavoriteTasks();
 
-    /* ======================================================
-       ▼ ステート管理
-    ======================================================= */
+    /* ---------------------------
+       Dataverseから取得
+    --------------------------- */
+    const { subcategories, isLoading: subLoading } = useSubcategories();
+    const { tasks, isLoading: taskLoading } = useTasks();
+
+    /* ---------------------------
+       状態管理
+    --------------------------- */
     const [selectedCategory, setSelectedCategory] = useState("");
     const [taskName, setTaskName] = useState("");
-    const [searchResults, setSearchResults] = useState<string[]>([]);
-    const [favoriteTasks, setFavoriteTasks] = useState<string[]>([]);
+    const [searchResults, setSearchResults] = useState<
+        { id: string; subcategoryName: string; taskName: string }[]
+    >([]);
+    const [allCombinations, setAllCombinations] = useState<
+        { id: string; subcategoryName: string; taskName: string }[]
+    >([]);
+    const [selectedTasks, setSelectedTasks] = useState<
+        { id: string; subcategoryName: string; taskName: string }[]
+    >([]);
     const [checkedResults, setCheckedResults] = useState<string[]>([]);
-    const [checkedFavorites, setCheckedFavorites] = useState<string[]>([]);
+    const [checkedSelected, setCheckedSelected] = useState<string[]>([]);
     const [isLeftHeaderChecked, setIsLeftHeaderChecked] = useState(false);
     const [isRightHeaderChecked, setIsRightHeaderChecked] = useState(false);
 
-    /* ======================================================
-       ▼ ダミーデータ（Dataverse移行予定）
-    ======================================================= */
-    const categories = [
-        t("favoriteTask.categories.improvement"),
-        t("favoriteTask.categories.quality"),
-        t("favoriteTask.categories.education"),
-    ];
-    const tasks = [
-        t("favoriteTask.tasks.document"),
-        t("favoriteTask.tasks.meeting"),
-        t("favoriteTask.tasks.testPlan"),
-        t("favoriteTask.tasks.review"),
-        t("favoriteTask.tasks.weekly"),
-    ];
-
-    /* ======================================================
-       ▼ 初期化
-    ======================================================= */
+    /* =========================================================
+       初期データ生成（サブカテゴリ × タスク）
+    ========================================================= */
     useEffect(() => {
-        setSearchResults(tasks);
-    }, [t]);
+        if (!subcategories || !tasks) return;
+        const combined = subcategories.flatMap((sc) =>
+            tasks.map((task) => ({
+                id: `${sc.id}_${task.id}`,
+                subcategoryName: sc.name ?? t("favoriteTask.unknownCategory"),
+                taskName: task.name ?? "-",
+            }))
+        );
+        setAllCombinations(combined);
+        setSearchResults([]); // 初期は空
+    }, [subcategories, tasks, t]);
 
-    /* ======================================================
-       ▼ 個別チェック操作
-    ======================================================= */
-    const toggleCheck = useCallback((task: string) => {
+    /* =========================================================
+       🔍 検索処理（元のロジックを維持）
+    ========================================================= */
+    const handleSearch = useCallback(() => {
+        if (!allCombinations || allCombinations.length === 0) {
+            setSearchResults([]);
+            return;
+        }
+
+        const filtered = allCombinations.filter((item) => {
+            const matchCat =
+                !selectedCategory || item.subcategoryName.includes(selectedCategory);
+            const matchName =
+                !taskName || item.taskName.includes(taskName);
+            return matchCat && matchName;
+        });
+
+        setSearchResults(filtered);
+    }, [allCombinations, selectedCategory, taskName]);
+
+    /* =========================================================
+       チェックボックス操作
+    ========================================================= */
+    const toggleCheck = useCallback((id: string) => {
         setCheckedResults((prev) =>
-            prev.includes(task) ? prev.filter((t) => t !== task) : [...prev, task]
+            prev.includes(id) ? prev.filter((u) => u !== id) : [...prev, id]
         );
     }, []);
 
-    const toggleFavoriteCheck = useCallback((task: string) => {
-        setCheckedFavorites((prev) =>
-            prev.includes(task) ? prev.filter((t) => t !== task) : [...prev, task]
+    const toggleSelectedCheck = useCallback((id: string) => {
+        setCheckedSelected((prev) =>
+            prev.includes(id) ? prev.filter((u) => u !== id) : [...prev, id]
         );
     }, []);
 
-    /* ======================================================
-       ▼ ヘッダー全選択・全解除
-    ======================================================= */
+    /* =========================================================
+       全選択・全解除
+    ========================================================= */
     const toggleLeftHeaderCheck = useCallback(() => {
         const newState = !isLeftHeaderChecked;
         setIsLeftHeaderChecked(newState);
-        const available = searchResults.filter((t) => !favoriteTasks.includes(t));
-        setCheckedResults(newState ? available : []);
-    }, [isLeftHeaderChecked, searchResults, favoriteTasks]);
+        const available = searchResults.filter(
+            (r) => !selectedTasks.some((s) => s.id === r.id)
+        );
+        setCheckedResults(newState ? available.map((r) => r.id) : []);
+    }, [isLeftHeaderChecked, searchResults, selectedTasks]);
 
     const toggleRightHeaderCheck = useCallback(() => {
-        const newState = checkedFavorites.length < favoriteTasks.length;
-        setCheckedFavorites(newState ? [...favoriteTasks] : []);
-    }, [checkedFavorites.length, favoriteTasks]);
+        const newState = checkedSelected.length < selectedTasks.length;
+        setCheckedSelected(newState ? selectedTasks.map((r) => r.id) : []);
+    }, [checkedSelected.length, selectedTasks]);
 
     useEffect(() => {
-        setIsRightHeaderChecked(checkedFavorites.length > 0);
-    }, [checkedFavorites]);
+        setIsRightHeaderChecked(checkedSelected.length > 0);
+    }, [checkedSelected]);
 
-    /* ======================================================
-       ▼ 移動（右へ）
-    ======================================================= */
-    const moveToFavorite = useCallback(() => {
-        const toAdd = checkedResults.filter((t) => !favoriteTasks.includes(t));
-        setFavoriteTasks((prev) => [...prev, ...toAdd]);
-        setCheckedFavorites((prev) => [...prev, ...toAdd]);
+    /* =========================================================
+       移動・削除操作
+    ========================================================= */
+    const moveToSelected = useCallback(() => {
+        const toAdd = searchResults.filter((r) => checkedResults.includes(r.id));
+
+        const updated = [...selectedTasks];
+        const newChecked = [...checkedSelected];
+
+        toAdd.forEach((r) => {
+            if (!updated.some((u) => u.id === r.id)) {
+                updated.push(r);
+                newChecked.push(r.id);
+            }
+        });
+
+        setSelectedTasks(updated);
+        setCheckedSelected(newChecked);
         setCheckedResults([]);
         setIsLeftHeaderChecked(false);
-    }, [checkedResults, favoriteTasks]);
+    }, [searchResults, checkedResults, selectedTasks, checkedSelected]);
 
-    /* ======================================================
-       ▼ 削除操作
-    ======================================================= */
-    const removeSelectedFavorites = useCallback(() => {
-        setFavoriteTasks((prev) => prev.filter((t) => !checkedFavorites.includes(t)));
-        setCheckedFavorites([]);
-    }, [checkedFavorites]);
+    const removeCheckedSelected = useCallback(() => {
+        setSelectedTasks((prev) => prev.filter((r) => !checkedSelected.includes(r.id)));
+        setCheckedSelected([]);
+    }, [checkedSelected]);
 
-    const removeFavorite = useCallback((task: string) => {
-        setFavoriteTasks((prev) => prev.filter((t) => t !== task));
-        setCheckedFavorites((prev) => prev.filter((t) => t !== task));
+    const removeTask = useCallback((id: string) => {
+        setSelectedTasks((prev) => prev.filter((r) => r.id !== id));
+        setCheckedSelected((prev) => prev.filter((u) => u !== id));
     }, []);
 
-    /* ======================================================
-       ▼ 検索処理
-    ======================================================= */
-    const handleSearch = useCallback(() => {
-        const filtered = tasks.filter(
-            (t) =>
-                (!selectedCategory || t.includes(selectedCategory)) &&
-                (!taskName || t.includes(taskName))
-        );
-        setSearchResults(filtered);
-    }, [selectedCategory, taskName, tasks]);
+    /* =========================================================
+       保存処理
+    ========================================================= */
+    const handleSave = useCallback(() => {
+        const ids = selectedTasks.map((u) => u.id);
+        setFavoriteTasks(selectedTasks);
+        onSave(ids);
+        onClose();
+    }, [selectedTasks, setFavoriteTasks, onSave, onClose]);
 
-    /* ======================================================
-       ▼ JSX
-    ======================================================= */
+    /* =========================================================
+       JSX
+    ========================================================= */
+    if (subLoading || taskLoading) {
+        return (
+            <BaseModal
+                isOpen={isOpen}
+                onClose={onClose}
+                title={t("favoriteTask.title")}
+                size="medium"
+            >
+                <div className="loading-state">
+                    <p>{t("favoriteTask.loading")}</p>
+                </div>
+            </BaseModal>
+        );
+    }
+
     return (
         <BaseModal
             isOpen={isOpen}
@@ -165,20 +206,21 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
                     key="save"
                     label={t("favoriteTask.save")}
                     color="primary"
-                    onClick={() => onSave(favoriteTasks)}
+                    onClick={handleSave}
                     className="favotitetask-create-button"
                 />,
             ]}
         >
             <div className="modal-body">
-                {/* -------------------------------
-            上部フィルタ
-        ------------------------------- */}
+                {/* 検索フォーム */}
                 <div className="modal-grid">
                     <div className="grid-left">
                         <label className="modal-label">{t("favoriteTask.subCategory")}</label>
                         <Select
-                            options={categories.map((c) => ({ value: c, label: c }))}
+                            options={subcategories.map((s) => ({
+                                value: s.name,
+                                label: s.name,
+                            }))}
                             value={selectedCategory}
                             onChange={setSelectedCategory}
                             placeholder={t("favoriteTask.selectSubCategory")}
@@ -203,20 +245,21 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
                             type="text"
                         />
                         <div className="left-align">
-                            <Button label={t("favoriteTask.search")} color="primary" onClick={handleSearch} />
+                            <Button
+                                label={t("favoriteTask.search")}
+                                color="primary"
+                                onClick={handleSearch}
+                            />
                         </div>
                     </div>
                 </div>
 
                 <hr className="divider" />
-
                 <p className="list-description">{t("favoriteTask.instructions")}</p>
 
-                {/* -------------------------------
-            タスクリスト
-        ------------------------------- */}
+                {/* タスクリスト */}
                 <div className="task-grid">
-                    {/* ---------- 左：検索結果 ---------- */}
+                    {/* 左：検索結果 */}
                     <div className="task-list">
                         <div className="list-header">
                             <span className="modal-label">{t("favoriteTask.searchResults")}</span>
@@ -232,41 +275,40 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
                                     className="subheader-checkbox"
                                 />
                                 <FaIcons.FaChevronDown className="task-icon" />
-                                <span className="label-text">{t("favoriteTask.subCategory")}</span>
-                                <FaIcons.FaTasks className="task-icon" />
+                                <span className="label-text">{t("favoriteTask.taskName")}</span>
                             </div>
                         </div>
 
                         <div className="list-box">
-                            {searchResults.map((task) => {
-                                const isFavorited = favoriteTasks.includes(task);
-                                return (
-                                    <label
-                                        key={task}
-                                        className={`list-item-2line ${isFavorited ? "disabled-item" : ""}`}
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            disabled={isFavorited}
-                                            checked={checkedResults.includes(task)}
-                                            onChange={() => toggleCheck(task)}
-                                        />
-                                        <div className="list-text">
-                                            <div className="category-name">
-                                                {selectedCategory || t("favoriteTask.categories.improvement")}
+                            {
+                                searchResults.map((r) => {
+                                    const isSelected = selectedTasks.some((u) => u.id === r.id);
+                                    return (
+                                        <label
+                                            key={r.id}
+                                            className={`list-item-2line ${isSelected ? "disabled-item" : ""}`}
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                disabled={isSelected}
+                                                checked={checkedResults.includes(r.id)}
+                                                onChange={() => toggleCheck(r.id)}
+                                            />
+                                            <div className="list-text">
+                                                <div className="category-name">{r.subcategoryName}</div>
+                                                <div className="task-name">{r.taskName}</div>
                                             </div>
-                                            <div className="task-name">{task}</div>
-                                        </div>
-                                    </label>
-                                );
-                            })}
+                                        </label>
+                                    );
+                                })
+                            }
                         </div>
                     </div>
 
-                    {/* ---------- 中央：移動ボタン ---------- */}
+                    {/* 中央：移動ボタン */}
                     <div className="move-button-container">
                         <button
-                            onClick={moveToFavorite}
+                            onClick={moveToSelected}
                             className="move-button"
                             title={t("favoriteTask.moveRight")}
                         >
@@ -274,11 +316,11 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
                         </button>
                     </div>
 
-                    {/* ---------- 右：お気に入り ---------- */}
+                    {/* 右：お気に入り */}
                     <div className="task-list">
                         <div className="list-header">
                             <span className="modal-label">{t("favoriteTask.favoriteList")}</span>
-                            <span className="count">{favoriteTasks.length}{t("favoriteTask.items")}</span>
+                            <span className="count">{selectedTasks.length}{t("favoriteTask.items")}</span>
                         </div>
 
                         <div className="list-subheader">
@@ -290,45 +332,44 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
                                     className="subheader-checkbox"
                                 />
                                 <FaIcons.FaChevronDown className="task-icon" />
-                                <span className="label-text">{t("favoriteTask.subCategory")}</span>
-                                <FaIcons.FaTasks className="task-icon" />
+                                <span className="label-text">{t("favoriteTask.taskName")}</span>
                             </div>
-                            {favoriteTasks.length > 0 && (
+                            {selectedTasks.length > 0 && (
                                 <Button
                                     label=""
                                     icon={<FaIcons.FaRegTrashAlt />}
-                                    onClick={removeSelectedFavorites}
+                                    onClick={removeCheckedSelected}
                                     className="trash-icon-button"
                                 />
                             )}
                         </div>
 
                         <div className="list-box">
-                            {favoriteTasks.map((task) => (
-                                <div key={task} className="list-item-favorite">
-                                    <div className="list-item-favorite-left">
-                                        <input
-                                            type="checkbox"
-                                            checked={checkedFavorites.includes(task)}
-                                            onChange={() => toggleFavoriteCheck(task)}
-                                        />
-                                        <div className="list-text">
-                                            <div className="category-name">
-                                                {selectedCategory || t("favoriteTask.categories.improvement")}
+                            {
+                                selectedTasks.map((r) => (
+                                    <div key={r.id} className="list-item-favorite">
+                                        <div className="list-item-favorite-left">
+                                            <input
+                                                type="checkbox"
+                                                checked={checkedSelected.includes(r.id)}
+                                                onChange={() => toggleSelectedCheck(r.id)}
+                                            />
+                                            <div className="list-text">
+                                                <div className="category-name">{r.subcategoryName}</div>
+                                                <div className="task-name">{r.taskName}</div>
                                             </div>
-                                            <div className="task-name">{task}</div>
+                                        </div>
+                                        <div className="list-item-favorite-right">
+                                            <Button
+                                                label=""
+                                                icon={<FaIcons.FaTimes />}
+                                                onClick={() => removeTask(r.id)}
+                                                className="delete-list-button"
+                                            />
                                         </div>
                                     </div>
-                                    <div className="list-item-favorite-right">
-                                        <Button
-                                            label=""
-                                            icon={<FaIcons.FaTimes />}
-                                            onClick={() => removeFavorite(task)}
-                                            className="delete-list-button"
-                                        />
-                                    </div>
-                                </div>
-                            ))}
+                                ))
+                            }
                         </div>
                     </div>
                 </div>

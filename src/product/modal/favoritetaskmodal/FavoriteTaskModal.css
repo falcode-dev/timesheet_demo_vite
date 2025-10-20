@@ -6,7 +6,7 @@
 }
 
 /* ===========================================
-   モーダル本文エリア
+   モーダル本文
 =========================================== */
 .modal-body {
     background-color: #fff;
@@ -26,10 +26,6 @@
     font-weight: 500;
     margin: 12px 0 16px;
     line-height: 1.6;
-}
-
-.favorite-task-select .select-display {
-    width: 100%;
 }
 
 /* ===========================================
@@ -58,7 +54,7 @@
 }
 
 /* ===========================================
-   タスクリストエリア
+   リストエリア
 =========================================== */
 .list-description {
     color: var(--text-gray);
@@ -88,7 +84,7 @@
     margin-bottom: 6px;
 }
 
-/* 件数ラベル（グレーラベル風） */
+/* 件数ラベル */
 .count {
     display: inline-block;
     padding: 2px 8px;
@@ -130,41 +126,55 @@
     font-size: 0.95rem;
 }
 
+.favorite-task-select .select-display {
+    width: 100%;
+}
+
 /* ---- リストボックス ---- */
 .list-box {
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    background: #fff;
+    position: relative;
+    min-height: 220px;
+    max-height: 400px;
     overflow-y: auto;
-    height: 240px;
-    max-height: 240px;
-    scrollbar-width: none;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box;
+    padding: 6px 8px;
 }
 
 .list-box::-webkit-scrollbar {
-    display: none;
+    width: 6px;
 }
 
-.list-box.empty::before {
-    content: 'データがありません';
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #aaa;
+.list-box::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
+
+.list-box::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+/* 空リスト */
+.no-results {
+    text-align: center;
+    color: #888;
     font-size: 0.9rem;
-    height: 100%;
+    margin: 40px 0;
+    user-select: none;
 }
 
 /* ===========================================
-   カスタムチェックボックス（共通）
+   カスタムチェックボックス
 =========================================== */
 .list-item-2line input[type='checkbox'],
 .list-item-favorite input[type='checkbox'],
 .subheader-checkbox {
     appearance: none;
     -webkit-appearance: none;
-    width: 22px;
-    height: 22px;
+    min-width: 22px;
+    min-height: 22px;
     margin-right: 10px;
     border: 2px solid var(--main-color);
     border-radius: 4px;
@@ -175,14 +185,14 @@
     box-shadow: 0 0 3px rgba(0, 137, 186, 0.3);
 }
 
-/* ホバー時のシャドウ */
+/* ホバー時 */
 .list-item-2line input[type='checkbox']:hover,
 .list-item-favorite input[type='checkbox']:hover,
 .subheader-checkbox:hover {
     box-shadow: 0 0 5px rgba(0, 137, 186, 0.4);
 }
 
-/* チェック時（反転） */
+/* チェック時 */
 .list-item-2line input[type='checkbox']:checked,
 .list-item-favorite input[type='checkbox']:checked,
 .subheader-checkbox:checked {
@@ -191,7 +201,7 @@
     box-shadow: 0 0 4px rgba(0, 137, 186, 0.4);
 }
 
-/* チェックマーク描画 */
+/* チェックマーク */
 .list-item-2line input[type='checkbox']:checked::after,
 .list-item-favorite input[type='checkbox']:checked::after,
 .subheader-checkbox:checked::after {
@@ -206,7 +216,7 @@
     transform: rotate(45deg);
 }
 
-/* 無効状態（お気に入り済み）もチェックON固定＆非アクティブ見た目 */
+/* 無効状態（選択済） */
 .disabled-item input[type='checkbox'] {
     border-color: var(--main-color);
     background-color: var(--main-color);
@@ -215,7 +225,6 @@
     opacity: 0.5;
 }
 
-/* 無効状態でもチェックマークを表示 */
 .disabled-item input[type='checkbox']::after {
     content: '';
     position: absolute;
@@ -235,6 +244,7 @@
     gap: 10px;
     padding: 8px 6px;
     border-bottom: 1px solid #f1f1f1;
+    cursor: pointer;
 }
 
 .list-item-2line:last-child {
@@ -258,7 +268,7 @@
     font-size: 0.85rem;
 }
 
-/* ---- お気に入りリスト ---- */
+/* ---- 選択済みリスト ---- */
 .list-item-favorite {
     height: 40px;
     display: flex;
@@ -267,8 +277,6 @@
     gap: 10px;
     margin: 5px;
     padding: 5px;
-    /* padding: 10px; */
-    /* margin-bottom: 8px; */
     border: 1.2px solid var(--main-color);
     border-radius: 6px;
     background-color: rgba(0, 137, 186, 0.08);
@@ -278,8 +286,6 @@
     display: flex;
     align-items: center;
 }
-
-/* .list-item-favorite-right {} */
 
 /* ---- 削除ボタン ---- */
 .btn-delete,
@@ -339,13 +345,9 @@
     transform: translateY(-1px);
 }
 
+/* ---- 保存ボタン ---- */
 .favotitetask-create-button {
     margin-left: 10px;
-}
-
-.move-button {
-    width: 35px;
-    font-size: 1.2rem;
 }
 
 /* ===========================================
@@ -358,8 +360,7 @@
         grid-template-columns: 1fr;
     }
 
-    .btn-move {
-        width: 100%;
+    .move-button {
         padding: 10px 0;
     }
 
