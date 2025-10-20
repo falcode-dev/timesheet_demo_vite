@@ -32,6 +32,7 @@
 }
 
 .main-tabs .tab-item {
+    width: 100%;
     min-width: 100px;
     padding: 6px 14px;
     font-weight: 600;

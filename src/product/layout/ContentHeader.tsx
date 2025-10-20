@@ -4,6 +4,7 @@ import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { Tabs } from "../../component/tab/Tabs";
 import { Button } from "../../component/button/Button";
 import type { TabOption } from "../../component/tab/Tabs";
+import { useTranslation } from "react-i18next";
 
 /** メインタブ種別 */
 export type MainTab = "user" | "indirect";
@@ -13,25 +14,14 @@ export type ViewMode = "1日" | "3日" | "週";
 
 /** ContentHeader Props定義 */
 export type ContentHeaderProps = {
-    /** メインタブ選択値 */
     mainTab: MainTab;
-    /** メインタブ更新関数 */
     setMainTab: (tab: MainTab) => void;
-
-    /** カレンダーの表示モード */
     viewMode: ViewMode;
-    /** 表示モード更新関数 */
     setViewMode: (mode: ViewMode) => void;
-
-    /** 現在の日付（フォーマット済み） */
     formattedToday: string;
-
-    /** ナビゲーション操作 */
     onPrev: () => void;
     onNext: () => void;
     onToday: () => void;
-
-    /** 新規作成ボタン */
     onCreateNew: () => void;
 };
 
@@ -53,14 +43,20 @@ export const ContentHeader: React.FC<ContentHeaderProps> = ({
     onToday,
     onCreateNew,
 }) => {
-    /** メインタブ設定 */
+    const { t } = useTranslation();
+
+    /** メインタブ設定（多言語対応） */
     const mainTabOptions: TabOption[] = [
-        { value: "user", label: "ユーザー" },
-        { value: "indirect", label: "間接タスク" },
+        { value: "user", label: t("contentHeader.userTab") },
+        { value: "indirect", label: t("contentHeader.indirectTab") },
     ];
 
-    /** 表示モードボタン */
-    const viewModes: ViewMode[] = ["1日", "3日", "週"];
+    /** 表示モードボタン（多言語対応） */
+    const viewModes: { value: ViewMode; label: string }[] = [
+        { value: "1日", label: t("contentHeader.viewMode.day") },
+        { value: "3日", label: t("contentHeader.viewMode.threeDays") },
+        { value: "週", label: t("contentHeader.viewMode.week") },
+    ];
 
     return (
         <header className="tab-header">
@@ -76,7 +72,7 @@ export const ContentHeader: React.FC<ContentHeaderProps> = ({
                 />
 
                 <Button
-                    label="新しいタイムエントリを作成"
+                    label={t("contentHeader.createNew")}
                     color="primary"
                     icon={<FaIcons.FaPlus />}
                     className="add-entry-button new-create-button"
@@ -90,7 +86,7 @@ export const ContentHeader: React.FC<ContentHeaderProps> = ({
             <div className="tab-header-right">
                 {/* 今日ボタン */}
                 <button className="today-button" onClick={onToday}>
-                    <FaIcons.FaCalendarDay className="icon" /> 今日
+                    <FaIcons.FaCalendarDay className="icon" /> {t("calendar.today")}
                 </button>
 
                 {/* 前後ナビゲーション */}
@@ -111,11 +107,11 @@ export const ContentHeader: React.FC<ContentHeaderProps> = ({
                 <div className="view-tabs">
                     {viewModes.map((mode) => (
                         <button
-                            key={mode}
-                            className={`view-tab ${viewMode === mode ? "active" : ""}`}
-                            onClick={() => setViewMode(mode)}
+                            key={mode.value}
+                            className={`view-tab ${viewMode === mode.value ? "active" : ""}`}
+                            onClick={() => setViewMode(mode.value)}
                         >
-                            {mode}
+                            {mode.label}
                         </button>
                     ))}
                 </div>

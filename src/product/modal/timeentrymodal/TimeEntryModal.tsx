@@ -8,6 +8,7 @@ import { Input } from "../../../component/input/Input";
 import { Textarea } from "../../../component/textarea/Textarea";
 import { ResourceSelectModal } from "../resourceselectmodal/ResourceSelectModal";
 import "./TimeEntryModal.css";
+import { useTranslation } from "react-i18next";
 
 /* =========================================================
    型定義
@@ -40,6 +41,8 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     timecategoryOptions,
     timezoneOptions,
 }) => {
+    const { t } = useTranslation();
+
     /* -------------------------------
        🧭 状態管理
     ------------------------------- */
@@ -85,31 +88,33 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     );
 
     const hours = useMemo<SelectOption[]>(
-        () => Array.from({ length: 24 }, (_, i) => ({
-            value: String(i).padStart(2, "0"),
-            label: `${String(i).padStart(2, "0")}時`,
-        })),
-        []
+        () =>
+            Array.from({ length: 24 }, (_, i) => ({
+                value: String(i).padStart(2, "0"),
+                label: `${String(i).padStart(2, "0")}${t("timeEntryModal.hourSuffix")}`,
+            })),
+        [t]
     );
 
     const minutes = useMemo<SelectOption[]>(
-        () => Array.from({ length: 60 }, (_, i) => ({
-            value: String(i).padStart(2, "0"),
-            label: `${String(i).padStart(2, "0")}分`,
-        })),
-        []
+        () =>
+            Array.from({ length: 60 }, (_, i) => ({
+                value: String(i).padStart(2, "0"),
+                label: `${String(i).padStart(2, "0")}${t("timeEntryModal.minuteSuffix")}`,
+            })),
+        [t]
     );
 
     const endUserOptions: SelectOption[] = [
-        { value: "abc", label: "株式会社ABC" },
-        { value: "xyz", label: "株式会社XYZ" },
-        { value: "sample", label: "サンプル商事" },
+        { value: "abc", label: t("timeEntryModal.sampleEndUser1") },
+        { value: "xyz", label: t("timeEntryModal.sampleEndUser2") },
+        { value: "sample", label: t("timeEntryModal.sampleEndUser3") },
     ];
 
     const taskOptions: SelectOption[] = [
-        { value: "doc", label: "資料作成" },
-        { value: "code", label: "プログラミング" },
-        { value: "test", label: "テスト" },
+        { value: "doc", label: t("timeEntryModal.task_list.document") },
+        { value: "code", label: t("timeEntryModal.task_list.coding") },
+        { value: "test", label: t("timeEntryModal.task_list.test") },
     ];
 
     /* -------------------------------
@@ -129,7 +134,6 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
         if (!isOpen) return;
 
         if (selectedEvent) {
-            // 編集モード
             setMode("edit");
             const start = new Date(selectedEvent.start);
             const end = new Date(selectedEvent.end);
@@ -151,7 +155,6 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setTimezone(String(selectedEvent.timezone ?? ""));
             setResource(selectedEvent.resource ?? "");
         } else if (selectedDateTime) {
-            // 新規作成モード
             setMode("create");
             const { start, end } = selectedDateTime;
 
@@ -206,17 +209,26 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             <BaseModal
                 isOpen={isOpen}
                 onClose={onClose}
-                title={mode === "edit" ? "タイムエントリを編集" : "新しいタイムエントリを作成"}
+                title={
+                    mode === "edit"
+                        ? t("timeEntryModal.titleEdit")
+                        : t("timeEntryModal.titleCreate")
+                }
                 description={
                     mode === "edit"
-                        ? "内容を修正して「更新」を押してください。"
-                        : "必要な情報を入力して「作成」を押してください。"
+                        ? t("timeEntryModal.descEdit")
+                        : t("timeEntryModal.descCreate")
                 }
                 footerButtons={[
-                    <Button key="cancel" label="キャンセル" color="secondary" onClick={onClose} />,
+                    <Button
+                        key="cancel"
+                        label={t("timeEntryModal.cancel")}
+                        color="secondary"
+                        onClick={onClose}
+                    />,
                     <Button
                         key="save"
-                        label={mode === "edit" ? "更新" : "作成"}
+                        label={mode === "edit" ? t("timeEntryModal.update") : t("timeEntryModal.create")}
                         color="primary"
                         onClick={handleSave}
                         className="timeentry-create-button"
@@ -225,19 +237,17 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                 size="large"
             >
                 <div className="timeentry-modal-body">
-                    {/* ================= 左列 ================= */}
-
-                    <label className="modal-label">WO番号</label>
+                    <label className="modal-label">{t("timeEntryModal.woNumber")}</label>
                     <Select
                         options={filteredWoOptions}
                         value={wo}
                         onChange={setWo}
-                        placeholder="WOを選択"
+                        placeholder={t("timeEntryModal.selectWO")}
                     />
 
                     <div className="modal-grid">
                         <div>
-                            <label className="modal-label">スケジュール開始日</label>
+                            <label className="modal-label">{t("timeEntryModal.startDate")}</label>
                             <div className="datetime-row">
                                 <Input
                                     ref={startDateRef}
@@ -256,7 +266,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                 <Select options={minutes} value={startMinute} onChange={setStartMinute} />
                             </div>
 
-                            <label className="modal-label">スケジュール終了日</label>
+                            <label className="modal-label">{t("timeEntryModal.endDate")}</label>
                             <div className="datetime-row">
                                 <Input
                                     ref={endDateRef}
@@ -278,7 +288,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             <label className="modal-label">EndUser</label>
                             <Select options={endUserOptions} value={endUser} onChange={setEndUser} />
 
-                            <label className="modal-label">Location</label>
+                            <label className="modal-label">{t("timeEntryModal.location")}</label>
                             <Select
                                 options={timezoneOptions}
                                 value={timezone}
@@ -286,14 +296,14 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             />
 
                             <div className="resource-header">
-                                <label className="modal-label">リソース</label>
+                                <label className="modal-label">{t("timeEntryModal.resource")}</label>
                                 <a href="#" className="resource-link" onClick={openResourceModal}>
-                                    リソース選択
+                                    {t("timeEntryModal.selectResource")}
                                 </a>
                             </div>
 
                             <Textarea
-                                placeholder="リソースがここに表示されます"
+                                placeholder={t("timeEntryModal.resourcePlaceholder")}
                                 value={resource}
                                 onChange={setResource}
                                 rows={4}
@@ -301,28 +311,39 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             />
                         </div>
 
-                        {/* ================= 右列 ================= */}
                         <div>
-                            <label className="modal-label">タイムカテゴリ</label>
-                            <Select options={timecategoryOptions} value={timeCategory} onChange={setTimeCategory} />
+                            <label className="modal-label">{t("timeEntryModal.timeCategory")}</label>
+                            <Select
+                                options={timecategoryOptions}
+                                value={timeCategory}
+                                onChange={setTimeCategory}
+                            />
 
-                            <label className="modal-label">カテゴリ</label>
-                            <Select options={maincategoryOptions} value={mainCategory} onChange={setMainCategory} />
+                            <label className="modal-label">{t("timeEntryModal.mainCategory")}</label>
+                            <Select
+                                options={maincategoryOptions}
+                                value={mainCategory}
+                                onChange={setMainCategory}
+                            />
 
-                            <label className="modal-label">ペイメントタイプ</label>
-                            <Select options={paymenttypeOptions} value={paymentType} onChange={setPaymentType} />
+                            <label className="modal-label">{t("timeEntryModal.paymentType")}</label>
+                            <Select
+                                options={paymenttypeOptions}
+                                value={paymentType}
+                                onChange={setPaymentType}
+                            />
 
-                            <label className="modal-label">サブカテゴリ</label>
-                            <Input value="自動設定" disabled />
+                            <label className="modal-label">{t("timeEntryModal.subCategory")}</label>
+                            <Input value={t("timeEntryModal.auto")} disabled />
 
-                            <label className="modal-label">タスク</label>
+                            <label className="modal-label">{t("timeEntryModal.task")}</label>
                             <Select options={taskOptions} value={task} onChange={setTask} />
 
                             <Textarea
-                                label="コメント"
+                                label={t("timeEntryModal.comment")}
                                 value={comment}
                                 onChange={setComment}
-                                placeholder="コメントを入力"
+                                placeholder={t("timeEntryModal.commentPlaceholder")}
                                 rows={4}
                                 showCount
                                 maxLength={2000}
@@ -332,7 +353,6 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                 </div>
             </BaseModal>
 
-            {/* リソース選択モーダル */}
             <ResourceSelectModal
                 isOpen={isResourceModalOpen}
                 onClose={closeResourceModal}

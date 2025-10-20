@@ -1,6 +1,7 @@
 import "./Footer.css";
 import * as FaIcons from "react-icons/fa";
 import { Button } from "../../component/button/Button";
+import { useTranslation } from "react-i18next";
 
 /** Footer コンポーネントの Props 型 */
 export type FooterProps = {
@@ -20,21 +21,23 @@ export const Footer: React.FC<FooterProps> = ({
     onOpenUserList,
     onOpenFavoriteTask,
 }) => {
+    const { t } = useTranslation();
+
     return (
         <footer className="content-bottom">
             {/* =============================
-                左側：設定関連ボタン
-            ============================= */}
+          左側：設定関連ボタン
+      ============================= */}
             <div className="content-bottom-left">
                 <Button
-                    label="ユーザー 一覧設定"
+                    label={t("footer.userListSetting")}
                     color="secondary"
                     icon={<FaIcons.FaUser />}
                     onClick={onOpenUserList}
                     className="footer-button"
                 />
                 <Button
-                    label="お気に入り間接タスク設定"
+                    label={t("footer.favoriteTaskSetting")}
                     color="secondary"
                     icon={<FaIcons.FaStar />}
                     onClick={onOpenFavoriteTask}
@@ -43,12 +46,12 @@ export const Footer: React.FC<FooterProps> = ({
             </div>
 
             {/* =============================
-                右側：その他メニューボタン
-            ============================= */}
+          右側：その他メニューボタン
+      ============================= */}
             <div className="content-bottom-right">
                 <button
                     className="menu-button"
-                    title="その他"
+                    title={t("footer.more")}
                     onClick={() => console.log("メニューを開く処理（未実装）")}
                 >
                     <FaIcons.FaEllipsisV />

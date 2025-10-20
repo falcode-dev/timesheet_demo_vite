@@ -8,6 +8,7 @@ import { useResources } from "../../../hooks/useResources";
 import { useAllowedUsers } from "../../../context/UserListContext";
 import type { Resource } from "../../../hooks/useResources";
 import "./ResourceSelectModal.css";
+import { useTranslation } from "react-i18next";
 
 interface ResourceSelectModalProps {
     isOpen: boolean;
@@ -23,6 +24,8 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
     onClose,
     onSave,
 }) => {
+    const { t } = useTranslation();
+
     /* =========================================================
        ▼ Dataverse ログインユーザー情報
     ========================================================= */
@@ -30,17 +33,17 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
 
     const displaySelf = useMemo(() => {
         if (isUserLoading) {
-            return { number: "取得中...", fullName: "ユーザー情報を取得中..." };
+            return { number: t("resource.loadingId"), fullName: t("resource.loadingName") };
         }
         if (!currentUser) {
-            return { number: "社員番号未取得", fullName: "ユーザー情報未取得" };
+            return { number: t("resource.noEmployeeId"), fullName: t("resource.noUserInfo") };
         }
 
-        const number = currentUser.employeeid ?? "社員番号未登録";
+        const number = currentUser.employeeid ?? t("resource.unregisteredId");
         const fullName = `${currentUser.lastName ?? ""} ${currentUser.firstName ?? ""}`.trim();
 
         return { number, fullName };
-    }, [currentUser, isUserLoading]);
+    }, [currentUser, isUserLoading, t]);
 
     /* =========================================================
        ▼ Dataverse リソース一覧
@@ -59,7 +62,7 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
     ========================================================= */
     const [searchType, setSearchType] = useState<"name" | "number">("name");
     const [keyword, setKeyword] = useState("");
-    const [selectedUsers, setSelectedUsers] = useState<string[]>(["self"]); // ✅ 自分を初期ON
+    const [selectedUsers, setSelectedUsers] = useState<string[]>(["self"]);
     const [sortByNumberAsc, setSortByNumberAsc] = useState(true);
     const [sortByNameAsc, setSortByNameAsc] = useState(true);
 
@@ -72,7 +75,6 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
                 ? visibleResources.filter((u) => (u.name ?? "").includes(keyword))
                 : visibleResources.filter((u) => (u.number ?? "").includes(keyword));
 
-        // ソート順を安定化
         return [...filtered]
             .sort((a, b) =>
                 sortByNumberAsc
@@ -92,7 +94,7 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
     const displayUsers: Resource[] = [
         {
             id: "self",
-            number: `${displaySelf.number}(自分)`,
+            number: `${displaySelf.number}${t("resource.selfTag")}`,
             name: displaySelf.fullName,
         },
         ...filteredUsers,
@@ -118,14 +120,14 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
             .filter((u) => selectedUsers.includes(u.id))
             .map((u) => ({
                 id: u.id,
-                label: `${u.number ?? "社員番号不明"} ${u.name ?? "名称未設定"}`,
+                label: `${u.number ?? t("resource.unknownId")} ${u.name ?? t("resource.noName")}`,
             }));
 
         console.log("✅ 選択されたリソース:", selectedResources);
 
         onSave?.(selectedResources);
         onClose();
-    }, [displayUsers, selectedUsers, onSave, onClose]);
+    }, [displayUsers, selectedUsers, onSave, onClose, t]);
 
     /* =========================================================
        ▼ JSX
@@ -136,15 +138,10 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
             onClose={onClose}
             size="medium"
             footerButtons={[
-                <Button
-                    key="cancel"
-                    label="キャンセル"
-                    color="secondary"
-                    onClick={onClose}
-                />,
+                <Button key="cancel" label={t("resource.cancel")} color="secondary" onClick={onClose} />,
                 <Button
                     key="save"
-                    label="保存"
+                    label={t("resource.save")}
                     color="primary"
                     onClick={handleSave}
                     className="resource-modal-button"
@@ -153,8 +150,8 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
         >
             <div className="resource-modal-body">
                 {/* -------------------------------
-                    検索条件
-                ------------------------------- */}
+            検索条件
+        ------------------------------- */}
                 <div className="resource-radios">
                     <input
                         id="radio-name"
@@ -164,7 +161,7 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
                         checked={searchType === "name"}
                         onChange={() => setSearchType("name")}
                     />
-                    <label htmlFor="radio-name">ユーザー名</label>
+                    <label htmlFor="radio-name">{t("resource.userName")}</label>
 
                     <input
                         id="radio-number"
@@ -174,14 +171,14 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
                         checked={searchType === "number"}
                         onChange={() => setSearchType("number")}
                     />
-                    <label htmlFor="radio-number">社員番号</label>
+                    <label htmlFor="radio-number">{t("resource.employeeId")}</label>
                 </div>
 
                 <Input
                     placeholder={
                         searchType === "name"
-                            ? "ユーザー名を入力"
-                            : "社員番号を入力"
+                            ? t("resource.enterUserName")
+                            : t("resource.enterEmployeeId")
                     }
                     className="resource-input"
                     value={keyword}
@@ -189,8 +186,8 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
                 />
 
                 {/* -------------------------------
-                    ソート
-                ------------------------------- */}
+            ソート
+        ------------------------------- */}
                 <div className="resource-sort-row">
                     <button
                         className="resource-sort-btn"
@@ -201,7 +198,7 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
                         ) : (
                             <FaIcons.FaSortAmountDown className="resource-sort-icon" />
                         )}
-                        社員番号
+                        {t("resource.sortByNumber")}
                     </button>
 
                     <button
@@ -213,13 +210,13 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
                         ) : (
                             <FaIcons.FaSortAlphaDown className="resource-sort-icon" />
                         )}
-                        ユーザー名
+                        {t("resource.sortByName")}
                     </button>
                 </div>
 
                 {/* -------------------------------
-                    リスト表示
-                ------------------------------- */}
+            リスト表示
+        ------------------------------- */}
                 <div className="resource-list">
                     {displayUsers.map((u) => (
                         <label key={u.id} className="resource-item clickable">
@@ -231,10 +228,10 @@ export const ResourceSelectModal: React.FC<ResourceSelectModalProps> = ({
                             />
                             <div className="resource-text">
                                 <span className="resource-number">
-                                    {u.number ?? "社員番号不明"}
+                                    {u.number ?? t("resource.unknownId")}
                                 </span>
                                 <span className="resource-name">
-                                    {u.name ?? "名称未設定"}
+                                    {u.name ?? t("resource.noName")}
                                 </span>
                             </div>
                         </label>

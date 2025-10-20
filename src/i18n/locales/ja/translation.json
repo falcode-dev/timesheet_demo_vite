@@ -1,0 +1,184 @@
+{
+    "header": {
+        "title": "Time Sheet",
+        "userList": "ユーザー一覧",
+        "favoriteTasks": "お気に入りタスク",
+        "targetWO": "対象WO",
+        "selectWO": "対象WOを選択",
+        "upload": "アップロード",
+        "all": "すべて",
+        "noName": "(名称未設定)"
+    },
+    "calendar": {
+        "today": "今日",
+        "next": "次へ",
+        "prev": "前へ"
+    },
+    "modal": {
+        "newEntry": "新規登録",
+        "editEntry": "編集",
+        "save": "保存",
+        "cancel": "キャンセル"
+    },
+    "contentHeader": {
+        "userTab": "ユーザー",
+        "indirectTab": "間接タスク",
+        "createNew": "新しいタイムエントリを作成",
+        "viewMode": {
+            "day": "1日",
+            "threeDays": "3日",
+            "week": "週"
+        }
+    },
+    "sidebar": {
+        "searchTitle": "検索",
+        "searchByName": "ユーザー名",
+        "searchByNumber": "社員番号",
+        "placeholderName": "ユーザー名を入力",
+        "placeholderNumber": "社員番号を入力",
+        "self": "自分",
+        "userSortLabel": "ユーザー名",
+        "taskSortLabel": "カテゴリ・タスク",
+        "loadingNumber": "取得中...",
+        "loadingUser": "ユーザー情報を取得中...",
+        "noEmpId": "社員番号未登録",
+        "noUserInfo": "ユーザー情報未取得",
+        "unknownNumber": "不明",
+        "unknownName": "名称未設定",
+        "sort": {
+            "empAsc": "社員番号昇順",
+            "empDesc": "社員番号降順",
+            "nameAsc": "ユーザー名昇順",
+            "nameDesc": "ユーザー名降順",
+            "categoryAsc": "サブカテゴリ昇順",
+            "categoryDesc": "サブカテゴリ降順",
+            "taskAsc": "タスク昇順",
+            "taskDesc": "タスク降順"
+        },
+        "tasks": {
+            "meeting": "会議",
+            "meetingDetail": "定例ミーティング",
+            "education": "教育",
+            "educationDetail": "新入社員研修資料作成",
+            "docs": "資料作成",
+            "docsDetail": "週次報告書作成",
+            "other": "その他",
+            "otherDetail": "社内イベント準備"
+        }
+    },
+    "footer": {
+        "userListSetting": "ユーザー 一覧設定",
+        "favoriteTaskSetting": "お気に入り間接タスク設定",
+        "more": "その他"
+    },
+    "calendarView": {
+        "threeDays": "3日",
+        "week": "週",
+        "day": "1日"
+    },
+    "timeEntryModal": {
+        "titleCreate": "新しいタイムエントリを作成",
+        "titleEdit": "タイムエントリを編集",
+        "descCreate": "必要な情報を入力して「作成」を押してください。",
+        "descEdit": "内容を修正して「更新」を押してください。",
+        "create": "作成",
+        "update": "更新",
+        "cancel": "キャンセル",
+        "woNumber": "WO番号",
+        "selectWO": "WOを選択",
+        "startDate": "スケジュール開始日",
+        "endDate": "スケジュール終了日",
+        "hourSuffix": "時",
+        "minuteSuffix": "分",
+        "location": "ロケーション",
+        "resource": "リソース",
+        "selectResource": "リソース選択",
+        "resourcePlaceholder": "リソースがここに表示されます",
+        "timeCategory": "タイムカテゴリ",
+        "mainCategory": "カテゴリ",
+        "paymentType": "ペイメントタイプ",
+        "subCategory": "サブカテゴリ",
+        "auto": "自動設定",
+        "task": "タスク",
+        "comment": "コメント",
+        "commentPlaceholder": "コメントを入力",
+        "sampleEndUser1": "株式会社ABC",
+        "sampleEndUser2": "株式会社XYZ",
+        "sampleEndUser3": "サンプル商事",
+        "task_list": {
+            "document": "資料作成",
+            "coding": "プログラミング",
+            "test": "テスト"
+        }
+    },
+    "favoriteTask": {
+        "title": "お気に入り間接タスク設定",
+        "description": "間接タスクの絞り込み情報を設定して検索を押してください。",
+        "cancel": "キャンセル",
+        "save": "保存",
+        "subCategory": "サブカテゴリ",
+        "selectSubCategory": "サブカテゴリを選択",
+        "clear": "クリア",
+        "taskName": "タスク名",
+        "enterTaskName": "タスク名を入力",
+        "search": "検索",
+        "instructions": "検索結果の項目を選択して追加し保存を押してください。",
+        "searchResults": "検索結果",
+        "favoriteList": "お気に入り間接タスク項目",
+        "moveRight": "選択項目を右へ移動",
+        "items": "件",
+        "categories": {
+            "improvement": "業務改善",
+            "quality": "品質向上",
+            "education": "教育・育成"
+        },
+        "tasks": {
+            "document": "資料整理",
+            "meeting": "会議準備",
+            "testPlan": "テスト計画",
+            "review": "レビュー対応",
+            "weekly": "定例会参加"
+        }
+    },
+    "userList": {
+        "title": "ユーザー一覧設定",
+        "description": "追加したいユーザーを検索してください。",
+        "cancel": "キャンセル",
+        "save": "保存",
+        "employeeId": "社員番号",
+        "enterEmployeeId": "社員番号を入力",
+        "userName": "ユーザー名",
+        "enterUserName": "ユーザー名を入力",
+        "clear": "クリア",
+        "search": "検索",
+        "instructions": "社員番号またはユーザー名を入力し、検索してください。",
+        "loading": "リソースを読み込み中...",
+        "searchResults": "検索結果",
+        "selectedUsers": "設定済ユーザー",
+        "items": "件",
+        "moveRight": "選択したユーザーを右へ移動",
+        "noSearchResults": "検索条件を入力して検索してください。",
+        "noSelected": "まだユーザーが追加されていません。",
+        "noName": "(名前なし)"
+    },
+    "resource": {
+        "title": "リソース選択",
+        "description": "ユーザーを検索して選択してください。",
+        "cancel": "キャンセル",
+        "save": "保存",
+        "userName": "ユーザー名",
+        "employeeId": "社員番号",
+        "enterUserName": "ユーザー名を入力",
+        "enterEmployeeId": "社員番号を入力",
+        "sortByNumber": "社員番号",
+        "sortByName": "ユーザー名",
+        "unknownId": "社員番号不明",
+        "noName": "名称未設定",
+        "loadingId": "取得中...",
+        "loadingName": "ユーザー情報を取得中...",
+        "noEmployeeId": "社員番号未取得",
+        "noUserInfo": "ユーザー情報未取得",
+        "unregisteredId": "社員番号未登録",
+        "selfTag": "(自分)"
+    }
+}

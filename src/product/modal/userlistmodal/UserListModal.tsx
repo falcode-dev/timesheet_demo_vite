@@ -9,6 +9,7 @@ import { useResources } from "../../../hooks/useResources";
 import { useAllowedUsers } from "../../../context/UserListContext";
 import type { Resource } from "../../../hooks/useResources";
 import "./UserListModal.css";
+import { useTranslation } from "react-i18next";
 
 /* =========================================================
    型定義
@@ -27,6 +28,8 @@ export const UserListModal: React.FC<UserListModalProps> = ({
     onClose,
     onSave,
 }) => {
+    const { t } = useTranslation();
+
     /* ---------------------------
        Dataverseから取得
     --------------------------- */
@@ -38,13 +41,10 @@ export const UserListModal: React.FC<UserListModalProps> = ({
     --------------------------- */
     const [employeeId, setEmployeeId] = useState("");
     const [userName, setUserName] = useState("");
-
     const [searchResults, setSearchResults] = useState<Resource[]>([]);
     const [selectedUsers, setSelectedUsers] = useState<Resource[]>([]);
-
     const [checkedResults, setCheckedResults] = useState<string[]>([]);
     const [checkedSelected, setCheckedSelected] = useState<string[]>([]);
-
     const [isLeftHeaderChecked, setIsLeftHeaderChecked] = useState(false);
     const [isRightHeaderChecked, setIsRightHeaderChecked] = useState(false);
 
@@ -124,9 +124,7 @@ export const UserListModal: React.FC<UserListModalProps> = ({
     }, [searchResults, checkedResults, selectedUsers, checkedSelected]);
 
     const removeCheckedSelected = useCallback(() => {
-        setSelectedUsers((prev) =>
-            prev.filter((r) => !checkedSelected.includes(r.id))
-        );
+        setSelectedUsers((prev) => prev.filter((r) => !checkedSelected.includes(r.id)));
         setCheckedSelected([]);
     }, [checkedSelected]);
 
@@ -152,19 +150,19 @@ export const UserListModal: React.FC<UserListModalProps> = ({
         <BaseModal
             isOpen={isOpen}
             onClose={onClose}
-            title="ユーザー一覧設定"
-            description="追加したいユーザーを検索してください。"
+            title={t("userList.title")}
+            description={t("userList.description")}
             size="large"
             footerButtons={[
                 <Button
                     key="cancel"
-                    label="キャンセル"
+                    label={t("userList.cancel")}
                     color="secondary"
                     onClick={onClose}
                 />,
                 <Button
                     key="save"
-                    label="保存"
+                    label={t("userList.save")}
                     color="primary"
                     onClick={handleSave}
                     className="userlist-create-button"
@@ -175,17 +173,17 @@ export const UserListModal: React.FC<UserListModalProps> = ({
                 {/* 検索フォーム */}
                 <div className="modal-grid">
                     <div className="grid-left">
-                        <label className="modal-label">社員番号</label>
+                        <label className="modal-label">{t("userList.employeeId")}</label>
                         <Input
                             value={employeeId}
                             onChange={setEmployeeId}
-                            placeholder="社員番号を入力"
+                            placeholder={t("userList.enterEmployeeId")}
                             width="100%"
                             type="text"
                         />
                         <div className="right-align">
                             <Button
-                                label="クリア"
+                                label={t("userList.clear")}
                                 color="secondary"
                                 onClick={() => setEmployeeId("")}
                             />
@@ -193,35 +191,33 @@ export const UserListModal: React.FC<UserListModalProps> = ({
                     </div>
 
                     <div className="grid-right">
-                        <label className="modal-label">ユーザー名</label>
+                        <label className="modal-label">{t("userList.userName")}</label>
                         <Input
                             value={userName}
                             onChange={setUserName}
-                            placeholder="ユーザー名を入力"
+                            placeholder={t("userList.enterUserName")}
                             width="100%"
                             type="text"
                         />
                         <div className="left-align">
-                            <Button label="検索" color="primary" onClick={handleSearch} />
+                            <Button label={t("userList.search")} color="primary" onClick={handleSearch} />
                         </div>
                     </div>
                 </div>
 
                 <hr className="divider" />
 
-                <p className="list-description">
-                    社員番号またはユーザー名を入力し、検索してください。
-                </p>
+                <p className="list-description">{t("userList.instructions")}</p>
 
                 {isLoading ? (
-                    <p>リソースを読み込み中...</p>
+                    <p>{t("userList.loading")}</p>
                 ) : (
                     <div className="task-grid">
                         {/* 左：検索結果 */}
                         <div className="task-list">
                             <div className="list-header">
-                                <span className="modal-label">検索結果</span>
-                                <span className="count">{searchResults.length}件</span>
+                                <span className="modal-label">{t("userList.searchResults")}</span>
+                                <span className="count">{searchResults.length}{t("userList.items")}</span>
                             </div>
 
                             <div className="list-subheader">
@@ -233,25 +229,20 @@ export const UserListModal: React.FC<UserListModalProps> = ({
                                         className="subheader-checkbox"
                                     />
                                     <FaIcons.FaChevronDown className="task-icon" />
-                                    <span className="label-text">ユーザー名</span>
+                                    <span className="label-text">{t("userList.userName")}</span>
                                 </div>
                             </div>
 
                             <div className="list-box">
                                 {searchResults.length === 0 ? (
-                                    <p className="no-results">
-                                        検索条件を入力して検索してください。
-                                    </p>
+                                    <p className="no-results">{t("userList.noSearchResults")}</p>
                                 ) : (
                                     searchResults.map((r) => {
-                                        const isSelected = selectedUsers.some(
-                                            (u) => u.id === r.id
-                                        );
+                                        const isSelected = selectedUsers.some((u) => u.id === r.id);
                                         return (
                                             <label
                                                 key={r.id}
-                                                className={`list-item-2line ${isSelected ? "disabled-item" : ""
-                                                    }`}
+                                                className={`list-item-2line ${isSelected ? "disabled-item" : ""}`}
                                             >
                                                 <input
                                                     type="checkbox"
@@ -260,12 +251,8 @@ export const UserListModal: React.FC<UserListModalProps> = ({
                                                     onChange={() => toggleCheck(r.id)}
                                                 />
                                                 <div className="list-text">
-                                                    <div className="category-name">
-                                                        {r.number ?? "-"}
-                                                    </div>
-                                                    <div className="task-name">
-                                                        {r.name ?? "(名前なし)"}
-                                                    </div>
+                                                    <div className="category-name">{r.number ?? "-"}</div>
+                                                    <div className="task-name">{r.name ?? t("userList.noName")}</div>
                                                 </div>
                                             </label>
                                         );
@@ -279,7 +266,7 @@ export const UserListModal: React.FC<UserListModalProps> = ({
                             <button
                                 onClick={moveToSelected}
                                 className="move-button"
-                                title="選択したユーザーを右へ移動"
+                                title={t("userList.moveRight")}
                             >
                                 <IoIosArrowForward />
                             </button>
@@ -288,8 +275,8 @@ export const UserListModal: React.FC<UserListModalProps> = ({
                         {/* 右：設定済ユーザー */}
                         <div className="task-list">
                             <div className="list-header">
-                                <span className="modal-label">設定済ユーザー</span>
-                                <span className="count">{selectedUsers.length}件</span>
+                                <span className="modal-label">{t("userList.selectedUsers")}</span>
+                                <span className="count">{selectedUsers.length}{t("userList.items")}</span>
                             </div>
 
                             <div className="list-subheader">
@@ -301,7 +288,7 @@ export const UserListModal: React.FC<UserListModalProps> = ({
                                         className="subheader-checkbox"
                                     />
                                     <FaIcons.FaChevronDown className="task-icon" />
-                                    <span className="label-text">ユーザー名</span>
+                                    <span className="label-text">{t("userList.userName")}</span>
                                 </div>
                                 {selectedUsers.length > 0 && (
                                     <Button
@@ -315,9 +302,7 @@ export const UserListModal: React.FC<UserListModalProps> = ({
 
                             <div className="list-box">
                                 {selectedUsers.length === 0 ? (
-                                    <p className="no-results">
-                                        まだユーザーが追加されていません。
-                                    </p>
+                                    <p className="no-results">{t("userList.noSelected")}</p>
                                 ) : (
                                     selectedUsers.map((r) => (
                                         <div key={r.id} className="list-item-favorite">
@@ -328,10 +313,8 @@ export const UserListModal: React.FC<UserListModalProps> = ({
                                                     onChange={() => toggleSelectedCheck(r.id)}
                                                 />
                                                 <div className="list-text">
-                                                    <div className="category-name">
-                                                        {r.number ?? "-"}
-                                                    </div>
-                                                    <div className="task-name">{r.name ?? "(名前なし)"}</div>
+                                                    <div className="category-name">{r.number ?? "-"}</div>
+                                                    <div className="task-name">{r.name ?? t("userList.noName")}</div>
                                                 </div>
                                             </div>
                                             <div className="list-item-favorite-right">

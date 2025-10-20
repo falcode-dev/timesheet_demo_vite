@@ -6,9 +6,10 @@ import { Button } from "../../../component/button/Button";
 import { Select } from "../../../component/select/Select";
 import { Input } from "../../../component/input/Input";
 import "./FavoriteTaskModal.css";
+import { useTranslation } from "react-i18next";
 
 /* ======================================================
-   BaseModalProps（types/Modal.ts から分離してここで定義）
+   BaseModalProps
 ====================================================== */
 export interface BaseModalProps {
     isOpen: boolean;
@@ -36,6 +37,8 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
     onClose,
     onSave,
 }) => {
+    const { t } = useTranslation();
+
     /* ======================================================
        ▼ ステート管理
     ======================================================= */
@@ -49,17 +52,27 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
     const [isRightHeaderChecked, setIsRightHeaderChecked] = useState(false);
 
     /* ======================================================
-       ▼ ダミーデータ（後でDataverse化可能）
+       ▼ ダミーデータ（Dataverse移行予定）
     ======================================================= */
-    const categories = ["業務改善", "品質向上", "教育・育成"];
-    const tasks = ["資料整理", "会議準備", "テスト計画", "レビュー対応", "定例会参加"];
+    const categories = [
+        t("favoriteTask.categories.improvement"),
+        t("favoriteTask.categories.quality"),
+        t("favoriteTask.categories.education"),
+    ];
+    const tasks = [
+        t("favoriteTask.tasks.document"),
+        t("favoriteTask.tasks.meeting"),
+        t("favoriteTask.tasks.testPlan"),
+        t("favoriteTask.tasks.review"),
+        t("favoriteTask.tasks.weekly"),
+    ];
 
     /* ======================================================
        ▼ 初期化
     ======================================================= */
     useEffect(() => {
         setSearchResults(tasks);
-    }, []);
+    }, [t]);
 
     /* ======================================================
        ▼ 個別チェック操作
@@ -138,14 +151,19 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
         <BaseModal
             isOpen={isOpen}
             onClose={onClose}
-            title="お気に入り間接タスク設定"
-            description="間接タスクの絞り込み情報を設定して検索を押してください。"
+            title={t("favoriteTask.title")}
+            description={t("favoriteTask.description")}
             size="large"
             footerButtons={[
-                <Button key="cancel" label="キャンセル" color="secondary" onClick={onClose} />,
+                <Button
+                    key="cancel"
+                    label={t("favoriteTask.cancel")}
+                    color="secondary"
+                    onClick={onClose}
+                />,
                 <Button
                     key="save"
-                    label="保存"
+                    label={t("favoriteTask.save")}
                     color="primary"
                     onClick={() => onSave(favoriteTasks)}
                     className="favotitetask-create-button"
@@ -154,59 +172,55 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
         >
             <div className="modal-body">
                 {/* -------------------------------
-                    上部フィルタ
-                ------------------------------- */}
+            上部フィルタ
+        ------------------------------- */}
                 <div className="modal-grid">
-                    {/* サブカテゴリ：Select */}
                     <div className="grid-left">
-                        <label className="modal-label">サブカテゴリ</label>
+                        <label className="modal-label">{t("favoriteTask.subCategory")}</label>
                         <Select
                             options={categories.map((c) => ({ value: c, label: c }))}
                             value={selectedCategory}
                             onChange={setSelectedCategory}
-                            placeholder="サブカテゴリを選択"
+                            placeholder={t("favoriteTask.selectSubCategory")}
                             className="favorite-task-select"
                         />
                         <div className="right-align">
                             <Button
-                                label="クリア"
+                                label={t("favoriteTask.clear")}
                                 color="secondary"
                                 onClick={() => setSelectedCategory("")}
                             />
                         </div>
                     </div>
 
-                    {/* タスク名：Input */}
                     <div className="grid-right">
-                        <label className="modal-label">タスク名</label>
+                        <label className="modal-label">{t("favoriteTask.taskName")}</label>
                         <Input
                             value={taskName}
                             onChange={setTaskName}
-                            placeholder="タスク名を入力"
+                            placeholder={t("favoriteTask.enterTaskName")}
                             width="100%"
                             type="text"
                         />
                         <div className="left-align">
-                            <Button label="検索" color="primary" onClick={handleSearch} />
+                            <Button label={t("favoriteTask.search")} color="primary" onClick={handleSearch} />
                         </div>
                     </div>
                 </div>
 
                 <hr className="divider" />
 
-                <p className="list-description">
-                    検索結果の項目を選択して追加し保存を押してください。
-                </p>
+                <p className="list-description">{t("favoriteTask.instructions")}</p>
 
                 {/* -------------------------------
-                    タスクリスト
-                ------------------------------- */}
+            タスクリスト
+        ------------------------------- */}
                 <div className="task-grid">
                     {/* ---------- 左：検索結果 ---------- */}
                     <div className="task-list">
                         <div className="list-header">
-                            <span className="modal-label">検索結果</span>
-                            <span className="count">{searchResults.length}件</span>
+                            <span className="modal-label">{t("favoriteTask.searchResults")}</span>
+                            <span className="count">{searchResults.length}{t("favoriteTask.items")}</span>
                         </div>
 
                         <div className="list-subheader">
@@ -218,7 +232,7 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
                                     className="subheader-checkbox"
                                 />
                                 <FaIcons.FaChevronDown className="task-icon" />
-                                <span className="label-text">サブカテゴリ</span>
+                                <span className="label-text">{t("favoriteTask.subCategory")}</span>
                                 <FaIcons.FaTasks className="task-icon" />
                             </div>
                         </div>
@@ -239,7 +253,7 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
                                         />
                                         <div className="list-text">
                                             <div className="category-name">
-                                                {selectedCategory || "業務改善"}
+                                                {selectedCategory || t("favoriteTask.categories.improvement")}
                                             </div>
                                             <div className="task-name">{task}</div>
                                         </div>
@@ -254,7 +268,7 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
                         <button
                             onClick={moveToFavorite}
                             className="move-button"
-                            title="選択項目を右へ移動"
+                            title={t("favoriteTask.moveRight")}
                         >
                             <IoIosArrowForward />
                         </button>
@@ -263,8 +277,8 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
                     {/* ---------- 右：お気に入り ---------- */}
                     <div className="task-list">
                         <div className="list-header">
-                            <span className="modal-label">お気に入り間接タスク項目</span>
-                            <span className="count">{favoriteTasks.length}件</span>
+                            <span className="modal-label">{t("favoriteTask.favoriteList")}</span>
+                            <span className="count">{favoriteTasks.length}{t("favoriteTask.items")}</span>
                         </div>
 
                         <div className="list-subheader">
@@ -276,7 +290,7 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
                                     className="subheader-checkbox"
                                 />
                                 <FaIcons.FaChevronDown className="task-icon" />
-                                <span className="label-text">サブカテゴリ</span>
+                                <span className="label-text">{t("favoriteTask.subCategory")}</span>
                                 <FaIcons.FaTasks className="task-icon" />
                             </div>
                             {favoriteTasks.length > 0 && (
@@ -300,7 +314,7 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
                                         />
                                         <div className="list-text">
                                             <div className="category-name">
-                                                {selectedCategory || "業務改善"}
+                                                {selectedCategory || t("favoriteTask.categories.improvement")}
                                             </div>
                                             <div className="task-name">{task}</div>
                                         </div>

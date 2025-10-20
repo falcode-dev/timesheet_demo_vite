@@ -1,26 +1,23 @@
 import React, { useRef, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
-import type { EventInput, DateSelectArg, EventClickArg } from "@fullcalendar/core"; // ← 修正ポイント
+import type { EventInput, DateSelectArg, EventClickArg } from "@fullcalendar/core";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import jaLocale from "@fullcalendar/core/locales/ja";
+import enLocale from "@fullcalendar/core/locales/en-gb";
 import "./CalendarView.css";
+import { useTranslation } from "react-i18next";
 
 /** カレンダービューモード */
 export type CalendarViewMode = "1日" | "3日" | "週";
 
 /** CalendarView コンポーネントの Props */
 export type CalendarViewProps = {
-    /** 表示モード（1日 / 3日 / 週） */
     viewMode: CalendarViewMode;
-    /** 現在の表示基準日 */
     currentDate: Date;
-    /** 日付変更時（週送りなど） */
     onDateChange?: (newDate: Date) => void;
-    /** 日付選択時（ドラッグまたはクリック） */
     onDateClick?: (range: { start: Date; end: Date }) => void;
-    /** イベントクリック時 */
     onEventClick?: (eventData: {
         id: string;
         title: string;
@@ -28,14 +25,13 @@ export type CalendarViewProps = {
         end: Date;
         extendedProps?: Record<string, any>;
     }) => void;
-    /** イベント配列 */
     events: EventInput[];
 };
 
 /**
  * FullCalendar ラッパーコンポーネント
- * - Dataverse 連携を前提とした表示制御
- * - 週／3日／1日の切替対応
+ * - Dataverse の個人言語設定に応じた多言語対応
+ * - 週／3日／1日の切替
  * - イベントクリック／日付選択ハンドリング
  */
 export const CalendarView: React.FC<CalendarViewProps> = ({
@@ -47,6 +43,10 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
     events,
 }) => {
     const calendarRef = useRef<FullCalendar>(null);
+    const { i18n } = useTranslation();
+
+    /** 言語に応じた FullCalendar locale の選択 */
+    const currentLocale = i18n.language.startsWith("ja") ? jaLocale : enLocale;
 
     /** currentDate が変化した際にカレンダー表示を同期 */
     useEffect(() => {
@@ -118,14 +118,15 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 nowIndicator
                 slotMinTime="00:00:00"
                 slotMaxTime="24:00:00"
-                locale={jaLocale}
+                locale={currentLocale}
                 firstDay={1}
                 initialDate={currentDate}
                 views={{
                     timeGridThreeDay: {
                         type: "timeGrid",
                         duration: { days: 3 },
-                        buttonText: "3日",
+                        // ✅ i18n連動：FullCalendar内部ボタンも翻訳
+                        buttonText: i18n.language.startsWith("ja") ? "3日" : "3 Days",
                     },
                 }}
                 eventClassNames={(arg) =>

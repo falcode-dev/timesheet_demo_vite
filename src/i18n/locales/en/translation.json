@@ -1,0 +1,184 @@
+{
+    "header": {
+        "title": "Time Sheet",
+        "userList": "User List",
+        "favoriteTasks": "Favorite Tasks",
+        "targetWO": "Target WO",
+        "selectWO": "Select Work Order",
+        "upload": "Upload",
+        "all": "All",
+        "noName": "(No Name)"
+    },
+    "calendar": {
+        "today": "Today",
+        "next": "Next",
+        "prev": "Prev"
+    },
+    "modal": {
+        "newEntry": "New Entry",
+        "editEntry": "Edit",
+        "save": "Save",
+        "cancel": "Cancel"
+    },
+    "contentHeader": {
+        "userTab": "User",
+        "indirectTab": "Indirect Task",
+        "createNew": "Create New Time Entry",
+        "viewMode": {
+            "day": "Day",
+            "threeDays": "3 Days",
+            "week": "Week"
+        }
+    },
+    "sidebar": {
+        "searchTitle": "Search",
+        "searchByName": "User Name",
+        "searchByNumber": "Employee ID",
+        "placeholderName": "Enter user name",
+        "placeholderNumber": "Enter employee ID",
+        "self": "Self",
+        "userSortLabel": "User Name",
+        "taskSortLabel": "Category / Task",
+        "loadingNumber": "Loading...",
+        "loadingUser": "Fetching user info...",
+        "noEmpId": "No Employee ID",
+        "noUserInfo": "User info not found",
+        "unknownNumber": "Unknown",
+        "unknownName": "No Name",
+        "sort": {
+            "empAsc": "Employee ID Asc",
+            "empDesc": "Employee ID Desc",
+            "nameAsc": "Name Asc",
+            "nameDesc": "Name Desc",
+            "categoryAsc": "Category Asc",
+            "categoryDesc": "Category Desc",
+            "taskAsc": "Task Asc",
+            "taskDesc": "Task Desc"
+        },
+        "tasks": {
+            "meeting": "Meeting",
+            "meetingDetail": "Regular Meeting",
+            "education": "Education",
+            "educationDetail": "New Employee Training Material",
+            "docs": "Documentation",
+            "docsDetail": "Weekly Report Creation",
+            "other": "Others",
+            "otherDetail": "Internal Event Preparation"
+        }
+    },
+    "footer": {
+        "userListSetting": "User List Settings",
+        "favoriteTaskSetting": "Favorite Task Settings",
+        "more": "More"
+    },
+    "calendarView": {
+        "threeDays": "3 Days",
+        "week": "Week",
+        "day": "Day"
+    },
+    "timeEntryModal": {
+        "titleCreate": "Create New Time Entry",
+        "titleEdit": "Edit Time Entry",
+        "descCreate": "Enter the required information and click 'Create'.",
+        "descEdit": "Modify the content and click 'Update'.",
+        "create": "Create",
+        "update": "Update",
+        "cancel": "Cancel",
+        "woNumber": "WO Number",
+        "selectWO": "Select WO",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "hourSuffix": "h",
+        "minuteSuffix": "m",
+        "location": "Location",
+        "resource": "Resource",
+        "selectResource": "Select Resource",
+        "resourcePlaceholder": "Selected resources will appear here",
+        "timeCategory": "Time Category",
+        "mainCategory": "Category",
+        "paymentType": "Payment Type",
+        "subCategory": "Sub Category",
+        "auto": "Auto",
+        "task": "Task",
+        "comment": "Comment",
+        "commentPlaceholder": "Enter comment",
+        "sampleEndUser1": "ABC Corporation",
+        "sampleEndUser2": "XYZ Ltd.",
+        "sampleEndUser3": "Sample Trading Co.",
+        "task_list": {
+            "document": "Documentation",
+            "coding": "Coding",
+            "test": "Testing"
+        }
+    },
+    "favoriteTask": {
+        "title": "Favorite Indirect Task Settings",
+        "description": "Set filtering information for indirect tasks and click Search.",
+        "cancel": "Cancel",
+        "save": "Save",
+        "subCategory": "Subcategory",
+        "selectSubCategory": "Select Subcategory",
+        "clear": "Clear",
+        "taskName": "Task Name",
+        "enterTaskName": "Enter Task Name",
+        "search": "Search",
+        "instructions": "Select items from the search results, add them, and click Save.",
+        "searchResults": "Search Results",
+        "favoriteList": "Favorite Indirect Tasks",
+        "moveRight": "Move selected items to the right",
+        "items": " items",
+        "categories": {
+            "improvement": "Improvement",
+            "quality": "Quality",
+            "education": "Education / Training"
+        },
+        "tasks": {
+            "document": "Document Organization",
+            "meeting": "Meeting Preparation",
+            "testPlan": "Test Planning",
+            "review": "Review Response",
+            "weekly": "Weekly Meeting Participation"
+        }
+    },
+    "userList": {
+        "title": "User List Settings",
+        "description": "Search for and add users to include.",
+        "cancel": "Cancel",
+        "save": "Save",
+        "employeeId": "Employee ID",
+        "enterEmployeeId": "Enter Employee ID",
+        "userName": "User Name",
+        "enterUserName": "Enter User Name",
+        "clear": "Clear",
+        "search": "Search",
+        "instructions": "Enter an Employee ID or User Name and click Search.",
+        "loading": "Loading resources...",
+        "searchResults": "Search Results",
+        "selectedUsers": "Selected Users",
+        "items": " items",
+        "moveRight": "Move selected users to the right",
+        "noSearchResults": "Enter conditions and search.",
+        "noSelected": "No users have been added yet.",
+        "noName": "(No name)"
+    },
+    "resource": {
+        "title": "Select Resource",
+        "description": "Search and select users.",
+        "cancel": "Cancel",
+        "save": "Save",
+        "userName": "User Name",
+        "employeeId": "Employee ID",
+        "enterUserName": "Enter user name",
+        "enterEmployeeId": "Enter employee ID",
+        "sortByNumber": "Employee ID",
+        "sortByName": "User Name",
+        "unknownId": "Unknown ID",
+        "noName": "No name",
+        "loadingId": "Loading...",
+        "loadingName": "Retrieving user info...",
+        "noEmployeeId": "No employee ID",
+        "noUserInfo": "No user info",
+        "unregisteredId": "Unregistered ID",
+        "selfTag": " (self)"
+    }
+}

@@ -2,6 +2,7 @@ import "./Header.css";
 import { Button } from "../../component/button/Button";
 import { Select } from "../../component/select/Select";
 import * as FaIcons from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 export type WorkOrder = {
     id: string;
@@ -25,33 +26,34 @@ export const Header: React.FC<HeaderProps> = ({
     selectedWO,
     setSelectedWO,
 }) => {
+    const { t } = useTranslation();
+
     const woOptions = [
-        { value: "all", label: "すべて" },
+        { value: "all", label: t("header.all") },
         ...workOrders.map((wo) => ({
             value: wo.id,
-            label: wo.name || "(名称未設定)",
+            label: wo.name || t("header.noName"),
         })),
     ];
 
     return (
         <header className="app-header">
             <div className="header-left">
-                <h1 className="header-title">Time Sheet</h1>
+                <h1 className="header-title">{t("header.title")}</h1>
             </div>
 
             <div className="header-right">
-                <span className="header-label">対象WO</span>
+                <span className="header-label">{t("header.targetWO")}</span>
 
-                {/* ✅ idを削除してOK */}
                 <Select
                     options={woOptions}
                     value={selectedWO}
                     onChange={setSelectedWO}
-                    placeholder="対象WOを選択"
+                    placeholder={t("header.selectWO")}
                 />
 
                 <Button
-                    label="アップロード"
+                    label={t("header.upload")}
                     color="secondary"
                     icon={<FaIcons.FaUpload />}
                     className="upload-button"
