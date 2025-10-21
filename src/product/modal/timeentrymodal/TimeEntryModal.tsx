@@ -54,7 +54,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     const [comment, setComment] = useState("");
     const [wo, setWo] = useState("");
     const [endUser, setEndUser] = useState("");
-    const [timezone, setTimezone] = useState("");
+    const [timezone, setTimezone] = useState("235");
     const [timeCategory, setTimeCategory] = useState("");
     const [mainCategory, setMainCategory] = useState("");
     const [paymentType, setPaymentType] = useState("");
@@ -171,7 +171,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
 
             setWo("");
             setEndUser("");
-            setTimezone("");
+            setTimezone("235");
             setTimeCategory("");
             setMainCategory("");
             setPaymentType("");
