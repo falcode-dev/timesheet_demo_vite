@@ -33,6 +33,7 @@ export const DataverseApp = () => {
         handlePrev,
         handleNext,
         handleToday,
+        handleDeleteTimeEntry, // ✅ useAppController に削除処理を実装済みと想定
     } = useAppController();
 
     /** 現在のタブ状態（ユーザー／間接タスク） */
@@ -68,6 +69,14 @@ export const DataverseApp = () => {
         setSelectedDateTime({ start, end });
         setSelectedEvent(null);
         setIsTimeEntryModalOpen(true);
+    };
+
+    /** 🗑 削除処理 */
+    const handleDeleteEvent = (id: string) => {
+        console.log("削除対象イベントID:", id);
+        if (handleDeleteTimeEntry) {
+            handleDeleteTimeEntry(id);
+        }
     };
 
     return (
@@ -129,6 +138,7 @@ export const DataverseApp = () => {
                     isOpen={isTimeEntryModalOpen}
                     onClose={() => setIsTimeEntryModalOpen(false)}
                     onSubmit={handleTimeEntrySubmit}
+                    onDelete={handleDeleteEvent} // ✅ 削除処理を追加
                     selectedDateTime={selectedDateTime}
                     selectedEvent={selectedEvent}
                     woOptions={workOrders.map((w) => ({ value: w.id, label: w.name }))}

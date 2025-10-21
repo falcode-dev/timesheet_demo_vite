@@ -4,6 +4,8 @@ import { useOptionSets } from "./useOptionSets";
 import { useEvents } from "./useEvents";
 import { useCalendarController } from "./useCalendarController";
 import { getUrlParams } from "../utils/url";
+import { getXrm } from "../utils/xrmUtils"; // ✅ Dataverse接続確認
+import { timeEntryClient } from "../api/dataverseClient/timeEntryClient"; // ✅ 削除API呼び出し
 
 /**
  * DataverseApp 全体の状態とロジックを統括するカスタムフック
@@ -69,6 +71,36 @@ export const useAppController = () => {
         }
     };
 
+    /** 🗑 イベント削除処理 */
+    const handleDeleteTimeEntry = async (id: string) => {
+        const xrm = getXrm();
+
+        try {
+            if (!xrm) {
+                // ✅ ローカルモード（mockEvents）
+                const mockEvents = JSON.parse(localStorage.getItem("mockEvents") || "[]");
+                const updated = mockEvents.filter((ev: any) => ev.id !== id);
+                localStorage.setItem("mockEvents", JSON.stringify(updated));
+                await refetchEvents();
+                console.log(`ローカルイベント削除完了: ${id}`);
+                return;
+            }
+
+            // ✅ Dataverse 環境：API経由で削除
+            await timeEntryClient.deleteTimeEntry(id);
+            await refetchEvents();
+            console.log(`Dataverse イベント削除完了: ${id}`);
+        } catch (error) {
+            console.error("イベント削除中にエラーが発生しました:", error);
+            alert("削除に失敗しました。");
+        } finally {
+            // ✅ 状態リセット
+            setIsTimeEntryModalOpen(false);
+            setSelectedEvent(null);
+            setSelectedDateTime(null);
+        }
+    };
+
     /** 全体のローディング状態 */
     const isLoading = woLoading || osLoading || evLoading;
 
@@ -96,6 +128,7 @@ export const useAppController = () => {
         // 操作ハンドラ
         handleTimeEntrySubmit,
         handleEventClick,
+        handleDeleteTimeEntry, // ✅ ← 追加
         handlePrev,
         handleNext,
         handleToday,

@@ -1,4 +1,3 @@
-// src/api/dataverseClient/timeEntryClient.ts
 import { getXrm } from "../../utils/xrmUtils";
 
 /** TimeEntry 登録・更新時の入力データ型 */
@@ -60,7 +59,6 @@ export const timeEntryClient = {
             wo: data.wo,
         };
 
-        // Dataverse登録形式に変換
         const payload: Record<string, any> = {
             proto_name: record.title,
             proto_maincategory: record.mainCategory,
@@ -75,7 +73,6 @@ export const timeEntryClient = {
             payload["proto_wonumber@odata.bind"] = `/proto_workorders(${record.wo})`;
         }
 
-        // Dataverse 登録
         if (xrm?.WebApi?.createRecord) {
             try {
                 const result = await xrm.WebApi.createRecord(entityName, payload);
@@ -128,7 +125,6 @@ export const timeEntryClient = {
             payload["proto_wonumber@odata.bind"] = `/proto_workorders(${record.wo})`;
         }
 
-        // Dataverse 更新
         if (xrm?.WebApi?.updateRecord) {
             try {
                 await xrm.WebApi.updateRecord(entityName, id, payload);
@@ -147,5 +143,29 @@ export const timeEntryClient = {
 
         console.log("ローカル更新:", record);
         return record;
+    },
+
+    /** 🗑 削除 */
+    async deleteTimeEntry(id: string): Promise<void> {
+        const xrm = getXrm();
+        const entityName = "proto_timeentry";
+
+        // Dataverse 環境
+        if (xrm?.WebApi?.deleteRecord) {
+            try {
+                await xrm.WebApi.deleteRecord(entityName, id);
+                console.log("Dataverse 削除成功:", id);
+                return;
+            } catch (error) {
+                console.error("Dataverse 削除失敗:", error);
+                throw error;
+            }
+        }
+
+        // ローカルモード（localStorage）
+        const existing = JSON.parse(localStorage.getItem("localEvents") || "[]");
+        const updated = existing.filter((ev: any) => ev.id !== id);
+        localStorage.setItem("localEvents", JSON.stringify(updated));
+        console.log("ローカル削除完了:", id);
     },
 };

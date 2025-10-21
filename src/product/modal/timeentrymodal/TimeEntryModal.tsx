@@ -7,6 +7,7 @@ import { Button } from "../../../component/button/Button";
 import { Input } from "../../../component/input/Input";
 import { Textarea } from "../../../component/textarea/Textarea";
 import { ResourceSelectModal } from "../resourceselectmodal/ResourceSelectModal";
+import { ConfirmDeleteModal } from "../confirmdeletemodal/ConfirmDeleteModal"; // ✅ 切り出した削除確認モーダル
 import "./TimeEntryModal.css";
 import { useTranslation } from "react-i18next";
 
@@ -17,6 +18,7 @@ export interface TimeEntryModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSubmit: (data: any) => void;
+    onDelete?: (id: string) => void;
     selectedDateTime?: { start: Date; end: Date } | null;
     selectedEvent?: any | null;
     woOptions: SelectOption[];
@@ -33,6 +35,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     isOpen,
     onClose,
     onSubmit,
+    onDelete,
     selectedDateTime,
     selectedEvent,
     woOptions,
@@ -47,6 +50,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
        🧭 状態管理
     ------------------------------- */
     const [mode, setMode] = useState<"create" | "edit">("create");
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [comment, setComment] = useState("");
     const [wo, setWo] = useState("");
     const [endUser, setEndUser] = useState("");
@@ -202,6 +206,22 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     };
 
     /* -------------------------------
+       🗑 削除処理
+    ------------------------------- */
+    const handleDelete = () => {
+        if (!selectedEvent?.id) return;
+        setIsDeleteModalOpen(true);
+    };
+
+    const confirmDelete = () => {
+        if (onDelete && selectedEvent?.id) {
+            onDelete(selectedEvent.id);
+            setIsDeleteModalOpen(false);
+            onClose();
+        }
+    };
+
+    /* -------------------------------
        🎨 JSX
     ------------------------------- */
     return (
@@ -220,15 +240,29 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                         : t("timeEntryModal.descCreate")
                 }
                 footerButtons={[
+                    ...(mode === "edit"
+                        ? [
+                            <Button
+                                key="delete"
+                                label={t("timeEntryModal.delete") || "削除"}
+                                onClick={handleDelete}
+                            />,
+                        ]
+                        : []),
                     <Button
                         key="cancel"
                         label={t("timeEntryModal.cancel")}
                         color="secondary"
                         onClick={onClose}
+                        className="timeentry-cancel-button"
                     />,
                     <Button
                         key="save"
-                        label={mode === "edit" ? t("timeEntryModal.update") : t("timeEntryModal.create")}
+                        label={
+                            mode === "edit"
+                                ? t("timeEntryModal.update")
+                                : t("timeEntryModal.create")
+                        }
                         color="primary"
                         onClick={handleSave}
                         className="timeentry-create-button"
@@ -353,6 +387,14 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                 </div>
             </BaseModal>
 
+            {/* ✅ 削除確認モーダル */}
+            <ConfirmDeleteModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={confirmDelete}
+            />
+
+            {/* ✅ リソース選択モーダル */}
             <ResourceSelectModal
                 isOpen={isResourceModalOpen}
                 onClose={closeResourceModal}

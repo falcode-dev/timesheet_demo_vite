@@ -35,7 +35,8 @@
 ======================================= */
 .modal-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 50% 50%;
+    /* grid-template-columns: 1fr 1fr; */
     /* ✅ 2グリッド */
     gap: 24px;
     margin-top: 16px;
@@ -205,6 +206,10 @@ textarea[disabled],
    ボタン
 ======================================= */
 .timeentry-create-button {
+    margin-left: 10px;
+}
+
+.timeentry-cancel-button {
     margin-left: 10px;
 }
 

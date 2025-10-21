@@ -109,7 +109,16 @@
             "document": "資料作成",
             "coding": "プログラミング",
             "test": "テスト"
-        }
+        },
+        "delete": "削除",
+        "confirmDelete": "このイベントを削除しますか？"
+    },
+    "confirmDeleteModal": {
+        "title": "削除の確認",
+        "message": "このイベントを削除しますか？",
+        "warning": "この操作は元に戻せません。",
+        "cancel": "キャンセル",
+        "confirm": "削除"
     },
     "favoriteTask": {
         "title": "お気に入り間接タスク設定",
