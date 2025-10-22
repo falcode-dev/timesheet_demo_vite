@@ -118,6 +118,15 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 nowIndicator
                 slotMinTime="00:00:00"
                 slotMaxTime="24:00:00"
+                slotLabelFormat={{
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: false
+                }}
+                dayHeaderFormat={{
+                    day: 'numeric',
+                    weekday: 'short'
+                }}
                 locale={currentLocale}
                 firstDay={1}
                 initialDate={currentDate}
