@@ -71,6 +71,41 @@ export const DataverseApp = () => {
         setIsTimeEntryModalOpen(true);
     };
 
+    /** 複製処理 */
+    const handleDuplicate = (duplicateData: any) => {
+        // 現在のモーダルを閉じる
+        setIsTimeEntryModalOpen(false);
+
+        // 少し遅延させてから複製モーダルを開く
+        setTimeout(() => {
+            // 複製データから日時を構築
+            const start = new Date(`${duplicateData.startDate}T${duplicateData.startHour}:${duplicateData.startMinute}`);
+            const end = new Date(`${duplicateData.endDate}T${duplicateData.endHour}:${duplicateData.endMinute}`);
+
+            // 複製データをselectedEventとして設定（複製モードで開く）
+            setSelectedEvent({
+                start,
+                end,
+                workOrder: duplicateData.wo,
+                endUser: duplicateData.endUser,
+                timezone: duplicateData.timezone,
+                resource: duplicateData.resource,
+                timecategory: duplicateData.timeCategory,
+                maincategory: duplicateData.mainCategory,
+                paymenttype: duplicateData.paymentType,
+                task: duplicateData.task,
+                comment: duplicateData.comment,
+                isDuplicate: true, // 複製フラグを追加
+            });
+
+            // selectedDateTimeをnullに設定して複製モードで開く
+            setSelectedDateTime(null);
+
+            // 複製モードでモーダルを開く
+            setIsTimeEntryModalOpen(true);
+        }, 100);
+    };
+
     /** 🗑 削除処理 */
     const handleDeleteEvent = (id: string) => {
         console.log("削除対象イベントID:", id);
@@ -139,6 +174,7 @@ export const DataverseApp = () => {
                     onClose={() => setIsTimeEntryModalOpen(false)}
                     onSubmit={handleTimeEntrySubmit}
                     onDelete={handleDeleteEvent} // ✅ 削除処理を追加
+                    onDuplicate={handleDuplicate} // ✅ 複製処理を追加
                     selectedDateTime={selectedDateTime}
                     selectedEvent={selectedEvent}
                     woOptions={workOrders.map((w) => ({ value: w.id, label: w.name }))}

@@ -19,6 +19,7 @@ export interface TimeEntryModalProps {
     onClose: () => void;
     onSubmit: (data: any) => void;
     onDelete?: (id: string) => void;
+    onDuplicate?: (data: any) => void;
     selectedDateTime?: { start: Date; end: Date } | null;
     selectedEvent?: any | null;
     woOptions: SelectOption[];
@@ -36,6 +37,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     onClose,
     onSubmit,
     onDelete,
+    onDuplicate,
     selectedDateTime,
     selectedEvent,
     woOptions,
@@ -49,7 +51,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     /* -------------------------------
        🧭 状態管理
     ------------------------------- */
-    const [mode, setMode] = useState<"create" | "edit">("create");
+    const [mode, setMode] = useState<"create" | "edit" | "duplicate">("create");
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [comment, setComment] = useState("");
     const [wo, setWo] = useState("");
@@ -138,7 +140,8 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
         if (!isOpen) return;
 
         if (selectedEvent) {
-            setMode("edit");
+            // 複製フラグをチェック
+            setMode(selectedEvent.isDuplicate ? "duplicate" : "edit");
             const start = new Date(selectedEvent.start);
             const end = new Date(selectedEvent.end);
 
@@ -222,6 +225,35 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     };
 
     /* -------------------------------
+       📋 複製処理
+    ------------------------------- */
+    const handleDuplicate = () => {
+        // 現在の値を取得
+        const currentData = {
+            wo,
+            startDate,
+            startHour,
+            startMinute,
+            endDate,
+            endHour,
+            endMinute,
+            endUser,
+            timezone,
+            resource,
+            timeCategory,
+            mainCategory,
+            paymentType,
+            task,
+            comment,
+        };
+
+        // 親コンポーネントに複製イベントを通知（モーダルは閉じない）
+        if (onDuplicate) {
+            onDuplicate(currentData);
+        }
+    };
+
+    /* -------------------------------
        🎨 JSX
     ------------------------------- */
     return (
@@ -232,42 +264,76 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                 title={
                     mode === "edit"
                         ? t("timeEntryModal.titleEdit")
-                        : t("timeEntryModal.titleCreate")
+                        : mode === "duplicate"
+                            ? t("timeEntryModal.titleDuplicate") || "複製"
+                            : t("timeEntryModal.titleCreate")
                 }
                 description={
                     mode === "edit"
                         ? t("timeEntryModal.descEdit")
-                        : t("timeEntryModal.descCreate")
+                        : mode === "duplicate"
+                            ? t("timeEntryModal.descDuplicate") || "複製されたタイムエントリを編集してください。"
+                            : t("timeEntryModal.descCreate")
                 }
-                footerButtons={[
-                    ...(mode === "edit"
+                footerButtons={
+                    mode === "edit"
                         ? [
+                            <div key="edit-footer" className="timeentry-modal-footer">
+                                <div className="timeentry-modal-footer-left">
+                                    <Button
+                                        key="delete"
+                                        label={t("timeEntryModal.delete") || "削除"}
+                                        color="secondary"
+                                        onClick={handleDelete}
+                                        className="timeentry-delete-button"
+                                    />
+                                </div>
+                                <div className="timeentry-modal-footer-right">
+                                    <Button
+                                        key="cancel"
+                                        label={t("timeEntryModal.cancel")}
+                                        color="secondary"
+                                        onClick={onClose}
+                                        className="timeentry-cancel-button"
+                                    />
+                                    <Button
+                                        key="duplicate"
+                                        label={t("timeEntryModal.duplicate") || "複製"}
+                                        color="secondary"
+                                        onClick={handleDuplicate}
+                                        className="timeentry-duplicate-button"
+                                    />
+                                    <Button
+                                        key="save"
+                                        label={t("timeEntryModal.update")}
+                                        color="primary"
+                                        onClick={handleSave}
+                                        className="timeentry-save-button"
+                                    />
+                                </div>
+                            </div>
+                        ]
+                        : [
                             <Button
-                                key="delete"
-                                label={t("timeEntryModal.delete") || "削除"}
-                                onClick={handleDelete}
+                                key="cancel"
+                                label={t("timeEntryModal.cancel")}
+                                color="secondary"
+                                onClick={onClose}
+                                className="timeentry-cancel-button"
+                            />,
+                            <Button
+                                key="save"
+                                label={
+                                    mode === "duplicate"
+                                        ? t("timeEntryModal.update")
+                                        : t("timeEntryModal.create")
+                                }
+                                color="primary"
+                                onClick={handleSave}
+                                className="timeentry-create-button"
                             />,
                         ]
-                        : []),
-                    <Button
-                        key="cancel"
-                        label={t("timeEntryModal.cancel")}
-                        color="secondary"
-                        onClick={onClose}
-                        className="timeentry-cancel-button"
-                    />,
-                    <Button
-                        key="save"
-                        label={
-                            mode === "edit"
-                                ? t("timeEntryModal.update")
-                                : t("timeEntryModal.create")
-                        }
-                        color="primary"
-                        onClick={handleSave}
-                        className="timeentry-create-button"
-                    />,
-                ]}
+                }
                 size="large"
             >
                 <div className="timeentry-modal-body">

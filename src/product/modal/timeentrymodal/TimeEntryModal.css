@@ -213,6 +213,29 @@ textarea[disabled],
     margin-left: 10px;
 }
 
+/* 編集時のボタンレイアウト */
+.timeentry-modal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.timeentry-modal-footer-left {
+    display: flex;
+    align-items: center;
+}
+
+.timeentry-modal-footer-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.timeentry-delete-button {
+    margin-right: auto;
+}
+
 /* =======================================
    アニメーション（BaseModalと同期）
 ======================================= */
