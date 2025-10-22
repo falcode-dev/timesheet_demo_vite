@@ -1,8 +1,17 @@
-import { getXrm } from "../../utils/xrmUtils";
+/**
+ * TimeEntry の Dataverse API クライアント
+ * - 新しいアーキテクチャに基づく型安全で拡張可能な実装
+ */
+
+import { BaseClient } from './core/BaseClient';
+import type { BaseEntity, QueryOptions } from './core/types';
+import { getConfig } from './config';
+import { MOCK_TIME_ENTRIES, MockDataHelper } from './data/mockData';
+import { DataTransformer } from './core/utils';
+import { getXrm } from '../../utils/xrmUtils';
 
 /** TimeEntry 登録・更新時の入力データ型 */
-export type TimeEntryInput = {
-    id?: string;
+export interface TimeEntryInput {
     title?: string;
     mainCategory?: string | number | null;
     timeCategory?: string | number | null;
@@ -11,11 +20,10 @@ export type TimeEntryInput = {
     start?: Date;
     end?: Date;
     wo?: string; // WorkOrder ID
-};
+}
 
 /** Dataverse 登録・更新後の返却型 */
-export type TimeEntryRecord = {
-    id: string;
+export interface TimeEntryRecord extends BaseEntity {
     title: string;
     mainCategory: number | null;
     timeCategory: number | null;
@@ -24,148 +32,195 @@ export type TimeEntryRecord = {
     start: string;
     end: string;
     wo?: string;
-};
+}
 
-/** Date → JST 文字列（yyyy-MM-ddTHH:mm:ss）変換 */
-const toJstString = (date?: Date): string => {
-    if (!date) return "";
-    const yyyy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, "0");
-    const dd = String(date.getDate()).padStart(2, "0");
-    const hh = String(date.getHours()).padStart(2, "0");
-    const mi = String(date.getMinutes()).padStart(2, "0");
-    const ss = String(date.getSeconds()).padStart(2, "0");
-    return `${yyyy}-${mm}-${dd}T${hh}:${mi}:${ss}`;
-};
+/** タイムエントリクライアントクラス */
+export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput> {
+    constructor() {
+        super('proto_timeentry', getConfig());
+    }
 
-/**
- * TimeEntry の Dataverse API クライアント
- */
+    /** タイムエントリ一覧取得の内部実装 */
+    protected async getEntitiesInternal(queryOptions?: QueryOptions): Promise<TimeEntryRecord[]> {
+        if (this.isLocalEnvironment()) {
+            return this.getMockData();
+        }
+
+        return await this.executeDataverseOperation(async () => {
+            const query = this.buildQueryString({
+                select: [
+                    'proto_timeentryid',
+                    'proto_name',
+                    'proto_maincategory',
+                    'proto_timecategory',
+                    'proto_paymenttype',
+                    'proto_timezone',
+                    'proto_startdatetime',
+                    'proto_enddatetime',
+                    '_proto_wonumber_value'
+                ],
+                ...queryOptions
+            });
+
+            const result = await this.getXrm().WebApi.retrieveMultipleRecords(this.entityName, query);
+            return DataTransformer.mapRecords(result.entities, this.transformRecord);
+        }, 'getEntities');
+    }
+
+    /** タイムエントリ作成の内部実装 */
+    protected async createEntityInternal(data: TimeEntryInput): Promise<TimeEntryRecord> {
+        if (this.isLocalEnvironment()) {
+            const newTimeEntry: TimeEntryRecord = {
+                id: MockDataHelper.generateId('timeentry'),
+                name: data.title || '現場作業',
+                title: data.title || '現場作業',
+                mainCategory: DataTransformer.toNumber(data.mainCategory),
+                timeCategory: DataTransformer.toNumber(data.timeCategory),
+                paymentType: DataTransformer.toNumber(data.paymentType),
+                timezone: DataTransformer.toNumber(data.timezone),
+                start: DataTransformer.toIsoString(data.start),
+                end: DataTransformer.toIsoString(data.end),
+                wo: data.wo
+            };
+            return newTimeEntry;
+        }
+
+        return await this.executeDataverseOperation(async () => {
+            const payload: any = {
+                proto_name: data.title || '現場作業',
+                proto_maincategory: DataTransformer.toNumber(data.mainCategory),
+                proto_timecategory: DataTransformer.toNumber(data.timeCategory),
+                proto_paymenttype: DataTransformer.toNumber(data.paymentType),
+                proto_timezone: DataTransformer.toNumber(data.timezone),
+                proto_startdatetime: DataTransformer.toIsoString(data.start),
+                proto_enddatetime: DataTransformer.toIsoString(data.end)
+            };
+
+            if (data.wo) {
+                payload['proto_wonumber@odata.bind'] = `/proto_workorders(${data.wo})`;
+            }
+
+            const result = await this.getXrm().WebApi.createRecord(this.entityName, payload);
+            return {
+                id: result.id,
+                name: data.title || '現場作業',
+                title: data.title || '現場作業',
+                mainCategory: DataTransformer.toNumber(data.mainCategory),
+                timeCategory: DataTransformer.toNumber(data.timeCategory),
+                paymentType: DataTransformer.toNumber(data.paymentType),
+                timezone: DataTransformer.toNumber(data.timezone),
+                start: DataTransformer.toIsoString(data.start),
+                end: DataTransformer.toIsoString(data.end),
+                wo: data.wo
+            };
+        }, 'createEntity');
+    }
+
+    /** タイムエントリ更新の内部実装 */
+    protected async updateEntityInternal(id: string, data: Partial<TimeEntryInput>): Promise<TimeEntryRecord> {
+        if (this.isLocalEnvironment()) {
+            const existing = MockDataHelper.getTimeEntryById(id);
+            if (!existing) throw new Error('タイムエントリが見つかりません');
+            return { ...existing, ...data } as TimeEntryRecord;
+        }
+
+        return await this.executeDataverseOperation(async () => {
+            const payload: any = {};
+            if (data.title !== undefined) payload.proto_name = data.title;
+            if (data.mainCategory !== undefined) payload.proto_maincategory = DataTransformer.toNumber(data.mainCategory);
+            if (data.timeCategory !== undefined) payload.proto_timecategory = DataTransformer.toNumber(data.timeCategory);
+            if (data.paymentType !== undefined) payload.proto_paymenttype = DataTransformer.toNumber(data.paymentType);
+            if (data.timezone !== undefined) payload.proto_timezone = DataTransformer.toNumber(data.timezone);
+            if (data.start !== undefined) payload.proto_startdatetime = DataTransformer.toIsoString(data.start);
+            if (data.end !== undefined) payload.proto_enddatetime = DataTransformer.toIsoString(data.end);
+            if (data.wo !== undefined) {
+                if (data.wo) {
+                    payload['proto_wonumber@odata.bind'] = `/proto_workorders(${data.wo})`;
+                } else {
+                    payload['proto_wonumber@odata.bind'] = null;
+                }
+            }
+
+            await this.getXrm().WebApi.updateRecord(this.entityName, id, payload);
+            return { id, name: data.title || '', title: data.title || '', ...data } as unknown as TimeEntryRecord;
+        }, 'updateEntity');
+    }
+
+    /** タイムエントリ削除の内部実装 */
+    protected async deleteEntityInternal(id: string): Promise<void> {
+        if (this.isLocalEnvironment()) {
+            // ローカル環境では何もしない（モックデータは変更しない）
+            return;
+        }
+
+        await this.executeDataverseOperation(async () => {
+            await this.getXrm().WebApi.deleteRecord(this.entityName, id);
+        }, 'deleteEntity');
+    }
+
+    /** モックデータ取得 */
+    protected getMockData(): TimeEntryRecord[] {
+        return MOCK_TIME_ENTRIES;
+    }
+
+    /** レコード変換 */
+    protected transformRecord(record: any): TimeEntryRecord {
+        return {
+            id: record.proto_timeentryid,
+            name: record.proto_name || '',
+            title: record.proto_name || '',
+            mainCategory: record.proto_maincategory,
+            timeCategory: record.proto_timecategory,
+            paymentType: record.proto_paymenttype,
+            timezone: record.proto_timezone,
+            start: record.proto_startdatetime || '',
+            end: record.proto_enddatetime || '',
+            wo: record._proto_wonumber_value
+        };
+    }
+
+    /** 入力データ検証 */
+    protected validateInput(data: TimeEntryInput): void {
+        if (data.start && data.end && new Date(data.start) >= new Date(data.end)) {
+            throw new Error('開始時刻は終了時刻より前である必要があります');
+        }
+    }
+
+    /** Xrm インスタンス取得 */
+    private getXrm() {
+        getXrm();
+        return getXrm();
+    }
+}
+
+/** レガシー互換性のための関数型API */
 export const timeEntryClient = {
     /** 新規登録 */
     async createTimeEntry(data: TimeEntryInput): Promise<TimeEntryRecord> {
-        const xrm = getXrm();
-        const entityName = "proto_timeentry";
-
-        const record: TimeEntryRecord = {
-            id: "",
-            title: data.title || "現場作業",
-            mainCategory: data.mainCategory ? Number(data.mainCategory) : null,
-            timeCategory: data.timeCategory ? Number(data.timeCategory) : null,
-            paymentType: data.paymentType ? Number(data.paymentType) : null,
-            timezone: data.timezone ? Number(data.timezone) : null,
-            start: toJstString(data.start),
-            end: toJstString(data.end),
-            wo: data.wo,
-        };
-
-        const payload: Record<string, any> = {
-            proto_name: record.title,
-            proto_maincategory: record.mainCategory,
-            proto_timecategory: record.timeCategory,
-            proto_paymenttype: record.paymentType,
-            proto_timezone: record.timezone,
-            proto_startdatetime: record.start,
-            proto_enddatetime: record.end,
-        };
-
-        if (record.wo) {
-            payload["proto_wonumber@odata.bind"] = `/proto_workorders(${record.wo})`;
+        const client = new TimeEntryClient();
+        const response = await client.createEntity(data);
+        if (!response.success) {
+            throw new Error(response.error || 'タイムエントリの作成に失敗しました');
         }
-
-        if (xrm?.WebApi?.createRecord) {
-            try {
-                const result = await xrm.WebApi.createRecord(entityName, payload);
-                console.log("Dataverse 登録成功:", result);
-                return { ...record, id: result.id };
-            } catch (error) {
-                console.error("Dataverse 登録失敗:", error);
-                throw error;
-            }
-        }
-
-        // ローカル環境フォールバック
-        const mockId = `local-${Date.now()}`;
-        const existing = JSON.parse(localStorage.getItem("localEvents") || "[]");
-        const updated = [...existing, { ...record, id: mockId }];
-        localStorage.setItem("localEvents", JSON.stringify(updated));
-
-        console.log("ローカル登録:", record);
-        return { ...record, id: mockId };
+        return response.data;
     },
 
     /** 更新 */
     async updateTimeEntry(id: string, data: TimeEntryInput): Promise<TimeEntryRecord> {
-        const xrm = getXrm();
-        const entityName = "proto_timeentry";
-
-        const record: TimeEntryRecord = {
-            id,
-            title: data.title || "現場作業",
-            mainCategory: data.mainCategory ? Number(data.mainCategory) : null,
-            timeCategory: data.timeCategory ? Number(data.timeCategory) : null,
-            paymentType: data.paymentType ? Number(data.paymentType) : null,
-            timezone: data.timezone ? Number(data.timezone) : null,
-            start: toJstString(data.start),
-            end: toJstString(data.end),
-            wo: data.wo,
-        };
-
-        const payload: Record<string, any> = {
-            proto_name: record.title,
-            proto_maincategory: record.mainCategory,
-            proto_timecategory: record.timeCategory,
-            proto_paymenttype: record.paymentType,
-            proto_timezone: record.timezone,
-            proto_startdatetime: record.start,
-            proto_enddatetime: record.end,
-        };
-
-        if (record.wo) {
-            payload["proto_wonumber@odata.bind"] = `/proto_workorders(${record.wo})`;
+        const client = new TimeEntryClient();
+        const response = await client.updateEntity(id, data);
+        if (!response.success) {
+            throw new Error(response.error || 'タイムエントリの更新に失敗しました');
         }
-
-        if (xrm?.WebApi?.updateRecord) {
-            try {
-                await xrm.WebApi.updateRecord(entityName, id, payload);
-                console.log("Dataverse 更新成功:", id);
-                return record;
-            } catch (error) {
-                console.error("Dataverse 更新失敗:", error);
-                throw error;
-            }
-        }
-
-        // ローカル更新
-        const existing = JSON.parse(localStorage.getItem("localEvents") || "[]");
-        const updated = existing.map((ev: any) => (ev.id === id ? { ...ev, ...record } : ev));
-        localStorage.setItem("localEvents", JSON.stringify(updated));
-
-        console.log("ローカル更新:", record);
-        return record;
+        return response.data;
     },
 
-    /** 🗑 削除 */
+    /** 削除 */
     async deleteTimeEntry(id: string): Promise<void> {
-        const xrm = getXrm();
-        const entityName = "proto_timeentry";
-
-        // Dataverse 環境
-        if (xrm?.WebApi?.deleteRecord) {
-            try {
-                await xrm.WebApi.deleteRecord(entityName, id);
-                console.log("Dataverse 削除成功:", id);
-                return;
-            } catch (error) {
-                console.error("Dataverse 削除失敗:", error);
-                throw error;
-            }
+        const client = new TimeEntryClient();
+        const response = await client.deleteEntity(id);
+        if (!response.success) {
+            throw new Error(response.error || 'タイムエントリの削除に失敗しました');
         }
-
-        // ローカルモード（localStorage）
-        const existing = JSON.parse(localStorage.getItem("localEvents") || "[]");
-        const updated = existing.filter((ev: any) => ev.id !== id);
-        localStorage.setItem("localEvents", JSON.stringify(updated));
-        console.log("ローカル削除完了:", id);
-    },
+    }
 };

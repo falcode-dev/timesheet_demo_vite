@@ -5,28 +5,28 @@
  */
 
 // レガシー互換性のための関数型API
-import { optionSetClient } from "./optionSetClient";
-import { timeEntryClient } from "./timeEntryClient";
-import { workOrderClient } from "./workOrderClient";
-import { subcategoryClient } from "./subcategoryClient";
-import { taskClient } from "./taskClient";
-import { resourceClient } from "./resourceClient";
-import { userClient } from "./userClient";
+import { optionSetClient } from "../optionSetClient";
+import { timeEntryClient } from "../timeEntryClient";
+import { workOrderClient } from "../workOrderClient";
+import { subcategoryClient } from "../subcategoryClient";
+import { taskClient } from "../taskClient";
+import { resourceClient } from "../resourceClient";
+import { userClient } from "../userClient";
 
 // 新しいクラスベースAPI
-import { OptionSetClient } from "./optionSetClient";
-import { TimeEntryClient } from "./timeEntryClient";
-import { WorkOrderClient } from "./workOrderClient";
-import { SubCategoryClient } from "./subcategoryClient";
-import { TaskClient } from "./taskClient";
-import { ResourceClient } from "./resourceClient";
-import { UserClient } from "./userClient";
+import { OptionSetClient } from "../optionSetClient";
+import { TimeEntryClient } from "../timeEntryClient";
+import { WorkOrderClient } from "../workOrderClient";
+import { SubCategoryClient } from "../subcategoryClient";
+import { TaskClient } from "../taskClient";
+import { ResourceClient } from "../resourceClient";
+import { UserClient } from "../userClient";
 
 // 共通型とユーティリティ
-export * from "./core/types";
-export * from "./core/utils";
-export * from "./config";
-export * from "./data/mockData";
+export * from "../core/types";
+export * from "../core/utils";
+export * from "../config";
+export * from "../data/mockData";
 
 /**
  * レガシー互換性のための統合クライアント
