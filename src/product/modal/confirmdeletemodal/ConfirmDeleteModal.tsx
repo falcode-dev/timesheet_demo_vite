@@ -22,7 +22,7 @@ export const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
     isOpen,
     onClose,
     onConfirm,
-    // title,
+    title,
     message,
 }) => {
     const { t } = useTranslation();
@@ -31,8 +31,7 @@ export const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
         <BaseModal
             isOpen={isOpen}
             onClose={onClose}
-            // title={title || t("timeEntryModal.confirmTitle") || "削除の確認"}
-            description={message || t("timeEntryModal.confirmDelete") || "このイベントを削除しますか？"}
+            title={title || t("confirmDeleteModal.title") || "削除"}
             size="small"
             footerButtons={[
                 <Button
@@ -49,9 +48,11 @@ export const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
                 />,
             ]}
         >
-            {/* <div className="confirm-delete-body">
-                <p>{t("timeEntryModal.deleteMessage") || "この操作は元に戻せません。"}</p>
-            </div> */}
+            <div className="confirm-delete-body">
+                <p>{message || t("timeEntryModal.confirmDelete") || "選択した情報を削除します。"}</p>
+                <p>{t("timeEntryModal.deleteWarning") || "削除したデータは復元ができません。"}</p>
+                <p>{t("timeEntryModal.deleteConfirm") || "よろしいですか？"}</p>
+            </div>
         </BaseModal>
     );
 };

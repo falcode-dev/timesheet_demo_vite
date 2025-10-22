@@ -78,11 +78,11 @@
     },
     "timeEntryModal": {
         "titleCreate": "新しいタイムエントリを作成",
-        "titleEdit": "タイムエントリを編集",
+        "titleEdit": "編集",
         "titleDuplicate": "複製",
-        "descCreate": "必要な情報を入力して「作成」を押してください。",
-        "descEdit": "内容を修正して「更新」を押してください。",
-        "descDuplicate": "複製されたタイムエントリを編集してください。",
+        "descCreate": "Time entry の基本情報を入力して作成を押してください。",
+        "descEdit": "Time entry を編集して保存を押してください。",
+        "descDuplicate": "Time entry を複製します。基本情報を編集して保存を押してください。",
         "create": "作成",
         "update": "保存",
         "cancel": "キャンセル",
@@ -114,10 +114,13 @@
         },
         "delete": "削除",
         "duplicate": "複製",
-        "confirmDelete": "このイベントを削除しますか？"
+        "confirmDelete": "選択した情報を削除します。",
+        "deleteWarning": "削除したデータは復元ができません。",
+        "deleteConfirm": "よろしいですか？",
+        "deleteFinal": "削除を実行する場合は「削除」ボタンを押してください。"
     },
     "confirmDeleteModal": {
-        "title": "削除の確認",
+        "title": "削除",
         "message": "このイベントを削除しますか？",
         "warning": "この操作は元に戻せません。",
         "cancel": "キャンセル",

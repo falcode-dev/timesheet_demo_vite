@@ -92,12 +92,14 @@ export const BaseModal: React.FC<BaseModalProps> = ({
                         <h3 className="modal-title">{title}</h3>
                     </div>
                 )}
-                {description && (
-                    <p className="modal-description">{description}</p>
-                )}
 
                 {/* ---------- コンテンツ ---------- */}
-                <div className="modal-body">{children}</div>
+                <div className="modal-body">
+                    {description && (
+                        <p className="modal-description">{description}</p>
+                    )}
+                    {children}
+                </div>
 
                 {/* ---------- フッター ---------- */}
                 {footerButtons && (
