@@ -1,6 +1,6 @@
 import React from "react";
 import { BaseModal } from "../BaseModal";
-import { Button } from "../../../component/button/Button";
+import { Button } from "../../../ui";
 import { useTranslation } from "react-i18next";
 import "./ConfirmDeleteModal.css";
 

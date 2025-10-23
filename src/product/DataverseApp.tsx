@@ -1,7 +1,4 @@
-import { Header } from "./layout/Header";
-import { Sidebar } from "./layout/Sidebar";
-import { Footer } from "./layout/Footer";
-import { ContentHeader } from "./layout/ContentHeader";
+import { Header, Sidebar, Footer, ContentHeader } from "../ui";
 import { CalendarView } from "./calendar/CalendarView";
 import { TimeEntryModal } from "./modal/timeentrymodal/TimeEntryModal";
 import { FavoriteTaskModal } from "./modal/favoritetaskmodal/FavoriteTaskModal";

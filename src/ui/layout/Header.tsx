@@ -1,6 +1,6 @@
-import "./Header.css";
-import { Button } from "../../component/button/Button";
-import { Select } from "../../component/select/Select";
+import { Button } from "../components/Button";
+import { Select } from "../components/Select";
+import "../styles/layout/Header.css";
 import * as FaIcons from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { HeaderProps } from "../../types/components";

@@ -1,5 +1,5 @@
 import React from "react";
-import "./Tabs.css";
+import "../styles/components/Tabs.css";
 import type { TabsProps } from "../../types/components";
 
 /**

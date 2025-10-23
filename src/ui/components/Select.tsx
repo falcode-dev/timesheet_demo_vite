@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import * as FaIcons from "react-icons/fa";
-import "./Select.css";
+import "../styles/components/Select.css";
 import type { SelectProps } from "../../types/components";
 
 /**

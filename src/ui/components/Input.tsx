@@ -1,5 +1,5 @@
 import React, { forwardRef } from "react";
-import "./Input.css";
+import "../styles/components/Input.css";
 import type { InputProps } from "../../types/components";
 
 /**

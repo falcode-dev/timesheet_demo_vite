@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
-import "./Sidebar.css";
 import * as FaIcons from "react-icons/fa";
-import { Input } from "../../component/input/Input";
+import { Input } from "../components/Input";
+import "../styles/layout/Sidebar.css";
 import { useCurrentUser } from "../../hooks/useCurrentUser";
 import { useResources } from "../../hooks/useResources";
 import { useAllowedUsers } from "../../context/UserListContext";

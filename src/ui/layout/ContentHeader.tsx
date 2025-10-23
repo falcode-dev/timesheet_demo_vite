@@ -1,8 +1,8 @@
-import "./ContentHeader.css";
 import * as FaIcons from "react-icons/fa";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
-import { Tabs } from "../../component/tab/Tabs";
-import { Button } from "../../component/button/Button";
+import { Tabs } from "../components/Tabs";
+import { Button } from "../components/Button";
+import "../styles/layout/ContentHeader.css";
 import { useTranslation } from "react-i18next";
 import type { ContentHeaderProps } from "../../types/components";
 import type { MainTab, ViewMode, Option } from "../../types";

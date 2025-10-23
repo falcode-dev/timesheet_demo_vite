@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import "./Textarea.css";
+import "../styles/components/Textarea.css";
 import type { TextareaProps } from "../../types/components";
 
 /**

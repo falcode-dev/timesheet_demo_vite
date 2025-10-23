@@ -1,8 +1,7 @@
 import React, { useState, useMemo, useCallback } from "react";
 import * as FaIcons from "react-icons/fa";
 import { BaseModal } from "../BaseModal";
-import { Button } from "../../../component/button/Button";
-import { Input } from "../../../component/input/Input";
+import { Button, Input } from "../../../ui";
 import { useCurrentUser } from "../../../hooks/useCurrentUser";
 import { useResources } from "../../../hooks/useResources";
 import { useAllowedUsers } from "../../../context/UserListContext";

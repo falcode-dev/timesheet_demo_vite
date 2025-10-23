@@ -1,5 +1,5 @@
 import React from "react";
-import "./Button.css";
+import "../styles/components/Button.css";
 import type { ButtonProps } from "../../types/components";
 
 /**

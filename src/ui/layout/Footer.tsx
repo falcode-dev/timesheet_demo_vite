@@ -1,6 +1,6 @@
-import "./Footer.css";
 import * as FaIcons from "react-icons/fa";
-import { Button } from "../../component/button/Button";
+import { Button } from "../components/Button";
+import "../styles/layout/Footer.css";
 import { useTranslation } from "react-i18next";
 
 /** Footer コンポーネントの Props 型 */
@@ -47,7 +47,7 @@ export const Footer: React.FC<FooterProps> = ({
 
             {/* =============================
           右側：その他メニューボタン
-      ============================= */}
+      ============================== */}
             <div className="content-bottom-right">
                 <button
                     className="menu-button"
