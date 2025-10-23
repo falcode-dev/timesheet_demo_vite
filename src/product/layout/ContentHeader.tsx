@@ -3,27 +3,9 @@ import * as FaIcons from "react-icons/fa";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { Tabs } from "../../component/tab/Tabs";
 import { Button } from "../../component/button/Button";
-import type { TabOption } from "../../component/tab/Tabs";
 import { useTranslation } from "react-i18next";
-
-/** メインタブ種別 */
-export type MainTab = "user" | "indirect";
-
-/** 表示モード種別 */
-export type ViewMode = "1日" | "3日" | "週";
-
-/** ContentHeader Props定義 */
-export type ContentHeaderProps = {
-    mainTab: MainTab;
-    setMainTab: (tab: MainTab) => void;
-    viewMode: ViewMode;
-    setViewMode: (mode: ViewMode) => void;
-    formattedToday: string;
-    onPrev: () => void;
-    onNext: () => void;
-    onToday: () => void;
-    onCreateNew: () => void;
-};
+import type { ContentHeaderProps } from "../../types/components";
+import type { MainTab, ViewMode, Option } from "../../types";
 
 /**
  * タイムシート上部の操作ヘッダー
@@ -46,7 +28,7 @@ export const ContentHeader: React.FC<ContentHeaderProps> = ({
     const { t } = useTranslation();
 
     /** メインタブ設定（多言語対応） */
-    const mainTabOptions: TabOption[] = [
+    const mainTabOptions: Option[] = [
         { value: "user", label: t("contentHeader.userTab") },
         { value: "indirect", label: t("contentHeader.indirectTab") },
     ];

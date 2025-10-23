@@ -7,16 +7,8 @@ import { useResources } from "../../hooks/useResources";
 import { useAllowedUsers } from "../../context/UserListContext";
 import { useFavoriteTasks } from "../../context/FavoriteTaskContext"; // ✅ 追加
 import { useTranslation } from "react-i18next";
-
-/** 並び替えオプションの型 */
-type UserSortKey = "numberAsc" | "numberDesc" | "nameAsc" | "nameDesc";
-type TaskSortKey = "categoryAsc" | "categoryDesc" | "taskAsc" | "taskDesc";
-
-/** Sidebar プロパティ */
-type SidebarProps = {
-    userName?: string;
-    mainTab: "user" | "indirect";
-};
+import type { SidebarProps } from "../../types/components";
+import type { UserSortKey, TaskSortKey, SearchType } from "../../types";
 
 /**
  * Sidebar コンポーネント
@@ -26,7 +18,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
     const { favoriteTasks } = useFavoriteTasks(); // ✅ Contextからお気に入りタスク取得
 
     /** 検索・選択状態 */
-    const [searchType, setSearchType] = useState<"name" | "number">("name");
+    const [searchType, setSearchType] = useState<SearchType>("name");
     const [keyword, setKeyword] = useState("");
     const [selectedUsers, setSelectedUsers] = useState<string[]>(["self"]);
     const [selectedTask, setSelectedTask] = useState<string>("");
@@ -131,7 +123,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mainTab }) => {
                                     name="sidebarSearchType"
                                     value={type}
                                     checked={searchType === type}
-                                    onChange={() => setSearchType(type as "name" | "number")}
+                                    onChange={() => setSearchType(type as SearchType)}
                                 />
                                 {type === "name" ? t("sidebar.searchByName") : t("sidebar.searchByNumber")}
                             </label>

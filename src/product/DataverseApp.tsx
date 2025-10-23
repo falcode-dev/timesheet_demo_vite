@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Header } from "./layout/Header";
 import { Sidebar } from "./layout/Sidebar";
 import { Footer } from "./layout/Footer";
@@ -9,6 +8,9 @@ import { FavoriteTaskModal } from "./modal/favoritetaskmodal/FavoriteTaskModal";
 import { UserListModal } from "./modal/userlistmodal/UserListModal";
 import { useAppController } from "../hooks/useAppController";
 import { FavoriteTaskProvider } from "../context/FavoriteTaskContext";
+import { formatToday } from "../utils/dateFormatter";
+import { convertWorkOrdersToOptions } from "../utils/modalHelpers";
+// 型定義は各コンポーネントで個別にインポート
 import "./DataverseApp.css";
 
 export const DataverseApp = () => {
@@ -22,100 +24,35 @@ export const DataverseApp = () => {
         setViewMode,
         currentDate,
         setCurrentDate,
+        mainTab,
+        setMainTab,
         isTimeEntryModalOpen,
         setIsTimeEntryModalOpen,
+        isFavoriteTaskModalOpen,
+        setIsFavoriteTaskModalOpen,
+        isUserListModalOpen,
+        setIsUserListModalOpen,
         selectedDateTime,
         setSelectedDateTime,
         selectedEvent,
         setSelectedEvent,
         handleTimeEntrySubmit,
         handleEventClick,
+        handleDeleteTimeEntry,
+        handleDuplicate,
+        openNewTimeEntry,
+        handleSaveFavoriteTasks,
+        handleSaveUserList,
         handlePrev,
         handleNext,
         handleToday,
-        handleDeleteTimeEntry, // ✅ useAppController に削除処理を実装済みと想定
     } = useAppController();
 
-    /** 現在のタブ状態（ユーザー／間接タスク） */
-    const [mainTab, setMainTab] = useState<"user" | "indirect">("user");
-
-    /** モーダル開閉状態 */
-    const [isFavoriteTaskModalOpen, setIsFavoriteTaskModalOpen] = useState(false);
-    const [isUserListModalOpen, setIsUserListModalOpen] = useState(false);
-
-    /** お気に入りタスク保存 */
-    const handleSaveFavoriteTasks = (tasks: string[]) => {
-        console.log("保存されたお気に入りタスク:", tasks);
-        setIsFavoriteTaskModalOpen(false);
-    };
-
-    /** ユーザーリスト保存 */
-    const handleSaveUserList = (users: string[]) => {
-        console.log("保存されたユーザー一覧:", users);
-        setIsUserListModalOpen(false);
-    };
-
     /** 今日の日付フォーマット（例：2025/10/14） */
-    const formattedToday = new Date().toLocaleDateString("ja-JP", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-    });
-
-    /** 新規タイムエントリ作成時の共通処理 */
-    const openNewTimeEntry = () => {
-        const start = new Date();
-        const end = new Date(start.getTime() + 60 * 60 * 1000);
-        setSelectedDateTime({ start, end });
-        setSelectedEvent(null);
-        setIsTimeEntryModalOpen(true);
-    };
-
-    /** 複製処理 */
-    const handleDuplicate = (duplicateData: any) => {
-        // 現在のモーダルを閉じる
-        setIsTimeEntryModalOpen(false);
-
-        // 少し遅延させてから複製モーダルを開く
-        setTimeout(() => {
-            // 複製データから日時を構築
-            const start = new Date(`${duplicateData.startDate}T${duplicateData.startHour}:${duplicateData.startMinute}`);
-            const end = new Date(`${duplicateData.endDate}T${duplicateData.endHour}:${duplicateData.endMinute}`);
-
-            // 複製データをselectedEventとして設定（複製モードで開く）
-            setSelectedEvent({
-                start,
-                end,
-                workOrder: duplicateData.wo,
-                endUser: duplicateData.endUser,
-                timezone: duplicateData.timezone,
-                resource: duplicateData.resource,
-                timecategory: duplicateData.timeCategory,
-                maincategory: duplicateData.mainCategory,
-                paymenttype: duplicateData.paymentType,
-                task: duplicateData.task,
-                comment: duplicateData.comment,
-                isDuplicate: true, // 複製フラグを追加
-            });
-
-            // selectedDateTimeをnullに設定して複製モードで開く
-            setSelectedDateTime(null);
-
-            // 複製モードでモーダルを開く
-            setIsTimeEntryModalOpen(true);
-        }, 100);
-    };
-
-    /** 🗑 削除処理 */
-    const handleDeleteEvent = (id: string) => {
-        console.log("削除対象イベントID:", id);
-        if (handleDeleteTimeEntry) {
-            handleDeleteTimeEntry(id);
-        }
-    };
+    const formattedToday = formatToday();
 
     return (
-        // ✅ Contextで全体をラップ
+        // Contextで全体をラップ
         <FavoriteTaskProvider>
             <div className="app-container">
                 {/* ヘッダー */}
@@ -173,11 +110,11 @@ export const DataverseApp = () => {
                     isOpen={isTimeEntryModalOpen}
                     onClose={() => setIsTimeEntryModalOpen(false)}
                     onSubmit={handleTimeEntrySubmit}
-                    onDelete={handleDeleteEvent} // ✅ 削除処理を追加
-                    onDuplicate={handleDuplicate} // ✅ 複製処理を追加
+                    onDelete={handleDeleteTimeEntry}
+                    onDuplicate={handleDuplicate}
                     selectedDateTime={selectedDateTime}
                     selectedEvent={selectedEvent}
-                    woOptions={workOrders.map((w) => ({ value: w.id, label: w.name }))}
+                    woOptions={convertWorkOrdersToOptions(workOrders)}
                     maincategoryOptions={optionSets?.maincategory ?? []}
                     timecategoryOptions={optionSets?.timecategory ?? []}
                     paymenttypeOptions={optionSets?.paymenttype ?? []}

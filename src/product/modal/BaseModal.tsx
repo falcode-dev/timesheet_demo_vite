@@ -49,6 +49,24 @@ export const BaseModal: React.FC<BaseModalProps> = ({
     }, [isOpen]);
 
     /* ======================================================
+       背景スクロール制御
+    ======================================================= */
+    useEffect(() => {
+        if (isOpen) {
+            // モーダルが開いている時は背景スクロールを無効化
+            document.body.style.overflow = 'hidden';
+        } else {
+            // モーダルが閉じている時は背景スクロールを有効化
+            document.body.style.overflow = 'unset';
+        }
+
+        // クリーンアップ: コンポーネントがアンマウントされる時もスクロールを復元
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isOpen]);
+
+    /* ======================================================
        背景クリックで閉じる
     ======================================================= */
     const handleOverlayClick = useCallback(

@@ -8,7 +8,11 @@ import type { Dispatch, SetStateAction } from "react";
 export const useCalendarController = (
     viewMode: "1日" | "3日" | "週",
     setCurrentDate: Dispatch<SetStateAction<Date>>
-) => {
+): {
+    handlePrev: () => void;
+    handleNext: () => void;
+    handleToday: () => void;
+} => {
     /** 表示モードに応じて日数を返す */
     const getShiftDays = (): number => {
         switch (viewMode) {

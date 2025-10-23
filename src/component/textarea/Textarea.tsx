@@ -1,41 +1,6 @@
 import React, { useMemo } from "react";
 import "./Textarea.css";
-
-/** Textarea コンポーネントの Props 型 */
-export type TextareaProps = {
-    /** ラベル（任意） */
-    label?: string;
-
-    /** 入力値 */
-    value?: string;
-
-    /** 値変更ハンドラ */
-    onChange?: (value: string) => void;
-
-    /** プレースホルダー */
-    placeholder?: string;
-
-    /** 行数（デフォルト: 4） */
-    rows?: number;
-
-    /** 無効状態 */
-    disabled?: boolean;
-
-    /** 読み取り専用 */
-    readOnly?: boolean;
-
-    /** 文字数カウンターを表示 */
-    showCount?: boolean;
-
-    /** 最大文字数（指定時はオーバーで警告表示） */
-    maxLength?: number;
-
-    /** 追加クラス名 */
-    className?: string;
-
-    /** クリックハンドラ（任意） */
-    onClick?: () => void;
-};
+import type { TextareaProps } from "../../types/components";
 
 /**
  * 共通 Textarea コンポーネント

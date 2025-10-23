@@ -1,32 +1,6 @@
 import React from "react";
 import "./Button.css";
-
-/** ボタンカラー種別 */
-export type ButtonColor = "primary" | "secondary";
-
-/** ボタンのProps型 */
-export type ButtonProps = {
-    /** ボタン内に表示するテキスト */
-    label: string;
-
-    /** クリック時のハンドラ */
-    onClick?: () => void;
-
-    /** ボタンタイプ */
-    type?: "button" | "submit" | "reset";
-
-    /** 色のバリエーション */
-    color?: ButtonColor;
-
-    /** 無効状態 */
-    disabled?: boolean;
-
-    /** ボタン左側のアイコン */
-    icon?: React.ReactNode;
-
-    /** 追加クラス */
-    className?: string;
-};
+import type { ButtonProps } from "../../types/components";
 
 /**
  * 共通ボタンコンポーネント

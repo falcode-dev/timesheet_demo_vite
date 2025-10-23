@@ -1,35 +1,6 @@
 import React, { forwardRef } from "react";
 import "./Input.css";
-
-/** Input コンポーネント Props 型 */
-export type InputProps = {
-    /** ラベル（任意） */
-    label?: string;
-
-    /** 入力値 */
-    value?: string;
-
-    /** 値変更ハンドラ */
-    onChange?: (value: string) => void;
-
-    /** プレースホルダーテキスト */
-    placeholder?: string;
-
-    /** input タイプ */
-    type?: string;
-
-    /** 無効状態 */
-    disabled?: boolean;
-
-    /** 追加クラス */
-    className?: string;
-
-    /** 幅（px, %, rem など指定可） */
-    width?: string;
-
-    /** 右側の装飾（アイコンなど） */
-    suffix?: React.ReactNode;
-};
+import type { InputProps } from "../../types/components";
 
 /**
  * 共通 Input コンポーネント

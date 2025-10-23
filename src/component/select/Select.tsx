@@ -1,33 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import * as FaIcons from "react-icons/fa";
 import "./Select.css";
-
-/** Selectのオプション型 */
-export type SelectOption = {
-    value: string;
-    label: string;
-};
-
-/** SelectコンポーネントのProps型 */
-export type SelectProps = {
-    /** 選択肢一覧 */
-    options: SelectOption[];
-
-    /** 現在の選択値 */
-    value?: string;
-
-    /** 値変更時のコールバック */
-    onChange?: (value: string) => void;
-
-    /** プレースホルダー */
-    placeholder?: string;
-
-    /** 無効状態 */
-    disabled?: boolean;
-
-    /** 追加クラス名 */
-    className?: string;
-};
+import type { SelectProps } from "../../types/components";
 
 /**
  * 共通Selectコンポーネント

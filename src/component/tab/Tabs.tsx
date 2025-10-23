@@ -1,29 +1,6 @@
 import React from "react";
 import "./Tabs.css";
-
-/** タブの選択肢型 */
-export type TabOption = {
-    value: string;
-    label: string;
-};
-
-/** Tabs コンポーネントの Props 型 */
-export type TabsProps = {
-    /** 表示するタブ一覧 */
-    tabs: TabOption[];
-
-    /** 現在アクティブなタブの値 */
-    activeTab: string;
-
-    /** タブ選択時のハンドラ */
-    onChange: (value: string) => void;
-
-    /** 無効状態 */
-    disabled?: boolean;
-
-    /** 追加クラス名 */
-    className?: string;
-};
+import type { TabsProps } from "../../types/components";
 
 /**
  * 共通 Tabs コンポーネント

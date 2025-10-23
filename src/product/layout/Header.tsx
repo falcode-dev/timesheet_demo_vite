@@ -3,17 +3,7 @@ import { Button } from "../../component/button/Button";
 import { Select } from "../../component/select/Select";
 import * as FaIcons from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-
-export type WorkOrder = {
-    id: string;
-    name: string;
-};
-
-export type HeaderProps = {
-    workOrders?: WorkOrder[];
-    selectedWO: string;
-    setSelectedWO: (id: string) => void;
-};
+import type { HeaderProps } from "../../types/components";
 
 /**
  * アプリ上部ヘッダー

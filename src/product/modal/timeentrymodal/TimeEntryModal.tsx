@@ -2,8 +2,8 @@ import React, { useState, useRef, useEffect, useMemo } from "react";
 import * as FaIcons from "react-icons/fa";
 import { BaseModal } from "../BaseModal";
 import { Select } from "../../../component/select/Select";
-import type { SelectOption } from "../../../component/select/Select";
 import { Button } from "../../../component/button/Button";
+import type { Option } from "../../../types";
 import { Input } from "../../../component/input/Input";
 import { Textarea } from "../../../component/textarea/Textarea";
 import { ResourceSelectModal } from "../resourceselectmodal/ResourceSelectModal";
@@ -22,11 +22,11 @@ export interface TimeEntryModalProps {
     onDuplicate?: (data: any) => void;
     selectedDateTime?: { start: Date; end: Date } | null;
     selectedEvent?: any | null;
-    woOptions: SelectOption[];
-    maincategoryOptions: SelectOption[];
-    paymenttypeOptions: SelectOption[];
-    timecategoryOptions: SelectOption[];
-    timezoneOptions: SelectOption[];
+    woOptions: Option[];
+    maincategoryOptions: Option[];
+    paymenttypeOptions: Option[];
+    timecategoryOptions: Option[];
+    timezoneOptions: Option[];
 }
 
 /* =========================================================
@@ -93,7 +93,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
         [woOptions]
     );
 
-    const hours = useMemo<SelectOption[]>(
+    const hours = useMemo<Option[]>(
         () =>
             Array.from({ length: 24 }, (_, i) => ({
                 value: String(i).padStart(2, "0"),
@@ -102,7 +102,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
         [t]
     );
 
-    const minutes = useMemo<SelectOption[]>(
+    const minutes = useMemo<Option[]>(
         () =>
             Array.from({ length: 60 }, (_, i) => ({
                 value: String(i).padStart(2, "0"),
@@ -111,13 +111,13 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
         [t]
     );
 
-    const endUserOptions: SelectOption[] = [
+    const endUserOptions: Option[] = [
         { value: "abc", label: t("timeEntryModal.sampleEndUser1") },
         { value: "xyz", label: t("timeEntryModal.sampleEndUser2") },
         { value: "sample", label: t("timeEntryModal.sampleEndUser3") },
     ];
 
-    const taskOptions: SelectOption[] = [
+    const taskOptions: Option[] = [
         { value: "doc", label: t("timeEntryModal.task_list.document") },
         { value: "code", label: t("timeEntryModal.task_list.coding") },
         { value: "test", label: t("timeEntryModal.task_list.test") },
