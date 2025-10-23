@@ -3,6 +3,9 @@
  * 基本コンポーネントとレイアウトコンポーネントを一箇所から提供
  */
 
+// メインCSS変数
+import './styles/variables.css';
+
 // 基本UIコンポーネント
 export { Button } from './components/Button';
 export { Input } from './components/Input';

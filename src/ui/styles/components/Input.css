@@ -1,10 +1,14 @@
 /* =============================
    入力コンテナ
 ============================= */
+
+/* メインCSS変数をインポート */
+@import '../variables.css';
+
 .input-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: var(--spacing-xs);
     width: 100%;
     font-family: var(--font-family);
     box-sizing: border-box;
@@ -14,18 +18,18 @@
    入力フィールド
 ============================= */
 .input-field {
-    height: 36px;
+    height: var(--input-height);
     width: 100%;
-    padding: 0 12px;
+    padding: 0 var(--spacing-md);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
-    background: #fff;
-    color: var(--text-color);
-    font-size: 0.875rem;
-    font-weight: 400;
-    transition: all 0.2s ease;
+    border-radius: var(--border-radius-md);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-normal);
+    transition: all var(--transition-normal);
     box-sizing: border-box;
-    line-height: 1.4;
+    line-height: var(--line-height-tight);
 }
 
 /* ホバー時 */

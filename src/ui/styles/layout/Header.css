@@ -1,13 +1,17 @@
 /* =============================
    ヘッダー全体
 ============================= */
+
+/* メインCSS変数をインポート */
+@import '../variables.css';
+
 .app-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 70px;
+    height: var(--header-height);
     flex-shrink: 0;
-    padding: 0 12px;
+    padding: 0 var(--spacing-md);
     box-sizing: border-box;
     font-family: var(--font-family);
 }
@@ -16,12 +20,12 @@
    タイトル部分
 ============================= */
 .header-title {
-    font-size: 1.5rem;
-    font-weight: 600;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-semibold);
     color: var(--main-color);
     margin: 0;
     white-space: nowrap;
-    line-height: 1.2;
+    line-height: var(--line-height-tight);
 }
 
 /* =============================
