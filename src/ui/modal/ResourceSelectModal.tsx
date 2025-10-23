@@ -1,12 +1,13 @@
 import React, { useState, useMemo, useCallback } from "react";
 import * as FaIcons from "react-icons/fa";
-import { BaseModal } from "../BaseModal";
-import { Button, Input } from "../../../ui";
-import { useCurrentUser } from "../../../hooks/useCurrentUser";
-import { useResources } from "../../../hooks/useResources";
-import { useAllowedUsers } from "../../../context/UserListContext";
-import type { Resource } from "../../../hooks/useResources";
-import "./ResourceSelectModal.css";
+import { BaseModal } from "./BaseModal";
+import { Button } from "../components/Button";
+import { Input } from "../components/Input";
+import { useCurrentUser } from "../../hooks/useCurrentUser";
+import { useResources } from "../../hooks/useResources";
+import { useAllowedUsers } from "../../context/UserListContext";
+import type { Resource } from "../../hooks/useResources";
+import "../styles/modal/ResourceSelectModal.css";
 import { useTranslation } from "react-i18next";
 
 interface ResourceSelectModalProps {

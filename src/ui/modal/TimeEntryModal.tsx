@@ -1,11 +1,14 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import * as FaIcons from "react-icons/fa";
-import { BaseModal } from "../BaseModal";
-import { Select, Button, Input, Textarea } from "../../../ui";
-import type { Option } from "../../../types";
-import { ResourceSelectModal } from "../resourceselectmodal/ResourceSelectModal";
-import { ConfirmDeleteModal } from "../confirmdeletemodal/ConfirmDeleteModal"; // ✅ 切り出した削除確認モーダル
-import "./TimeEntryModal.css";
+import { BaseModal } from "./BaseModal";
+import { Button } from "../components/Button";
+import { Select } from "../components/Select";
+import { Input } from "../components/Input";
+import { Textarea } from "../components/Textarea";
+import type { Option } from "../../types";
+import { ResourceSelectModal } from "./ResourceSelectModal";
+import { ConfirmDeleteModal } from "./ConfirmDeleteModal";
+import "../styles/modal/TimeEntryModal.css";
 import { useTranslation } from "react-i18next";
 
 /* =========================================================

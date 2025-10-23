@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import "./BaseModal.css";
+import "../styles/modal/BaseModal.css";
 
 /* ======================================================
    BaseModalProps

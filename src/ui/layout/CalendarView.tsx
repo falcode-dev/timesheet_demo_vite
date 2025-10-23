@@ -6,7 +6,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import jaLocale from "@fullcalendar/core/locales/ja";
 import enLocale from "@fullcalendar/core/locales/en-gb";
-import "./CalendarView.css";
+import "../styles/layout/CalendarView.css";
 import { useTranslation } from "react-i18next";
 
 /** カレンダービューモード */

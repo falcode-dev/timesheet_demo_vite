@@ -171,7 +171,8 @@
 .resource-checkbox:checked::after {
     content: "";
     position: absolute;
-    left: 5px;
+    left: 6px;
+    top: 2px;
     width: 6px;
     height: 11px;
     border-right: 2px solid white;

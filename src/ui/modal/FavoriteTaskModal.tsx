@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useCallback } from "react";
 import * as FaIcons from "react-icons/fa";
 import { IoIosArrowForward } from "react-icons/io";
-import { BaseModal } from "../BaseModal";
-import { Button, Select, Input } from "../../../ui";
-import "./FavoriteTaskModal.css";
+import { BaseModal } from "./BaseModal";
+import { Button } from "../components/Button";
+import { Select } from "../components/Select";
+import { Input } from "../components/Input";
+import "../styles/modal/FavoriteTaskModal.css";
 import { useTranslation } from "react-i18next";
-import { useSubcategories } from "../../../hooks/useSubcategories";
-import { useTasks } from "../../../hooks/useTasks";
-import { useFavoriteTasks } from "../../../context/FavoriteTaskContext";
+import { useSubcategories } from "../../hooks/useSubcategories";
+import { useTasks } from "../../hooks/useTasks";
+import { useFavoriteTasks } from "../../context/FavoriteTaskContext";
 
 /* =========================================================
    型定義

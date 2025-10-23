@@ -100,7 +100,7 @@
 
 /* ---- サブヘッダー ---- */
 .list-subheader {
-    height: 30px;
+    height: 45px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -208,8 +208,8 @@
 .subheader-checkbox:checked::after {
     content: '';
     position: absolute;
-    left: 5px;
-    top: 0px;
+    left: 6px;
+    top: 3px;
     width: 5px;
     height: 10px;
     border: solid white;
@@ -229,8 +229,8 @@
 .disabled-item input[type='checkbox']::after {
     content: '';
     position: absolute;
-    left: 5px;
-    top: 0px;
+    left: 6px;
+    top: 3px;
     width: 5px;
     height: 10px;
     border: solid white;
@@ -271,7 +271,7 @@
 
 /* ---- 選択済みリスト ---- */
 .list-item-favorite {
-    height: 40px;
+    height: 50px;
     display: flex;
     align-items: center;
     justify-content: space-between;

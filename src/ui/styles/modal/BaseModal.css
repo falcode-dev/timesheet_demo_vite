@@ -85,54 +85,6 @@
     flex-shrink: 0;
 }
 
-/* ===== ボタン共通 ===== */
-/* .btn {
-    padding: 8px 16px;
-    border-radius: 4px;
-    border: none;
-    cursor: pointer;
-    font-weight: 600;
-    margin-left: 8px;
-    transition: opacity 0.2s ease;
-}
-
-.btn.primary {
-    background-color: var(--main-color);
-    color: #fff;
-}
-
-.btn.primary:hover {
-    opacity: 0.85;
-}
-
-.btn.secondary {
-    background-color: #e5e5e5;
-    color: #333;
-}
-
-.btn.secondary:hover {
-    background-color: #dcdcdc;
-}
-
-.btn.danger {
-    background-color: #d9534f;
-    color: #fff;
-}
-
-.btn.danger:hover {
-    opacity: 0.85;
-}
-
-.btn.text {
-    background: none;
-    color: var(--main-color);
-    padding: 8px 10px;
-}
-
-.btn.text:hover {
-    text-decoration: underline;
-} */
-
 /* ===== アニメーション ===== */
 .modal-content.fade-in {
     transform: translateY(0);

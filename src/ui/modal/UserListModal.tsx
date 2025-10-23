@@ -2,12 +2,13 @@
 import React, { useState, useEffect, useCallback } from "react";
 import * as FaIcons from "react-icons/fa";
 import { IoIosArrowForward } from "react-icons/io";
-import { BaseModal } from "../BaseModal";
-import { Button, Input } from "../../../ui";
-import { useResources } from "../../../hooks/useResources";
-import { useAllowedUsers } from "../../../context/UserListContext";
-import type { Resource } from "../../../hooks/useResources";
-import "./UserListModal.css";
+import { BaseModal } from "./BaseModal";
+import { Button } from "../components/Button";
+import { Input } from "../components/Input";
+import { useResources } from "../../hooks/useResources";
+import { useAllowedUsers } from "../../context/UserListContext";
+import type { Resource } from "../../hooks/useResources";
+import "../styles/modal/UserListModal.css";
 import { useTranslation } from "react-i18next";
 
 /* =========================================================

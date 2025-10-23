@@ -15,6 +15,15 @@ export { Header } from './layout/Header';
 export { Sidebar } from './layout/Sidebar';
 export { ContentHeader } from './layout/ContentHeader';
 export { Footer } from './layout/Footer';
+export { CalendarView } from './layout/CalendarView';
+
+// モーダルコンポーネント
+export { BaseModal } from './modal/BaseModal';
+export { ConfirmDeleteModal } from './modal/ConfirmDeleteModal';
+export { FavoriteTaskModal } from './modal/FavoriteTaskModal';
+export { TimeEntryModal } from './modal/TimeEntryModal';
+export { UserListModal } from './modal/UserListModal';
+export { ResourceSelectModal } from './modal/ResourceSelectModal';
 
 // 型定義は types/components から再エクスポート
 export type {

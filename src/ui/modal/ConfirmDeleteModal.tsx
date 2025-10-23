@@ -1,8 +1,8 @@
 import React from "react";
-import { BaseModal } from "../BaseModal";
-import { Button } from "../../../ui";
+import { BaseModal } from "./BaseModal";
+import { Button } from "../components/Button";
 import { useTranslation } from "react-i18next";
-import "./ConfirmDeleteModal.css";
+import "../styles/modal/ConfirmDeleteModal.css";
 
 /* =========================================================
    型定義
