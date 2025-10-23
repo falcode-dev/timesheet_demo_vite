@@ -24,11 +24,12 @@ body {
     margin: 0;
     font-family: var(--font-family, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif);
     font-size: 16px;
-    line-height: 1.5;
+    line-height: 1.6;
     color: #333;
     background-color: #fff;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font-weight: 400;
 }
 
 main {
@@ -226,6 +227,16 @@ template {
     --bg-light: #f9f9f9;
     --text-gray: #555;
     --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+    /* レスポンシブ用ブレークポイント */
+    --breakpoint-tablet: 1024px;
+    --breakpoint-mobile: 768px;
+    --breakpoint-small-mobile: 480px;
+    --breakpoint-tiny-mobile: 360px;
+
+    /* タッチターゲット最小サイズ */
+    --touch-target-min: 44px;
+    --touch-target-small: 40px;
 }
 
 /* =============================
@@ -291,12 +302,19 @@ body,
 /* =============================
    レスポンシブ対応
 ============================= */
+
+/* ▼ タブレット（1024px以下） */
 @media (max-width: 1024px) {
     .content-middle {
         gap: 12px;
     }
+
+    .app-container {
+        padding: 8px;
+    }
 }
 
+/* ▼ タブレット（768px以下） */
 @media (max-width: 768px) {
     html {
         height: auto;
@@ -304,25 +322,81 @@ body,
 
     .app-container {
         display: block;
-        padding: 8px;
+        padding: 6px;
     }
 
     .content-middle {
         flex-direction: column;
         min-height: auto;
+        gap: 8px;
     }
 
     .content-card {
         border-radius: 6px;
     }
+
+    .content-main {
+        min-height: 500px;
+    }
 }
 
+/* ▼ スマホ（480px以下） */
 @media (max-width: 480px) {
     .app-container {
-        padding: 6px;
+        padding: 4px;
     }
 
     .content-middle {
-        gap: 8px;
+        gap: 6px;
+    }
+
+    .content-main {
+        min-height: 400px;
+    }
+}
+
+/* ▼ 小型スマホ（360px以下） */
+@media (max-width: 360px) {
+    .app-container {
+        padding: 2px;
+    }
+
+    .content-card {
+        border-radius: 4px;
+    }
+}
+
+/* =============================
+   レスポンシブフォントサイズ
+============================= */
+
+/* ▼ タブレット（1024px以下） */
+@media (max-width: 1024px) {
+    body {
+        font-size: 15px;
+    }
+}
+
+/* ▼ タブレット（768px以下） */
+@media (max-width: 768px) {
+    body {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+}
+
+/* ▼ スマホ（480px以下） */
+@media (max-width: 480px) {
+    body {
+        font-size: 14px;
+        line-height: 1.4;
+    }
+}
+
+/* ▼ 小型スマホ（360px以下） */
+@media (max-width: 360px) {
+    body {
+        font-size: 13px;
+        line-height: 1.4;
     }
 }

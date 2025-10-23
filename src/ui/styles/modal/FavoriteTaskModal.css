@@ -368,4 +368,8 @@
     .task-list {
         padding: 12px;
     }
+
+    .favotitetask-create-button {
+        margin-left: 0;
+    }
 }

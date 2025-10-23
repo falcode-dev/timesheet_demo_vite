@@ -426,4 +426,8 @@
     .task-list {
         padding: 12px;
     }
+
+    .userlist-create-button {
+        margin-left: 0;
+    }
 }

@@ -14,16 +14,18 @@
    入力フィールド
 ============================= */
 .input-field {
-    height: 35px;
+    height: 36px;
     width: 100%;
-    padding: 0 10px;
+    padding: 0 12px;
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 6px;
     background: #fff;
     color: var(--text-color);
-    font-size: 0.9rem;
+    font-size: 0.875rem;
+    font-weight: 400;
     transition: all 0.2s ease;
     box-sizing: border-box;
+    line-height: 1.4;
 }
 
 /* ホバー時 */
@@ -52,11 +54,38 @@
 }
 
 /* =============================
-   レスポンシブ
+   レスポンシブ対応
 ============================= */
+
+/* ▼ タブレット（768px以下） */
+@media (max-width: 768px) {
+    .input-field {
+        height: 40px;
+        padding: 0 12px;
+        font-size: 0.875rem;
+        /* iOS ズーム防止 */
+        border-radius: 6px;
+    }
+}
+
+/* ▼ スマホ（480px以下） */
 @media (max-width: 480px) {
     .input-field {
-        height: 32px;
-        font-size: 0.85rem;
+        height: 44px;
+        padding: 0 14px;
+        font-size: 0.875rem;
+        border-radius: 8px;
+        min-height: 44px;
+        /* タッチターゲットの最小サイズ */
+    }
+}
+
+/* ▼ 小型スマホ（360px以下） */
+@media (max-width: 360px) {
+    .input-field {
+        height: 42px;
+        padding: 0 12px;
+        font-size: 0.8125rem;
+        border-radius: 6px;
     }
 }

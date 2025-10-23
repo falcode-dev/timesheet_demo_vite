@@ -48,7 +48,7 @@ export const Footer: React.FC<FooterProps> = ({
             {/* =============================
           右側：その他メニューボタン
       ============================== */}
-            <div className="content-bottom-right">
+            {/* <div className="content-bottom-right">
                 <button
                     className="menu-button"
                     title={t("footer.more")}
@@ -56,7 +56,7 @@ export const Footer: React.FC<FooterProps> = ({
                 >
                     <FaIcons.FaEllipsisV />
                 </button>
-            </div>
+            </div> */}
         </footer>
     );
 };

@@ -374,10 +374,26 @@
 /* =============================
    レスポンシブ対応
 ============================= */
+
+/* ▼ タブレット（1024px以下） */
+@media (max-width: 1024px) {
+    .sidebar-container {
+        width: 240px;
+        padding: 8px;
+    }
+
+    .sidebar-title {
+        font-size: 0.9rem;
+    }
+}
+
+/* ▼ タブレット（768px以下） */
 @media (max-width: 768px) {
     .sidebar-container {
         width: 100%;
         padding: 8px 12px;
+        max-height: 300px;
+        overflow-y: auto;
     }
 
     .sidebar-title {
@@ -391,5 +407,83 @@
 
     .sidebar-self-item {
         gap: 8px;
+    }
+
+    .sidebar-results {
+        max-height: 200px;
+    }
+
+    .sidebar-task-list {
+        max-height: 200px;
+    }
+}
+
+/* ▼ スマホ（480px以下） */
+@media (max-width: 480px) {
+    .sidebar-container {
+        padding: 6px 8px;
+        max-height: 250px;
+    }
+
+    .sidebar-title {
+        font-size: 0.85rem;
+    }
+
+    .sidebar-radios {
+        gap: 6px;
+    }
+
+    .sidebar-radios label {
+        font-size: 0.85rem;
+    }
+
+    .sidebar-self-item {
+        gap: 6px;
+        padding: 4px 6px;
+    }
+
+    .sidebar-self-number {
+        font-size: 0.75rem;
+    }
+
+    .sidebar-self-roman {
+        font-size: 0.8rem;
+    }
+
+    .sidebar-results {
+        max-height: 150px;
+    }
+
+    .sidebar-task-list {
+        max-height: 150px;
+    }
+}
+
+/* ▼ 小型スマホ（360px以下） */
+@media (max-width: 360px) {
+    .sidebar-container {
+        padding: 4px 6px;
+        max-height: 200px;
+    }
+
+    .sidebar-title {
+        font-size: 0.8rem;
+    }
+
+    .sidebar-radios label {
+        font-size: 0.8rem;
+    }
+
+    .sidebar-self-item {
+        gap: 4px;
+        padding: 3px 4px;
+    }
+
+    .sidebar-self-number {
+        font-size: 0.7rem;
+    }
+
+    .sidebar-self-roman {
+        font-size: 0.75rem;
     }
 }

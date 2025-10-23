@@ -55,12 +55,13 @@
 
 .textarea-field {
     width: 100%;
-    padding: 8px 10px;
+    padding: 10px 12px;
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 6px;
     background: #fff;
     color: var(--text-color);
-    font-size: 0.9rem;
+    font-size: 0.875rem;
+    font-weight: 400;
     line-height: 1.5;
     resize: vertical;
     transition: all 0.2s ease;
@@ -94,12 +95,57 @@
 }
 
 /* =============================
-   レスポンシブ
+   レスポンシブ対応
 ============================= */
+
+/* ▼ タブレット（768px以下） */
+@media (max-width: 768px) {
+    .textarea-field {
+        font-size: 0.875rem;
+        /* iOS ズーム防止 */
+        padding: 10px 12px;
+        border-radius: 6px;
+        min-height: 100px;
+    }
+
+    .textarea-label {
+        font-size: 0.9rem;
+    }
+
+    .textarea-count {
+        font-size: 0.8rem;
+    }
+}
+
+/* ▼ スマホ（480px以下） */
 @media (max-width: 480px) {
     .textarea-field {
+        font-size: 0.875rem;
+        padding: 12px 14px;
+        border-radius: 8px;
+        min-height: 120px;
+    }
+
+    .textarea-label {
         font-size: 0.85rem;
-        padding: 6px 8px;
+    }
+
+    .textarea-count {
+        font-size: 0.75rem;
+    }
+}
+
+/* ▼ 小型スマホ（360px以下） */
+@media (max-width: 360px) {
+    .textarea-field {
+        font-size: 0.8125rem;
+        padding: 10px 12px;
+        border-radius: 6px;
+        min-height: 100px;
+    }
+
+    .textarea-label {
+        font-size: 0.8rem;
     }
 
     .textarea-count {

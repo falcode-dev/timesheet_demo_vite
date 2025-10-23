@@ -265,4 +265,8 @@
     .resource-name {
         font-size: 0.9rem;
     }
+
+    .resource-modal-button {
+        margin-left: 0;
+    }
 }

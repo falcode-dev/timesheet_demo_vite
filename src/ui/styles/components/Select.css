@@ -10,11 +10,11 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 35px;
+    height: 36px;
     width: 300px;
     padding: 0 12px;
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 6px;
     background: #fff;
     transition: 0.2s ease;
     cursor: pointer;
@@ -40,12 +40,14 @@
 ============================= */
 .select-text {
     flex: 1;
-    font-size: 14px;
+    font-size: 0.875rem;
+    font-weight: 400;
     color: var(--main-color);
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
     font-family: var(--font-family);
+    line-height: 1.4;
 }
 
 .select-text.placeholder {
@@ -101,12 +103,14 @@
    オプション項目
 ============================= */
 .select-option {
-    padding: 8px 12px;
-    font-size: 14px;
+    padding: 10px 12px;
+    font-size: 0.875rem;
+    font-weight: 400;
     color: var(--text-color);
     cursor: pointer;
     transition: background-color 0.15s ease;
     font-family: var(--font-family);
+    line-height: 1.4;
 }
 
 .select-option:hover {
@@ -136,4 +140,85 @@
 .select-option-list::-webkit-scrollbar-thumb {
     background-color: rgba(0, 0, 0, 0.2);
     border-radius: 3px;
+}
+
+/* =============================
+   レスポンシブ対応
+============================= */
+
+/* ▼ タブレット（768px以下） */
+@media (max-width: 768px) {
+    .select-display {
+        height: 40px;
+        padding: 0 14px;
+        font-size: 0.875rem;
+        /* iOS ズーム防止 */
+        border-radius: 6px;
+        min-height: 40px;
+    }
+
+    .select-text {
+        font-size: 0.875rem;
+    }
+
+    .select-option {
+        padding: 10px 14px;
+        font-size: 0.875rem;
+        min-height: 44px;
+        /* タッチターゲットの最小サイズ */
+        display: flex;
+        align-items: center;
+    }
+}
+
+/* ▼ スマホ（480px以下） */
+@media (max-width: 480px) {
+    .select-display {
+        height: 44px;
+        padding: 0 16px;
+        font-size: 0.875rem;
+        border-radius: 8px;
+        min-height: 44px;
+    }
+
+    .select-text {
+        font-size: 0.875rem;
+    }
+
+    .select-option {
+        padding: 12px 16px;
+        font-size: 0.875rem;
+        min-height: 48px;
+    }
+
+    .select-option-list {
+        max-height: 250px;
+        border-radius: 8px;
+    }
+}
+
+/* ▼ 小型スマホ（360px以下） */
+@media (max-width: 360px) {
+    .select-display {
+        height: 42px;
+        padding: 0 14px;
+        font-size: 0.8125rem;
+        border-radius: 6px;
+        min-height: 42px;
+    }
+
+    .select-text {
+        font-size: 0.8125rem;
+    }
+
+    .select-option {
+        padding: 10px 14px;
+        font-size: 0.8125rem;
+        min-height: 44px;
+    }
+
+    .select-option-list {
+        max-height: 200px;
+        border-radius: 6px;
+    }
 }
