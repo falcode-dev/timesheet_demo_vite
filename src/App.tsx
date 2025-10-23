@@ -89,7 +89,7 @@ function TimesheetApp() {
 
         {/* 中央：サイドバー＋カレンダー */}
         <div className="content-middle">
-          {/* ✅ Sidebar が Context からお気に入りタスクを取得 */}
+          {/* Sidebar が Context からお気に入りタスクを取得 */}
           <Sidebar mainTab={mainTab} />
 
           <div className="content-main">

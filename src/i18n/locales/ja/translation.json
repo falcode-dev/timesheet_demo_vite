@@ -1,8 +1,6 @@
 {
     "header": {
         "title": "Time Sheet",
-        "userList": "ユーザー一覧",
-        "favoriteTasks": "お気に入りタスク",
         "targetWO": "対象WO",
         "selectWO": "対象WOを選択",
         "upload": "アップロード",
@@ -10,15 +8,7 @@
         "noName": "(名称未設定)"
     },
     "calendar": {
-        "today": "今日",
-        "next": "次へ",
-        "prev": "前へ"
-    },
-    "modal": {
-        "newEntry": "新規登録",
-        "editEntry": "編集",
-        "save": "保存",
-        "cancel": "キャンセル"
+        "today": "今日"
     },
     "contentHeader": {
         "userTab": "ユーザー",
@@ -54,27 +44,12 @@
             "categoryDesc": "サブカテゴリ降順",
             "taskAsc": "タスク昇順",
             "taskDesc": "タスク降順"
-        },
-        "tasks": {
-            "meeting": "会議",
-            "meetingDetail": "定例ミーティング",
-            "education": "教育",
-            "educationDetail": "新入社員研修資料作成",
-            "docs": "資料作成",
-            "docsDetail": "週次報告書作成",
-            "other": "その他",
-            "otherDetail": "社内イベント準備"
         }
     },
     "footer": {
         "userListSetting": "ユーザー 一覧設定",
         "favoriteTaskSetting": "お気に入り間接タスク設定",
         "more": "その他"
-    },
-    "calendarView": {
-        "threeDays": "3日",
-        "week": "週",
-        "day": "1日"
     },
     "timeEntryModal": {
         "titleCreate": "新しいタイムエントリを作成",
@@ -86,6 +61,8 @@
         "create": "作成",
         "update": "保存",
         "cancel": "キャンセル",
+        "delete": "削除",
+        "duplicate": "複製",
         "woNumber": "WO番号",
         "selectWO": "WOを選択",
         "startDate": "スケジュール開始日",
@@ -112,19 +89,12 @@
             "coding": "プログラミング",
             "test": "テスト"
         },
-        "delete": "削除",
-        "duplicate": "複製",
         "confirmDelete": "選択した情報を削除します。",
         "deleteWarning": "削除したデータは復元ができません。",
-        "deleteConfirm": "よろしいですか？",
-        "deleteFinal": "削除を実行する場合は「削除」ボタンを押してください。"
+        "deleteConfirm": "よろしいですか？"
     },
     "confirmDeleteModal": {
-        "title": "削除",
-        "message": "このイベントを削除しますか？",
-        "warning": "この操作は元に戻せません。",
-        "cancel": "キャンセル",
-        "confirm": "削除"
+        "title": "削除"
     },
     "favoriteTask": {
         "title": "お気に入り間接タスク設定",
@@ -142,18 +112,7 @@
         "favoriteList": "お気に入り間接タスク項目",
         "moveRight": "選択項目を右へ移動",
         "items": "件",
-        "categories": {
-            "improvement": "業務改善",
-            "quality": "品質向上",
-            "education": "教育・育成"
-        },
-        "tasks": {
-            "document": "資料整理",
-            "meeting": "会議準備",
-            "testPlan": "テスト計画",
-            "review": "レビュー対応",
-            "weekly": "定例会参加"
-        }
+        "unknownCategory": "不明なカテゴリ"
     },
     "userList": {
         "title": "ユーザー一覧設定",

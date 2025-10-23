@@ -1,9 +1,5 @@
 import React, { createContext, useContext, useState, type ReactNode } from "react";
 
-/* =========================================================
-   型定義
-========================================================= */
-
 /** お気に入りタスク情報の型 */
 export type FavoriteTask = {
     id: string;
@@ -19,19 +15,11 @@ export type FavoriteTaskContextType = {
     setFavoriteTasks: (tasks: FavoriteTask[]) => void;
 };
 
-/* =========================================================
-   Context本体
-========================================================= */
-
-/** 初期値は undefined（Provider 外で使うとエラーにする） */
+/** Context本体（初期値: undefined） */
 const FavoriteTaskContext = createContext<FavoriteTaskContextType | undefined>(undefined);
 
-/* =========================================================
-   Provider コンポーネント
-========================================================= */
-
 /**
- * お気に入りタスク情報をアプリ全体で共有する Provider
+ * お気に入りタスク情報をアプリ全体で共有するProvider
  * - favoriteTasks: お気に入りタスク一覧
  * - setFavoriteTasks: 更新関数
  */
@@ -45,13 +33,9 @@ export const FavoriteTaskProvider: React.FC<{ children: ReactNode }> = ({ childr
     );
 };
 
-/* =========================================================
-   カスタムフック
-========================================================= */
-
 /**
  * お気に入りタスク情報を利用するためのカスタムフック
- * - Provider 配下でのみ使用可能
+ * - Provider配下でのみ使用可能
  */
 export const useFavoriteTasks = (): FavoriteTaskContextType => {
     const context = useContext(FavoriteTaskContext);
