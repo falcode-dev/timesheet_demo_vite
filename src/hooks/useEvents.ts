@@ -10,6 +10,10 @@ export type EventData = {
     start: string;
     end: string;
     workOrderId: string;
+    maincategory?: number;
+    timecategory?: number;
+    paymenttype?: number;
+    timezone?: string;
     extendedProps?: Record<string, any>;
 };
 
@@ -64,6 +68,10 @@ const fetchEvents = async (): Promise<EventData[]> => {
             start: fromUtcToJst(t.proto_startdatetime),
             end: fromUtcToJst(t.proto_enddatetime),
             workOrderId: wo.proto_workorderid,
+            maincategory: t.proto_maincategory,
+            timecategory: t.proto_timecategory,
+            paymenttype: t.proto_paymenttype,
+            timezone: t.proto_timezone ?? null,
             extendedProps: {
                 timezone: t.proto_timezone ?? null,
             },
@@ -72,36 +80,26 @@ const fetchEvents = async (): Promise<EventData[]> => {
 };
 
 /**
- * イベント詳細を取得（クリック時用）
+ * イベント詳細を取得（既存データから取得、API呼び出しなし）
  */
-const fetchEventDetail = async (id: string) => {
-    const xrm = getXrm();
-
-    // ローカルモード
-    if (!xrm) {
-        const local = JSON.parse(localStorage.getItem("mockEvents") || "[]");
-        return local.find((e: any) => e.id === id);
+const fetchEventDetail = async (id: string, allEvents: EventData[]) => {
+    // 既存のイベントデータから検索
+    const event = allEvents.find(e => e.id === id);
+    if (!event) {
+        console.warn("イベントが見つかりません:", id);
+        return null;
     }
 
-    // Dataverse 環境
-    const entityName = "proto_timeentry";
-    const query =
-        `?$select=proto_name,proto_startdatetime,proto_enddatetime,` +
-        `proto_maincategory,proto_paymenttype,proto_timecategory,proto_timezone` +
-        `&$expand=proto_wonumber($select=proto_wonumber,proto_workorderid)`;
-
-    const record = await xrm.WebApi.retrieveRecord(entityName, id, query);
-
     return {
-        id,
-        title: record.proto_name,
-        start: fromUtcToJst(record.proto_startdatetime),
-        end: fromUtcToJst(record.proto_enddatetime),
-        maincategory: record.proto_maincategory,
-        timecategory: record.proto_timecategory,
-        paymenttype: record.proto_paymenttype,
-        timezone: record.proto_timezone ?? null,
-        workOrder: record.proto_wonumber?.proto_workorderid,
+        id: event.id,
+        title: event.title,
+        start: new Date(event.start),
+        end: new Date(event.end),
+        maincategory: event.maincategory?.toString(),
+        timecategory: event.timecategory?.toString(),
+        paymenttype: event.paymenttype?.toString(),
+        timezone: event.timezone,
+        workOrder: event.workOrderId,
     };
 };
 
@@ -179,6 +177,6 @@ export const useEvents = (selectedWO: string) => {
         isError,
         refetchEvents: refetch,
         createOrUpdateEvent: handleSubmit,
-        fetchEventDetail,
+        fetchEventDetail: (id: string) => fetchEventDetail(id, allEvents),
     };
 };

@@ -26,7 +26,7 @@ export const useTimeEntryActions = (
         setSelectedDateTime(null);
     };
 
-    /** イベントクリック時の詳細取得処理 */
+    /** イベントクリック時の詳細取得処理（既存データから取得） */
     const handleEventClick = async (event: Event) => {
         try {
             const detail = await fetchEventDetail(event.id);
