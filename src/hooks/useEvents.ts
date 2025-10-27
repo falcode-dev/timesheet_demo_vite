@@ -167,7 +167,31 @@ export const useEvents = (selectedWO: string) => {
 
     /** モーダル送信処理 */
     const handleSubmit = async (data: any) => {
-        await mutation.mutateAsync(data);
+        // Event型とTimeEntryData型の両方に対応
+        let processedData: any;
+
+        if (data.start && data.end && typeof data.start === 'object' && typeof data.end === 'object') {
+            // Event型の場合：TimeEntryData型に変換
+            processedData = {
+                id: data.id,
+                wo: data.workOrder || '',
+                start: data.start,
+                end: data.end,
+                endUser: data.endUser || '',
+                timezone: data.timezone || '',
+                resource: data.resource || '',
+                timeCategory: data.timecategory || '',
+                mainCategory: data.maincategory || '',
+                paymentType: data.paymenttype || '',
+                task: data.task || '',
+                comment: data.comment || '',
+            };
+        } else {
+            // TimeEntryData型の場合：そのまま使用
+            processedData = data;
+        }
+
+        await mutation.mutateAsync(processedData);
         await refetch();
     };
 
