@@ -35,7 +35,7 @@ export class TaskClient extends BaseClient<Task, TaskInput> {
 
         return await this.executeDataverseOperation(async () => {
             const query = this.buildQueryString({
-                select: ['proto_taskid', 'proto_name', '_proto_subcategory_value'],
+                select: ['proto_taskid', 'proto_name'],
                 ...queryOptions
             });
 
@@ -115,7 +115,7 @@ export class TaskClient extends BaseClient<Task, TaskInput> {
         return {
             id: record.proto_taskid,
             name: record.proto_name || '',
-            subcategoryId: record._proto_subcategory_value
+            // subcategoryId: record._proto_subcategory_value
         };
     }
 

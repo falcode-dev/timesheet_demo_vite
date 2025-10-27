@@ -41,7 +41,7 @@ export class ResourceClient extends BaseClient<ResourceRecord, ResourceInput> {
 
         return await this.executeDataverseOperation(async () => {
             const query = this.buildQueryString({
-                select: ['proto_bookableresourceid', 'proto_sei', 'proto_mei', 'proto_shimei', 'proto_name', 'proto_employeeid'],
+                select: ['proto_bookableresourceid', 'proto_sei', 'proto_mei', 'proto_shimei', 'proto_name'],
                 ...queryOptions
             });
 
@@ -66,7 +66,7 @@ export class ResourceClient extends BaseClient<ResourceRecord, ResourceInput> {
                 proto_sei: data.lastName,
                 proto_mei: data.firstName,
                 proto_shimei: data.fullName,
-                proto_employeeid: data.number
+                // proto_employeeid: data.number
             };
 
             const result = await this.getXrm().WebApi.createRecord(this.entityName, payload);
@@ -88,7 +88,7 @@ export class ResourceClient extends BaseClient<ResourceRecord, ResourceInput> {
             if (data.lastName) payload.proto_sei = data.lastName;
             if (data.firstName) payload.proto_mei = data.firstName;
             if (data.fullName) payload.proto_shimei = data.fullName;
-            if (data.number) payload.proto_employeeid = data.number;
+            // if (data.number) payload.proto_employeeid = data.number;
 
             await this.getXrm().WebApi.updateRecord(this.entityName, id, payload);
             return { id, ...data } as ResourceRecord;
@@ -117,7 +117,7 @@ export class ResourceClient extends BaseClient<ResourceRecord, ResourceInput> {
         return {
             id: record.proto_bookableresourceid,
             name: record.proto_name || '',
-            number: record.proto_employeeid || '',
+            // number: record.proto_employeeid || '',
             lastName: record.proto_sei || '',
             firstName: record.proto_mei || '',
             fullName: record.proto_shimei || ''
