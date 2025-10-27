@@ -107,6 +107,7 @@
    オプション項目
 ============================= */
 .select-option {
+    height: 35px;
     padding: var(--spacing-sm) var(--spacing-md);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-normal);

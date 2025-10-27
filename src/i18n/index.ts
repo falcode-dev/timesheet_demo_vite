@@ -48,10 +48,10 @@ const getLanguageFromXrm = (): string => {
 };
 
 /** Dataverse / ローカル環境両対応の言語判定 */
-const userLang = getLanguageFromXrm();
+// const userLang = getLanguageFromXrm();
 
 // debug
-// const userLang = "en";
+const userLang = "en";
 // debug
 
 i18n

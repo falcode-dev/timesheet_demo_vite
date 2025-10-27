@@ -234,9 +234,7 @@ export const UserListModal: React.FC<UserListModalProps> = ({
                             </div>
 
                             <div className="list-box">
-                                {searchResults.length === 0 ? (
-                                    <p className="no-results">{t("userList.noSearchResults")}</p>
-                                ) : (
+                                {
                                     searchResults.map((r) => {
                                         const isSelected = selectedUsers.some((u) => u.id === r.id);
                                         return (
@@ -257,7 +255,7 @@ export const UserListModal: React.FC<UserListModalProps> = ({
                                             </label>
                                         );
                                     })
-                                )}
+                                }
                             </div>
                         </div>
 
@@ -301,9 +299,7 @@ export const UserListModal: React.FC<UserListModalProps> = ({
                             </div>
 
                             <div className="list-box">
-                                {selectedUsers.length === 0 ? (
-                                    <p className="no-results">{t("userList.noSelected")}</p>
-                                ) : (
+                                {
                                     selectedUsers.map((r) => (
                                         <div key={r.id} className="list-item-favorite">
                                             <div className="list-item-favorite-left">
@@ -327,7 +323,7 @@ export const UserListModal: React.FC<UserListModalProps> = ({
                                             </div>
                                         </div>
                                     ))
-                                )}
+                                }
                             </div>
                         </div>
                     </div>

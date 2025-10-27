@@ -64,12 +64,12 @@
         "delete": "削除",
         "duplicate": "複製",
         "woNumber": "WO番号",
-        "selectWO": "WOを選択",
+        "selectWO": "WO番号を選択",
         "startDate": "スケジュール開始日",
         "endDate": "スケジュール終了日",
         "hourSuffix": "",
         "minuteSuffix": "",
-        "location": "ロケーション",
+        "location": "Location",
         "resource": "リソース",
         "selectResource": "リソース選択",
         "resourcePlaceholder": "リソースがここに表示されます",
@@ -91,7 +91,17 @@
         },
         "confirmDelete": "選択した情報を削除します。",
         "deleteWarning": "削除したデータは復元ができません。",
-        "deleteConfirm": "よろしいですか？"
+        "deleteConfirm": "よろしいですか？",
+        "placeholders": {
+            "selectWO": "WO番号を選択",
+            "selectTimeCategory": "タイムカテゴリを選択",
+            "selectMainCategory": "カテゴリを選択",
+            "selectPaymentType": "ペイメントタイプを選択",
+            "selectTask": "カテゴリを選択してタスクを選択",
+            "selectEndUser": "EndUserを選択",
+            "selectLocation": "Locationを選択",
+            "enterComment": "コメントを入力"
+        }
     },
     "confirmDeleteModal": {
         "title": "削除"
@@ -104,12 +114,12 @@
         "subCategory": "サブカテゴリ",
         "selectSubCategory": "サブカテゴリを選択",
         "clear": "クリア",
-        "taskName": "タスク名",
+        "taskName": "サブカテゴリ",
         "enterTaskName": "タスク名を入力",
         "search": "検索",
         "instructions": "検索結果の項目を選択して追加し保存を押してください。",
         "searchResults": "検索結果",
-        "favoriteList": "お気に入り間接タスク項目",
+        "favoriteList": "お気に入り間接タスク追加項目",
         "moveRight": "選択項目を右へ移動",
         "items": "件",
         "unknownCategory": "不明なカテゴリ"
@@ -125,7 +135,7 @@
         "enterUserName": "ユーザー名を入力",
         "clear": "クリア",
         "search": "検索",
-        "instructions": "社員番号またはユーザー名を入力し、検索してください。",
+        "instructions": "検索結果の項目を選択して追加し保存を押してください。",
         "loading": "リソースを読み込み中...",
         "searchResults": "検索結果",
         "selectedUsers": "設定済ユーザー",

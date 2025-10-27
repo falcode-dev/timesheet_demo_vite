@@ -342,7 +342,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                         options={filteredWoOptions}
                         value={wo}
                         onChange={setWo}
-                        placeholder={t("timeEntryModal.selectWO")}
+                        placeholder={t("timeEntryModal.placeholders.selectWO")}
                     />
 
                     <div className="modal-grid">
@@ -386,13 +386,19 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                             </div>
 
                             <label className="modal-label">EndUser</label>
-                            <Select options={endUserOptions} value={endUser} onChange={setEndUser} />
+                            <Select
+                                options={endUserOptions}
+                                value={endUser}
+                                onChange={setEndUser}
+                                placeholder={t("timeEntryModal.placeholders.selectEndUser")}
+                            />
 
                             <label className="modal-label">{t("timeEntryModal.location")}</label>
                             <Select
                                 options={timezoneOptions}
                                 value={timezone}
                                 onChange={setTimezone}
+                                placeholder={t("timeEntryModal.placeholders.selectLocation")}
                             />
 
                             <div className="resource-header">
@@ -417,6 +423,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                 options={timecategoryOptions}
                                 value={timeCategory}
                                 onChange={setTimeCategory}
+                                placeholder={t("timeEntryModal.placeholders.selectTimeCategory")}
                             />
 
                             <label className="modal-label">{t("timeEntryModal.mainCategory")}</label>
@@ -424,6 +431,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                 options={maincategoryOptions}
                                 value={mainCategory}
                                 onChange={setMainCategory}
+                                placeholder={t("timeEntryModal.placeholders.selectMainCategory")}
                             />
 
                             <label className="modal-label">{t("timeEntryModal.paymentType")}</label>
@@ -431,19 +439,25 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                                 options={paymenttypeOptions}
                                 value={paymentType}
                                 onChange={setPaymentType}
+                                placeholder={t("timeEntryModal.placeholders.selectPaymentType")}
                             />
 
                             <label className="modal-label">{t("timeEntryModal.subCategory")}</label>
                             <Input value={t("timeEntryModal.auto")} disabled />
 
                             <label className="modal-label">{t("timeEntryModal.task")}</label>
-                            <Select options={taskOptions} value={task} onChange={setTask} />
+                            <Select
+                                options={taskOptions}
+                                value={task}
+                                onChange={setTask}
+                                placeholder={t("timeEntryModal.placeholders.selectTask")}
+                            />
 
                             <Textarea
                                 label={t("timeEntryModal.comment")}
                                 value={comment}
                                 onChange={setComment}
-                                placeholder={t("timeEntryModal.commentPlaceholder")}
+                                placeholder={t("timeEntryModal.placeholders.enterComment")}
                                 rows={4}
                                 showCount
                                 maxLength={2000}

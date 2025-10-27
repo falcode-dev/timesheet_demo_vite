@@ -119,7 +119,7 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    font-size: 0.8125rem;
+    font-size: 1rem;
     font-weight: 500;
     color: var(--main-color);
     background-color: #fff;

@@ -19,7 +19,7 @@ export const Header: React.FC<HeaderProps> = ({
     const { t } = useTranslation();
 
     const woOptions = [
-        { value: "all", label: t("header.all") },
+        { value: "", label: "" },
         ...workOrders.map((wo) => ({
             value: wo.id,
             label: wo.name || t("header.noName"),
