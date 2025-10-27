@@ -167,27 +167,56 @@ export const useEvents = (selectedWO: string) => {
 
     /** モーダル送信処理 */
     const handleSubmit = async (data: any) => {
-        // Event型とTimeEntryData型の両方に対応
+        // 複数のデータ形式に対応
         let processedData: any;
 
-        if (data.start && data.end && typeof data.start === 'object' && typeof data.end === 'object') {
-            // Event型の場合：TimeEntryData型に変換
+        if (data.startDate && data.endDate) {
+            // TimeEntryData型（複製処理で使用）の場合：TimeEntryInput型に変換
+            const start = new Date(`${data.startDate}T${data.startHour}:${data.startMinute}`);
+            const end = new Date(`${data.endDate}T${data.endHour}:${data.endMinute}`);
+
             processedData = {
                 id: data.id,
-                wo: data.workOrder || '',
-                start: data.start,
-                end: data.end,
-                endUser: data.endUser || '',
+                title: '現場作業', // デフォルトタイトル
+                wo: data.wo || '',
+                start: start,
+                end: end,
                 timezone: data.timezone || '',
-                resource: data.resource || '',
-                timeCategory: data.timecategory || '',
-                mainCategory: data.maincategory || '',
-                paymentType: data.paymenttype || '',
-                task: data.task || '',
-                comment: data.comment || '',
+                mainCategory: data.mainCategory || '',
+                timeCategory: data.timeCategory || '',
+                paymentType: data.paymentType || '',
             };
+        } else if (data.start && data.end && typeof data.start === 'object' && typeof data.end === 'object') {
+            // Event型（複製処理）またはTimeEntryModal型（新規・更新）の場合
+            if (data.timecategory !== undefined || data.maincategory !== undefined) {
+                // Event型の場合：TimeEntryInput型に変換
+                processedData = {
+                    id: data.id,
+                    title: '現場作業', // デフォルトタイトル
+                    wo: data.workOrder || '',
+                    start: data.start,
+                    end: data.end,
+                    timezone: data.timezone || '',
+                    mainCategory: data.maincategory || '',
+                    timeCategory: data.timecategory || '',
+                    paymentType: data.paymenttype || '',
+                };
+            } else {
+                // TimeEntryModal型の場合：TimeEntryInput型に変換
+                processedData = {
+                    id: data.id,
+                    title: '現場作業', // デフォルトタイトル
+                    wo: data.wo || '',
+                    start: data.start,
+                    end: data.end,
+                    timezone: data.timezone || '',
+                    mainCategory: data.mainCategory || '',
+                    timeCategory: data.timeCategory || '',
+                    paymentType: data.paymentType || '',
+                };
+            }
         } else {
-            // TimeEntryData型の場合：そのまま使用
+            // その他の場合：そのまま使用
             processedData = data;
         }
 
