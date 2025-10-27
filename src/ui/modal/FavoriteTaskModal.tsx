@@ -73,11 +73,17 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
     }, [subcategories, tasks, t]);
 
     /* =========================================================
-       🔍 検索処理（元のロジックを維持）
+       🔍 検索処理（空検索で全件ヒット）
     ========================================================= */
     const handleSearch = useCallback(() => {
         if (!allCombinations || allCombinations.length === 0) {
             setSearchResults([]);
+            return;
+        }
+
+        // 検索条件が両方とも空の場合は全件表示
+        if (!selectedCategory && !taskName) {
+            setSearchResults(allCombinations);
             return;
         }
 
@@ -161,14 +167,47 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
     }, []);
 
     /* =========================================================
+       初期化処理（モーダルを閉じる時）
+    ========================================================= */
+    const resetModal = useCallback(() => {
+        setSelectedCategory("");
+        setTaskName("");
+        setSearchResults([]);
+        setCheckedResults([]);
+        setCheckedSelected([]);
+        setIsLeftHeaderChecked(false);
+        setIsRightHeaderChecked(false);
+    }, []);
+
+    /* =========================================================
+       クリア処理
+    ========================================================= */
+    const handleClear = useCallback(() => {
+        setSelectedCategory("");
+        setTaskName("");
+        setSearchResults([]);
+        setCheckedResults([]);
+        setIsLeftHeaderChecked(false);
+    }, []);
+
+    /* =========================================================
        保存処理
     ========================================================= */
     const handleSave = useCallback(() => {
         const ids = selectedTasks.map((u) => u.id);
         setFavoriteTasks(selectedTasks);
         onSave(ids);
+        resetModal();
         onClose();
-    }, [selectedTasks, setFavoriteTasks, onSave, onClose]);
+    }, [selectedTasks, setFavoriteTasks, onSave, onClose, resetModal]);
+
+    /* =========================================================
+       モーダルを閉じる処理
+    ========================================================= */
+    const handleClose = useCallback(() => {
+        resetModal();
+        onClose();
+    }, [resetModal, onClose]);
 
     /* =========================================================
        JSX
@@ -191,7 +230,7 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
     return (
         <BaseModal
             isOpen={isOpen}
-            onClose={onClose}
+            onClose={handleClose}
             title={t("favoriteTask.title")}
             description={t("favoriteTask.description")}
             size="large"
@@ -200,7 +239,7 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
                     key="cancel"
                     label={t("favoriteTask.cancel")}
                     color="secondary"
-                    onClick={onClose}
+                    onClick={handleClose}
                 />,
                 <Button
                     key="save"
@@ -230,7 +269,7 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
                             <Button
                                 label={t("favoriteTask.clear")}
                                 color="secondary"
-                                onClick={() => setSelectedCategory("")}
+                                onClick={handleClear}
                             />
                         </div>
                     </div>

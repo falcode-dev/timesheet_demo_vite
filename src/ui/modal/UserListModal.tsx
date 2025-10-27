@@ -49,11 +49,17 @@ export const UserListModal: React.FC<UserListModalProps> = ({
     const [isRightHeaderChecked, setIsRightHeaderChecked] = useState(false);
 
     /* =========================================================
-       検索処理
+       検索処理（空検索で全件ヒット）
     ========================================================= */
     const handleSearch = useCallback(() => {
-        if (!employeeId && !userName) {
+        if (!resources || resources.length === 0) {
             setSearchResults([]);
+            return;
+        }
+
+        // 検索条件が両方とも空の場合は全件表示
+        if (!employeeId && !userName) {
+            setSearchResults(resources);
             return;
         }
 
@@ -134,14 +140,47 @@ export const UserListModal: React.FC<UserListModalProps> = ({
     }, []);
 
     /* =========================================================
+       初期化処理（モーダルを閉じる時）
+    ========================================================= */
+    const resetModal = useCallback(() => {
+        setEmployeeId("");
+        setUserName("");
+        setSearchResults([]);
+        setCheckedResults([]);
+        setCheckedSelected([]);
+        setIsLeftHeaderChecked(false);
+        setIsRightHeaderChecked(false);
+    }, []);
+
+    /* =========================================================
+       クリア処理
+    ========================================================= */
+    const handleClear = useCallback(() => {
+        setEmployeeId("");
+        setUserName("");
+        setSearchResults([]);
+        setCheckedResults([]);
+        setIsLeftHeaderChecked(false);
+    }, []);
+
+    /* =========================================================
        保存処理
     ========================================================= */
     const handleSave = useCallback(() => {
         const ids = selectedUsers.map((u) => u.id);
         setAllowedUsers(ids);
         onSave(ids);
+        resetModal();
         onClose();
-    }, [selectedUsers, setAllowedUsers, onSave, onClose]);
+    }, [selectedUsers, setAllowedUsers, onSave, onClose, resetModal]);
+
+    /* =========================================================
+       モーダルを閉じる処理
+    ========================================================= */
+    const handleClose = useCallback(() => {
+        resetModal();
+        onClose();
+    }, [resetModal, onClose]);
 
     /* =========================================================
        JSX
@@ -149,7 +188,7 @@ export const UserListModal: React.FC<UserListModalProps> = ({
     return (
         <BaseModal
             isOpen={isOpen}
-            onClose={onClose}
+            onClose={handleClose}
             title={t("userList.title")}
             description={t("userList.description")}
             size="large"
@@ -158,7 +197,7 @@ export const UserListModal: React.FC<UserListModalProps> = ({
                     key="cancel"
                     label={t("userList.cancel")}
                     color="secondary"
-                    onClick={onClose}
+                    onClick={handleClose}
                 />,
                 <Button
                     key="save"
@@ -185,7 +224,7 @@ export const UserListModal: React.FC<UserListModalProps> = ({
                             <Button
                                 label={t("userList.clear")}
                                 color="secondary"
-                                onClick={() => setEmployeeId("")}
+                                onClick={handleClear}
                             />
                         </div>
                     </div>
