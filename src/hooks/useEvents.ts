@@ -167,60 +167,7 @@ export const useEvents = (selectedWO: string) => {
 
     /** モーダル送信処理 */
     const handleSubmit = async (data: any) => {
-        // 複数のデータ形式に対応
-        let processedData: any;
-
-        if (data.startDate && data.endDate) {
-            // TimeEntryData型（複製処理で使用）の場合：TimeEntryInput型に変換
-            const start = new Date(`${data.startDate}T${data.startHour}:${data.startMinute}`);
-            const end = new Date(`${data.endDate}T${data.endHour}:${data.endMinute}`);
-
-            processedData = {
-                id: data.id,
-                title: '現場作業', // デフォルトタイトル
-                wo: data.wo || '',
-                start: start,
-                end: end,
-                timezone: data.timezone || '',
-                mainCategory: data.mainCategory || '',
-                timeCategory: data.timeCategory || '',
-                paymentType: data.paymentType || '',
-            };
-        } else if (data.start && data.end && typeof data.start === 'object' && typeof data.end === 'object') {
-            // Event型（複製処理）またはTimeEntryModal型（新規・更新）の場合
-            if (data.timecategory !== undefined || data.maincategory !== undefined) {
-                // Event型の場合：TimeEntryInput型に変換
-                processedData = {
-                    id: data.id,
-                    title: '現場作業', // デフォルトタイトル
-                    wo: data.workOrder || '',
-                    start: data.start,
-                    end: data.end,
-                    timezone: data.timezone || '',
-                    mainCategory: data.maincategory || '',
-                    timeCategory: data.timecategory || '',
-                    paymentType: data.paymenttype || '',
-                };
-            } else {
-                // TimeEntryModal型の場合：TimeEntryInput型に変換
-                processedData = {
-                    id: data.id,
-                    title: '現場作業', // デフォルトタイトル
-                    wo: data.wo || '',
-                    start: data.start,
-                    end: data.end,
-                    timezone: data.timezone || '',
-                    mainCategory: data.mainCategory || '',
-                    timeCategory: data.timeCategory || '',
-                    paymentType: data.paymentType || '',
-                };
-            }
-        } else {
-            // その他の場合：そのまま使用
-            processedData = data;
-        }
-
-        await mutation.mutateAsync(processedData);
+        await mutation.mutateAsync(data);
         await refetch();
     };
 
