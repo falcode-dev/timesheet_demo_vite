@@ -117,10 +117,21 @@ export class ErrorHandler {
 
 /** データ変換ユーティリティ */
 export class DataTransformer {
-    /** Date オブジェクトを ISO 文字列に変換 */
+    /** Date オブジェクトを ISO 文字列に変換（ローカル時間をUTCに正しく変換） */
     public static toIsoString(date?: Date): string {
         if (!date) return '';
-        return date.toISOString();
+
+        // ローカル時間のDateオブジェクトをUTC時間として正しく変換
+        // ユーザーが入力したローカル時間をそのままUTCとして扱う
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+        const milliseconds = String(date.getMilliseconds()).padStart(3, '0');
+
+        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}Z`;
     }
 
     /** 文字列を数値に安全に変換 */
