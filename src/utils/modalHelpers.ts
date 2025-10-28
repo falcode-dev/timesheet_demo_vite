@@ -15,7 +15,8 @@ export const createEventFromDuplicateData = (duplicateData: any): Event => {
     const end = new Date(`${duplicateData.endDate}T${duplicateData.endHour}:${duplicateData.endMinute}`);
 
     return {
-        id: duplicateData.id || `duplicate-${Date.now()}`,
+        // 複製の場合は空文字列でidを設定（新規作成として扱う）
+        id: "",
         start,
         end,
         workOrder: duplicateData.wo,

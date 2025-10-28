@@ -141,6 +141,14 @@ export class DataTransformer {
         return isNaN(num) ? null : num;
     }
 
+    /** オプションセット用の数値変換（0や無効な値は除外） */
+    public static toOptionSetNumber(value: string | number | null | undefined): number | null {
+        if (value === null || value === undefined) return null;
+        const num = Number(value);
+        // 0や無効な値はnullを返す（Dataverseのオプションセットでは通常1から始まる）
+        return (isNaN(num) || num <= 0) ? null : num;
+    }
+
     /** 空文字列を null に変換 */
     public static emptyToNull(value: string | null | undefined): string | null {
         return value === '' ? null : (value ?? null);

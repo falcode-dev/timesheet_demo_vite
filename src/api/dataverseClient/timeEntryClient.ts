@@ -15,6 +15,7 @@ export interface TimeEntryInput {
     title?: string;
     mainCategory?: string | number | null;
     timeCategory?: string | number | null;
+    subcategory?: string | number | null;
     paymentType?: string | number | null;
     timezone?: string | number | null;
     start?: Date;
@@ -27,6 +28,7 @@ export interface TimeEntryRecord extends BaseEntity {
     title: string;
     mainCategory: number | null;
     timeCategory: number | null;
+    subcategory: number | null;
     paymentType: number | null;
     timezone: number | null;
     start: string;
@@ -53,6 +55,7 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
                     'proto_name',
                     'proto_maincategory',
                     'proto_timecategory',
+                    'proto_subcategory',
                     'proto_paymenttype',
                     'proto_timezone',
                     'proto_startdatetime',
@@ -74,10 +77,11 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
                 id: MockDataHelper.generateId('timeentry'),
                 name: data.title || '現場作業',
                 title: data.title || '現場作業',
-                mainCategory: DataTransformer.toNumber(data.mainCategory),
-                timeCategory: DataTransformer.toNumber(data.timeCategory),
-                paymentType: DataTransformer.toNumber(data.paymentType),
-                timezone: DataTransformer.toNumber(data.timezone),
+                mainCategory: DataTransformer.toOptionSetNumber(data.mainCategory),
+                timeCategory: DataTransformer.toOptionSetNumber(data.timeCategory),
+                subcategory: DataTransformer.toOptionSetNumber(data.subcategory),
+                paymentType: DataTransformer.toOptionSetNumber(data.paymentType),
+                timezone: DataTransformer.toOptionSetNumber(data.timezone),
                 start: DataTransformer.toIsoString(data.start),
                 end: DataTransformer.toIsoString(data.end),
                 wo: data.wo
@@ -88,10 +92,11 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
         return await this.executeDataverseOperation(async () => {
             const payload: any = {
                 proto_name: data.title || '現場作業',
-                proto_maincategory: DataTransformer.toNumber(data.mainCategory),
-                proto_timecategory: DataTransformer.toNumber(data.timeCategory),
-                proto_paymenttype: DataTransformer.toNumber(data.paymentType),
-                proto_timezone: DataTransformer.toNumber(data.timezone),
+                proto_maincategory: DataTransformer.toOptionSetNumber(data.mainCategory),
+                proto_timecategory: DataTransformer.toOptionSetNumber(data.timeCategory),
+                proto_subcategory: DataTransformer.toOptionSetNumber(data.subcategory),
+                proto_paymenttype: DataTransformer.toOptionSetNumber(data.paymentType),
+                proto_timezone: DataTransformer.toOptionSetNumber(data.timezone),
                 proto_startdatetime: DataTransformer.toIsoString(data.start),
                 proto_enddatetime: DataTransformer.toIsoString(data.end)
             };
@@ -105,10 +110,11 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
                 id: result.id,
                 name: data.title || '現場作業',
                 title: data.title || '現場作業',
-                mainCategory: DataTransformer.toNumber(data.mainCategory),
-                timeCategory: DataTransformer.toNumber(data.timeCategory),
-                paymentType: DataTransformer.toNumber(data.paymentType),
-                timezone: DataTransformer.toNumber(data.timezone),
+                mainCategory: DataTransformer.toOptionSetNumber(data.mainCategory),
+                timeCategory: DataTransformer.toOptionSetNumber(data.timeCategory),
+                subcategory: DataTransformer.toOptionSetNumber(data.subcategory),
+                paymentType: DataTransformer.toOptionSetNumber(data.paymentType),
+                timezone: DataTransformer.toOptionSetNumber(data.timezone),
                 start: DataTransformer.toIsoString(data.start),
                 end: DataTransformer.toIsoString(data.end),
                 wo: data.wo
@@ -127,10 +133,11 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
         return await this.executeDataverseOperation(async () => {
             const payload: any = {};
             if (data.title !== undefined) payload.proto_name = data.title;
-            if (data.mainCategory !== undefined) payload.proto_maincategory = DataTransformer.toNumber(data.mainCategory);
-            if (data.timeCategory !== undefined) payload.proto_timecategory = DataTransformer.toNumber(data.timeCategory);
-            if (data.paymentType !== undefined) payload.proto_paymenttype = DataTransformer.toNumber(data.paymentType);
-            if (data.timezone !== undefined) payload.proto_timezone = DataTransformer.toNumber(data.timezone);
+            if (data.mainCategory !== undefined) payload.proto_maincategory = DataTransformer.toOptionSetNumber(data.mainCategory);
+            if (data.timeCategory !== undefined) payload.proto_timecategory = DataTransformer.toOptionSetNumber(data.timeCategory);
+            if (data.subcategory !== undefined) payload.proto_subcategory = DataTransformer.toOptionSetNumber(data.subcategory);
+            if (data.paymentType !== undefined) payload.proto_paymenttype = DataTransformer.toOptionSetNumber(data.paymentType);
+            if (data.timezone !== undefined) payload.proto_timezone = DataTransformer.toOptionSetNumber(data.timezone);
             if (data.start !== undefined) payload.proto_startdatetime = DataTransformer.toIsoString(data.start);
             if (data.end !== undefined) payload.proto_enddatetime = DataTransformer.toIsoString(data.end);
             if (data.wo !== undefined) {
@@ -171,6 +178,7 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
             title: record.proto_name || '',
             mainCategory: record.proto_maincategory,
             timeCategory: record.proto_timecategory,
+            subcategory: record.proto_subcategory,
             paymentType: record.proto_paymenttype,
             timezone: record.proto_timezone,
             start: record.proto_startdatetime || '',

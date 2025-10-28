@@ -12,6 +12,7 @@ export type EventData = {
     workOrderId: string;
     maincategory?: number;
     timecategory?: number;
+    subcategory?: number;
     paymenttype?: number;
     timezone?: string;
     extendedProps?: Record<string, any>;
@@ -56,7 +57,7 @@ const fetchEvents = async (): Promise<EventData[]> => {
         `&$filter=_createdby_value eq ${userId}` +
         `&$expand=${navigationName}(` +
         `$select=proto_timeentryid,proto_name,proto_startdatetime,proto_enddatetime,` +
-        `proto_maincategory,proto_paymenttype,proto_timecategory,proto_timezone)`;
+        `proto_maincategory,proto_paymenttype,proto_timecategory,proto_subcategory,proto_timezone)`;
 
     const result = await xrm.WebApi.retrieveMultipleRecords(entityName, query);
 
@@ -70,6 +71,7 @@ const fetchEvents = async (): Promise<EventData[]> => {
             workOrderId: wo.proto_workorderid,
             maincategory: t.proto_maincategory,
             timecategory: t.proto_timecategory,
+            subcategory: t.proto_subcategory,
             paymenttype: t.proto_paymenttype,
             timezone: t.proto_timezone ?? null,
             extendedProps: {
@@ -97,6 +99,7 @@ const fetchEventDetail = async (id: string, allEvents: EventData[]) => {
         end: new Date(event.end),
         maincategory: event.maincategory?.toString(),
         timecategory: event.timecategory?.toString(),
+        subcategory: event.subcategory?.toString(),
         paymenttype: event.paymenttype?.toString(),
         timezone: event.timezone,
         workOrder: event.workOrderId,
@@ -133,7 +136,8 @@ export const useEvents = (selectedWO: string) => {
     /** 登録・更新処理 */
     const mutation = useMutation({
         mutationFn: async (data: any) => {
-            const isUpdate = !!data.id;
+            // 複製の場合は常に新規作成として扱う
+            const isUpdate = !!data.id && data.id !== "" && !data.isDuplicate;
 
             // Dataverse 環境
             if (xrm) {

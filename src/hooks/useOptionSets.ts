@@ -8,22 +8,37 @@ import { optionSetClient } from "../api/dataverseClient/optionSetClient";
 const fetchOptionSets = async (): Promise<{
     maincategory?: { value: string; label: string }[];
     timecategory?: { value: string; label: string }[];
+    subcategory?: { value: string; label: string }[];
     paymenttype?: { value: string; label: string }[];
     timezone?: { value: string; label: string }[];
 }> => {
-    const [maincategory, timecategory, paymenttype, timezone] = await Promise.all([
-        optionSetClient.getOptionSets("proto_timeentry", ["proto_maincategory"]),
-        optionSetClient.getOptionSets("proto_timeentry", ["proto_timecategory"]),
-        optionSetClient.getOptionSets("proto_timeentry", ["proto_paymenttype"]),
-        optionSetClient.getProtoTimeEntryTimeZones(),
-    ]);
+    try {
+        const [maincategory, timecategory, subcategory, paymenttype, timezone] = await Promise.all([
+            optionSetClient.getOptionSets("proto_timeentry", ["proto_maincategory"]),
+            optionSetClient.getOptionSets("proto_timeentry", ["proto_timecategory"]),
+            optionSetClient.getOptionSets("proto_timeentry", ["proto_subcategory"]),
+            optionSetClient.getOptionSets("proto_timeentry", ["proto_paymenttype"]),
+            optionSetClient.getProtoTimeEntryTimeZones(),
+        ]);
 
-    return {
-        maincategory: maincategory["proto_maincategory"] ?? [],
-        timecategory: timecategory["proto_timecategory"] ?? [],
-        paymenttype: paymenttype["proto_paymenttype"] ?? [],
-        timezone,
-    };
+        return {
+            maincategory: maincategory["proto_maincategory"] ?? [],
+            timecategory: timecategory["proto_timecategory"] ?? [],
+            subcategory: subcategory["proto_subcategory"] ?? [],
+            paymenttype: paymenttype["proto_paymenttype"] ?? [],
+            timezone: timezone ?? [],
+        };
+    } catch (error) {
+        console.warn("OptionSetの取得に失敗しました:", error);
+        // エラーが発生した場合は空の配列を返す
+        return {
+            maincategory: [],
+            timecategory: [],
+            subcategory: [],
+            paymenttype: [],
+            timezone: [],
+        };
+    }
 };
 
 /**

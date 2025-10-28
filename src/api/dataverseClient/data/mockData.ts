@@ -101,6 +101,14 @@ export const MOCK_OPTION_SETS = {
         { value: "3", label: "休日出勤" },
         { value: "4", label: "有給休暇" }
     ],
+    subcategory: [
+        { value: "1", label: "教育・研修" },
+        { value: "2", label: "品質改善" },
+        { value: "3", label: "業務効率化" },
+        { value: "4", label: "システム開発" },
+        { value: "5", label: "顧客対応" },
+        { value: "6", label: "会議・打ち合わせ" }
+    ],
     paymentType: [
         { value: "1", label: "有償" },
         { value: "2", label: "無償" },
@@ -116,6 +124,7 @@ export const MOCK_TIME_ENTRIES = [
         title: "システム開発",
         mainCategory: 1,
         timeCategory: 1,
+        subcategory: 4,
         paymentType: 1,
         timezone: 1,
         start: "2024-01-15T09:00:00",
@@ -128,6 +137,7 @@ export const MOCK_TIME_ENTRIES = [
         title: "コードレビュー",
         mainCategory: 1,
         timeCategory: 2,
+        subcategory: 4,
         paymentType: 1,
         timezone: 1,
         start: "2024-01-15T19:00:00",
