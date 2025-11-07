@@ -95,18 +95,46 @@
 .calendar-wrapper.is-subgrid {
     min-height: 400px;
     max-height: 600px;
-    height: auto;
+    height: 600px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .calendar-wrapper.is-subgrid .fc {
-    height: auto;
+    height: 100%;
 }
 
 .calendar-wrapper.is-subgrid .fc-view-harness,
-.calendar-wrapper.is-subgrid .fc-view-harness-active,
+.calendar-wrapper.is-subgrid .fc-view-harness-active {
+    height: 100% !important;
+}
+
+/* サブグリッドの場合、スクロールを有効化 */
 .calendar-wrapper.is-subgrid .fc-scroller {
-    height: auto !important;
-    max-height: 550px;
+    height: 100% !important;
+    max-height: none;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -ms-overflow-style: auto !important;
+    scrollbar-width: thin !important;
+}
+
+.calendar-wrapper.is-subgrid .fc-scroller::-webkit-scrollbar {
+    display: block !important;
+    width: 8px;
+}
+
+.calendar-wrapper.is-subgrid .fc-scroller::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.calendar-wrapper.is-subgrid .fc-scroller::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.calendar-wrapper.is-subgrid .fc-scroller::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }
 
 /* =============================

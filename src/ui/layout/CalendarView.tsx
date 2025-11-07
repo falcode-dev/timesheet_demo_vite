@@ -116,7 +116,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 events={events}
                 allDaySlot={false}
                 slotDuration="00:30:00"
-                height={isSubgrid ? "auto" : "100%"}
+                height={isSubgrid ? "600px" : "100%"}
                 nowIndicator
                 slotMinTime="00:00:00"
                 slotMaxTime="24:00:00"
