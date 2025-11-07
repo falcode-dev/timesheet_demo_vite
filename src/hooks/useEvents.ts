@@ -109,7 +109,7 @@ const fetchEventDetail = async (id: string, allEvents: EventData[]) => {
 /**
  * イベント一覧・登録・更新・詳細取得を統合管理するフック
  */
-export const useEvents = (selectedWO: string) => {
+export const useEvents = (selectedWO: string, isSubgrid: boolean = false) => {
     const queryClient = useQueryClient();
     const xrm = getXrm();
 
@@ -124,8 +124,13 @@ export const useEvents = (selectedWO: string) => {
         queryFn: fetchEvents,
     });
 
+    /** サブグリッドの場合、選択中の WorkOrder に一致するイベントのみをフィルタリング */
+    const filteredEvents = isSubgrid && selectedWO !== "all"
+        ? allEvents.filter((e) => e.workOrderId === selectedWO)
+        : allEvents;
+
     /** 選択中の WorkOrder に対応するイベントを強調 */
-    const events = allEvents.map((e) => ({
+    const events = filteredEvents.map((e) => ({
         ...e,
         extendedProps: {
             ...e.extendedProps,

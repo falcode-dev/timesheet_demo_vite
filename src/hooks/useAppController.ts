@@ -42,7 +42,7 @@ export const useAppController = () => {
     } = appState;
 
     /** イベント関連フック */
-    const { events, isLoading: evLoading } = useEvents(selectedWO);
+    const { events, isLoading: evLoading } = useEvents(selectedWO, isSubgrid);
 
     /** カレンダー操作ハンドラ（前・次・今日） */
     const { handlePrev, handleNext, handleToday } = useCalendarController(viewMode, setCurrentDate);
