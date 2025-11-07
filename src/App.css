@@ -282,6 +282,13 @@ body,
     min-height: 600px;
 }
 
+/* サブグリッドの場合、コンテンツエリアの高さを調整 */
+.app-container.is-subgrid-mode .content-middle,
+.app-container.is-subgrid-mode .content-main {
+    min-height: auto;
+    max-height: 600px;
+}
+
 /* =============================
    レスポンシブ対応
 ============================= */

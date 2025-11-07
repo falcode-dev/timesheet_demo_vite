@@ -26,6 +26,7 @@ export type CalendarViewProps = {
         extendedProps?: Record<string, any>;
     }) => void;
     events: EventInput[];
+    isSubgrid?: boolean;
 };
 
 /**
@@ -41,6 +42,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
     onDateClick,
     onEventClick,
     events,
+    isSubgrid = false,
 }) => {
     const calendarRef = useRef<FullCalendar>(null);
     const { i18n } = useTranslation();
@@ -101,7 +103,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
     };
 
     return (
-        <div className="calendar-wrapper">
+        <div className={`calendar-wrapper ${isSubgrid ? 'is-subgrid' : ''}`}>
             <FullCalendar
                 ref={calendarRef}
                 plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
@@ -114,7 +116,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 events={events}
                 allDaySlot={false}
                 slotDuration="00:30:00"
-                height="100%"
+                height={isSubgrid ? "auto" : "100%"}
                 nowIndicator
                 slotMinTime="00:00:00"
                 slotMaxTime="24:00:00"

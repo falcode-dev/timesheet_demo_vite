@@ -86,6 +86,29 @@
     background-color: var(--main-color) !important;
 }
 
+/* サブグリッドの場合、すべてのイベントを濃く表示 */
+.calendar-wrapper.is-subgrid .fc .fc-event {
+    background-color: var(--main-color) !important;
+}
+
+/* サブグリッドの場合、高さを適切に調整 */
+.calendar-wrapper.is-subgrid {
+    min-height: 400px;
+    max-height: 600px;
+    height: auto;
+}
+
+.calendar-wrapper.is-subgrid .fc {
+    height: auto;
+}
+
+.calendar-wrapper.is-subgrid .fc-view-harness,
+.calendar-wrapper.is-subgrid .fc-view-harness-active,
+.calendar-wrapper.is-subgrid .fc-scroller {
+    height: auto !important;
+    max-height: 550px;
+}
+
 /* =============================
    日付・枠線
 ============================= */

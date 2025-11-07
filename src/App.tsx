@@ -65,7 +65,7 @@ function TimesheetApp() {
   const formattedToday = formatToday();
 
   return (
-    <div className="app-container">
+    <div className={`app-container ${isSubgrid ? 'is-subgrid-mode' : ''}`}>
       {/* ヘッダー（サブグリッドの場合は非表示） */}
       {!isSubgrid && (
         <Header
@@ -107,6 +107,7 @@ function TimesheetApp() {
               }}
               onEventClick={handleEventClick}
               events={events}
+              isSubgrid={isSubgrid}
             />
           </div>
         </div>
