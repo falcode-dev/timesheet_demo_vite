@@ -27,6 +27,8 @@ export interface TimeEntryModalProps {
     paymenttypeOptions: Option[];
     timecategoryOptions: Option[];
     timezoneOptions: Option[];
+    isSubgrid?: boolean;
+    selectedWO?: string;
 }
 
 /* =========================================================
@@ -45,6 +47,8 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
     paymenttypeOptions,
     timecategoryOptions,
     timezoneOptions,
+    isSubgrid = false,
+    selectedWO = "",
 }) => {
     const { t } = useTranslation();
 
@@ -172,7 +176,8 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setEndHour(String(end.getHours()).padStart(2, "0"));
             setEndMinute(String(end.getMinutes()).padStart(2, "0"));
 
-            setWo("");
+            // サブグリッドの場合、selectedWOを自動設定
+            setWo(isSubgrid && selectedWO ? selectedWO : "");
             setEndUser("");
             setTimezone("235");
             setTimeCategory("");
@@ -182,7 +187,7 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
             setComment("");
             setResource("");
         }
-    }, [isOpen, selectedEvent, selectedDateTime]);
+    }, [isOpen, selectedEvent, selectedDateTime, isSubgrid, selectedWO]);
 
     /* -------------------------------
        💾 保存処理
@@ -337,13 +342,18 @@ export const TimeEntryModal: React.FC<TimeEntryModalProps> = ({
                 size="large"
             >
                 <div className="timeentry-modal-body">
-                    <label className="modal-label">{t("timeEntryModal.woNumber")}</label>
-                    <Select
-                        options={filteredWoOptions}
-                        value={wo}
-                        onChange={setWo}
-                        placeholder={t("timeEntryModal.placeholders.selectWO")}
-                    />
+                    {/* WO番号選択（サブグリッドの場合は非表示） */}
+                    {!isSubgrid && (
+                        <>
+                            <label className="modal-label">{t("timeEntryModal.woNumber")}</label>
+                            <Select
+                                options={filteredWoOptions}
+                                value={wo}
+                                onChange={setWo}
+                                placeholder={t("timeEntryModal.placeholders.selectWO")}
+                            />
+                        </>
+                    )}
 
                     <div className="modal-grid">
                         <div>

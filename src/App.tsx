@@ -58,6 +58,7 @@ function TimesheetApp() {
     handlePrev,
     handleNext,
     handleToday,
+    isSubgrid,
   } = useAppController();
 
   /** 今日の日付フォーマット（例：2025/10/14） */
@@ -65,12 +66,14 @@ function TimesheetApp() {
 
   return (
     <div className="app-container">
-      {/* ヘッダー */}
-      <Header
-        workOrders={workOrders}
-        selectedWO={selectedWO}
-        setSelectedWO={setSelectedWO}
-      />
+      {/* ヘッダー（サブグリッドの場合は非表示） */}
+      {!isSubgrid && (
+        <Header
+          workOrders={workOrders}
+          selectedWO={selectedWO}
+          setSelectedWO={setSelectedWO}
+        />
+      )}
 
       {/* メインコンテンツ */}
       <section className="content-card">
@@ -129,6 +132,8 @@ function TimesheetApp() {
         timecategoryOptions={optionSets?.timecategory ?? []}
         paymenttypeOptions={optionSets?.paymenttype ?? []}
         timezoneOptions={optionSets?.timezone ?? []}
+        isSubgrid={isSubgrid}
+        selectedWO={selectedWO}
       />
 
       <FavoriteTaskModal

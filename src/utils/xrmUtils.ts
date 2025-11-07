@@ -39,3 +39,55 @@ export const getXrm = (): any | null => {
         return null;
     }
 };
+
+/**
+ * サブグリッドで表示されているかどうかを判定する関数
+ * 
+ * サブグリッドで表示される場合、Xrm.Page.data.entity が存在し、
+ * エンティティ名が "proto_workorder" であることを確認します。
+ * 
+ * 【戻り値】
+ * - true: サブグリッドで表示されている場合
+ * - false: 通常のWEBリソースとして表示されている場合、またはXrmが取得できない場合
+ */
+export const isSubgridContext = (): boolean => {
+    try {
+        const xrm = getXrm();
+        if (!xrm || !xrm.Page || !xrm.Page.data || !xrm.Page.data.entity) {
+            return false;
+        }
+
+        const entityName = xrm.Page.data.entity.getEntityName();
+        return entityName === "proto_workorder";
+    } catch (err) {
+        console.error("サブグリッド判定中にエラーが発生しました。：", err);
+        return false;
+    }
+};
+
+/**
+ * サブグリッドで表示されている場合、親レコード（proto_workorder）のIDを取得する関数
+ * 
+ * 【戻り値】
+ * - 親レコードID（取得成功時、GUID形式）
+ * - null（サブグリッドでない場合、または取得できなかった場合）
+ */
+export const getParentWorkOrderId = (): string | null => {
+    try {
+        if (!isSubgridContext()) {
+            return null;
+        }
+
+        const xrm = getXrm();
+        if (!xrm || !xrm.Page || !xrm.Page.data || !xrm.Page.data.entity) {
+            return null;
+        }
+
+        const recordId = xrm.Page.data.entity.getId();
+        // GUID形式のIDから波括弧を除去
+        return recordId.replace(/[{}]/g, "") || null;
+    } catch (err) {
+        console.error("親レコードID取得中にエラーが発生しました。：", err);
+        return null;
+    }
+};

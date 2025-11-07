@@ -38,6 +38,7 @@ export const useAppController = () => {
         setIsFavoriteTaskModalOpen,
         isUserListModalOpen,
         setIsUserListModalOpen,
+        isSubgrid,
     } = appState;
 
     /** イベント関連フック */
@@ -86,6 +87,7 @@ export const useAppController = () => {
         setSelectedDateTime,
         selectedEvent,
         setSelectedEvent,
+        isSubgrid,
 
         // 操作ハンドラ
         ...timeEntryActions,
