@@ -52,7 +52,8 @@ export const useAppController = () => {
         selectedWO,
         setIsTimeEntryModalOpen,
         setSelectedEvent,
-        setSelectedDateTime
+        setSelectedDateTime,
+        isSubgrid
     );
 
     /** モーダル関連アクション */

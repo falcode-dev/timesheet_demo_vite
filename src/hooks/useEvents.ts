@@ -20,16 +20,23 @@ export type EventData = {
 
 /**
  * Dataverse またはローカルモックからイベント一覧を取得
+ * @param workOrderId 特定のWorkOrderのID（サブグリッドの場合に指定）
  */
-const fetchEvents = async (): Promise<EventData[]> => {
+const fetchEvents = async (workOrderId?: string): Promise<EventData[]> => {
     const xrm = getXrm();
 
     // ローカル環境（モックデータ）
     if (!xrm) {
         const localMock = JSON.parse(localStorage.getItem("mockEvents") || "[]");
-        if (localMock.length > 0) return localMock;
+        if (localMock.length > 0) {
+            // workOrderIdが指定されている場合、フィルタリング
+            if (workOrderId) {
+                return localMock.filter((e: EventData) => e.workOrderId === workOrderId);
+            }
+            return localMock;
+        }
 
-        return [
+        const mockEvents = [
             {
                 id: "1",
                 title: "モック会議",
@@ -45,6 +52,12 @@ const fetchEvents = async (): Promise<EventData[]> => {
                 workOrderId: "wo-002",
             },
         ];
+
+        // workOrderIdが指定されている場合、フィルタリング
+        if (workOrderId) {
+            return mockEvents.filter((e) => e.workOrderId === workOrderId);
+        }
+        return mockEvents;
     }
 
     // Dataverse 環境
@@ -52,9 +65,15 @@ const fetchEvents = async (): Promise<EventData[]> => {
     const navigationName = "proto_timeentry_wonumber_proto_workorder";
     const userId = xrm.Utility.getGlobalContext().userSettings.userId.replace(/[{}]/g, "");
 
+    // workOrderIdが指定されている場合（サブグリッド）、特定のWorkOrderのみを取得
+    let filter = `_createdby_value eq ${userId}`;
+    if (workOrderId) {
+        filter = `proto_workorderid eq ${workOrderId}`;
+    }
+
     const query =
         `?$select=proto_workorderid,proto_wonumber` +
-        `&$filter=_createdby_value eq ${userId}` +
+        `&$filter=${filter}` +
         `&$expand=${navigationName}(` +
         `$select=proto_timeentryid,proto_name,proto_startdatetime,proto_enddatetime,` +
         `proto_maincategory,proto_paymenttype,proto_timecategory,proto_subcategory,proto_timezone)`;
@@ -113,6 +132,9 @@ export const useEvents = (selectedWO: string, isSubgrid: boolean = false) => {
     const queryClient = useQueryClient();
     const xrm = getXrm();
 
+    /** サブグリッドの場合、特定のWorkOrderのイベントのみを取得 */
+    const workOrderIdForQuery = isSubgrid && selectedWO !== "all" ? selectedWO : undefined;
+
     /** イベント一覧取得 */
     const {
         data: allEvents = [],
@@ -120,17 +142,12 @@ export const useEvents = (selectedWO: string, isSubgrid: boolean = false) => {
         isError,
         refetch,
     } = useQuery({
-        queryKey: ["events"],
-        queryFn: fetchEvents,
+        queryKey: ["events", workOrderIdForQuery, isSubgrid],
+        queryFn: () => fetchEvents(workOrderIdForQuery),
     });
 
-    /** サブグリッドの場合、選択中の WorkOrder に一致するイベントのみをフィルタリング */
-    const filteredEvents = isSubgrid && selectedWO !== "all"
-        ? allEvents.filter((e) => e.workOrderId === selectedWO)
-        : allEvents;
-
     /** 選択中の WorkOrder に対応するイベントを強調 */
-    const events = filteredEvents.map((e) => ({
+    const events = allEvents.map((e) => ({
         ...e,
         extendedProps: {
             ...e.extendedProps,
@@ -165,8 +182,9 @@ export const useEvents = (selectedWO: string, isSubgrid: boolean = false) => {
             return true;
         },
         onSuccess: async () => {
+            // すべてのイベントクエリを無効化（サブグリッド/通常表示両方）
             await queryClient.invalidateQueries({ queryKey: ["events"] });
-            await queryClient.refetchQueries({ queryKey: ["events"] });
+            await refetch();
         },
         onError: (err) => {
             console.error("TimeEntry登録/更新失敗:", err);

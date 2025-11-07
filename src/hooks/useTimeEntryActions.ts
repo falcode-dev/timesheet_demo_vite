@@ -13,9 +13,10 @@ export const useTimeEntryActions = (
     selectedWO: string,
     setIsTimeEntryModalOpen: (open: boolean) => void,
     setSelectedEvent: (event: Event | null) => void,
-    setSelectedDateTime: (range: { start: Date; end: Date } | null) => void
+    setSelectedDateTime: (range: { start: Date; end: Date } | null) => void,
+    isSubgrid: boolean = false
 ) => {
-    const { createOrUpdateEvent, refetchEvents, fetchEventDetail } = useEvents(selectedWO);
+    const { createOrUpdateEvent, refetchEvents, fetchEventDetail } = useEvents(selectedWO, isSubgrid);
 
     /** タイムエントリ登録・更新処理 */
     const handleTimeEntrySubmit = async (data: TimeEntryData) => {
