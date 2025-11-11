@@ -16,7 +16,7 @@
         "createNew": "Create Time Entry",
         "viewMode": {
             "day": "Day",
-            "threeDays": "3Days",
+            "threeDays": "3days",
             "week": "Week"
         }
     },
@@ -53,16 +53,16 @@
     },
     "timeEntryModal": {
         "titleCreate": "Create Time Entry",
-        "titleEdit": "Edit Time Entry",
-        "titleDuplicate": "Duplicate",
+        "titleEdit": "Edit",
+        "titleDuplicate": "Copy",
         "descCreate": "Please enter the basic information for the Time entry and press Create.",
         "descEdit": "Please edit the Time entry and press Save.",
-        "descDuplicate": "Please edit the duplicated Time entry.",
+        "descDuplicate": "Duplicate the Time entry. Please edit the basic information and press Save.",
         "create": "Create",
-        "update": "Update",
+        "update": "Save",
         "cancel": "Cancel",
         "delete": "Delete",
-        "duplicate": "Duplicate",
+        "duplicate": "Copy",
         "woNumber": "Work Order No.",
         "selectWO": "Select Work Order No.",
         "startDate": "Start Time",
@@ -104,7 +104,7 @@
         }
     },
     "confirmDeleteModal": {
-        "title": "Confirm Deletion"
+        "title": "Delete"
     },
     "favoriteTask": {
         "title": "Register Favorite Task",
@@ -114,7 +114,7 @@
         "subCategory": "Subcategory",
         "selectSubCategory": "Please select a subcategory",
         "clear": "Clear",
-        "taskName": "Subcategory",
+        "taskName": "Task",
         "enterTaskName": "Please enter a task",
         "search": "Search",
         "instructions": "Select an item from the search results, then add it and press Save button.",

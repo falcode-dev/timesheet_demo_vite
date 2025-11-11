@@ -314,7 +314,7 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
                                     className="subheader-checkbox"
                                 />
                                 <FaIcons.FaChevronDown className="task-icon" />
-                                <span className="label-text">{t("favoriteTask.taskName")}</span>
+                                <span className="label-text">{t("favoriteTask.subCategory")}</span>
                             </div>
                         </div>
 
@@ -371,7 +371,7 @@ export const FavoriteTaskModal: React.FC<FavoriteTaskModalProps> = ({
                                     className="subheader-checkbox"
                                 />
                                 <FaIcons.FaChevronDown className="task-icon" />
-                                <span className="label-text">{t("favoriteTask.taskName")}</span>
+                                <span className="label-text">{t("favoriteTask.subCategory")}</span>
                             </div>
                             {selectedTasks.length > 0 && (
                                 <Button
