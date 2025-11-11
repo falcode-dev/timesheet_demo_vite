@@ -42,13 +42,13 @@ export const Header: React.FC<HeaderProps> = ({
                     placeholder={t("header.selectWO")}
                 />
 
-                <Button
+                {/* <Button
                     label={t("header.upload")}
                     color="secondary"
                     icon={<FaIcons.FaUpload />}
                     className="upload-button"
                     onClick={() => console.log("アップロード処理")}
-                />
+                /> */}
             </div>
         </header>
     );
