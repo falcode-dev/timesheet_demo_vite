@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getXrm } from "../utils/xrmUtils";
 import { dataverseClient } from "../api/dataverseClient";
-import { fromUtcToJst } from "../utils/dateUtils";
 
 /** イベントデータ型 */
 export type EventData = {
@@ -81,12 +80,14 @@ const fetchEvents = async (workOrderId?: string): Promise<EventData[]> => {
     const result = await xrm.WebApi.retrieveMultipleRecords(entityName, query);
 
     // データ整形
+    // FullCalendarはUTCのISO文字列を自動的にローカル時間（JST）に変換して表示するため、
+    // Dataverseから取得したUTC時間をそのまま使用する
     return result.entities.flatMap((wo: any) =>
         (wo[navigationName] || []).map((t: any) => ({
             id: t.proto_timeentryid,
             title: t.proto_name || "作業",
-            start: fromUtcToJst(t.proto_startdatetime),
-            end: fromUtcToJst(t.proto_enddatetime),
+            start: t.proto_startdatetime,
+            end: t.proto_enddatetime,
             workOrderId: wo.proto_workorderid,
             maincategory: t.proto_maincategory,
             timecategory: t.proto_timecategory,

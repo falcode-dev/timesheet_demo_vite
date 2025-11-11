@@ -121,17 +121,9 @@ export class DataTransformer {
     public static toIsoString(date?: Date): string {
         if (!date) return '';
 
-        // ローカル時間のDateオブジェクトをUTC時間として正しく変換
-        // ユーザーが入力したローカル時間をそのままUTCとして扱う
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
-        const seconds = String(date.getSeconds()).padStart(2, '0');
-        const milliseconds = String(date.getMilliseconds()).padStart(3, '0');
-
-        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}Z`;
+        // ローカル時間のDateオブジェクトをUTCに正しく変換
+        // toISOString()は自動的にローカル時間をUTCに変換する
+        return date.toISOString();
     }
 
     /** 文字列を数値に安全に変換 */
