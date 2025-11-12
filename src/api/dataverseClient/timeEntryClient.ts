@@ -75,8 +75,8 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
         if (this.isLocalEnvironment()) {
             const newTimeEntry: TimeEntryRecord = {
                 id: MockDataHelper.generateId('timeentry'),
-                name: data.title || '現場作業',
-                title: data.title || '現場作業',
+                name: data.title || 'Onsite Work',
+                title: data.title || 'Onsite Work',
                 mainCategory: DataTransformer.toOptionSetNumber(data.mainCategory),
                 timeCategory: DataTransformer.toOptionSetNumber(data.timeCategory),
                 subcategory: DataTransformer.toOptionSetNumber(data.subcategory),
@@ -91,7 +91,7 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
 
         return await this.executeDataverseOperation(async () => {
             const payload: any = {
-                proto_name: data.title || '現場作業',
+                proto_name: data.title || 'Onsite Work',
                 proto_maincategory: DataTransformer.toOptionSetNumber(data.mainCategory),
                 proto_timecategory: DataTransformer.toOptionSetNumber(data.timeCategory),
                 proto_subcategory: DataTransformer.toOptionSetNumber(data.subcategory),
@@ -108,8 +108,8 @@ export class TimeEntryClient extends BaseClient<TimeEntryRecord, TimeEntryInput>
             const result = await this.getXrm().WebApi.createRecord(this.entityName, payload);
             return {
                 id: result.id,
-                name: data.title || '現場作業',
-                title: data.title || '現場作業',
+                name: data.title || 'Onsite Work',
+                title: data.title || 'Onsite Work',
                 mainCategory: DataTransformer.toOptionSetNumber(data.mainCategory),
                 timeCategory: DataTransformer.toOptionSetNumber(data.timeCategory),
                 subcategory: DataTransformer.toOptionSetNumber(data.subcategory),
